@@ -51,3 +51,18 @@ To prevent temporary build files (like `bin/`, `obj/`) or local configuration fi
 cd DotNetMvcWeb
 dotnet new gitignore
 ```
+
+## Architecture Concepts: MVC vs. Razor Pages
+
+In .NET web development, two common architectural patterns are **MVC (Model-View-Controller)** and **Razor Pages**:
+
+- **Razor Pages**:
+  - **Page-Focused**: Each web page has a corresponding backend code-behind file (PageModel). It keeps related code and markup organized together.
+  - **When to use**: Ideal for most standard web applications, simple form-driven sites, and scenarios where the data flow is straightforward.
+
+- **MVC (Model-View-Controller)**:
+  - **Separation of Concerns**: Strictly divides the application into three interconnected components: Models (data and business logic), Views (UI), and Controllers (handles requests and coordinates between Models and Views).
+  - **When to use**:
+    1. **Large and complex applications**: When the project scale requires a strict architectural pattern to maintain order and structure.
+    2. **Complex routing requirements**: MVC provides extensive and highly customizable routing capabilities.
+    3. **Divided team roles**: Front-end developers can focus on Views, while back-end developers can focus on Controllers and Models without interfering with each other.

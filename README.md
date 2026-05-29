@@ -51,3 +51,18 @@ dotnet new mvc -n DotNetMvcWeb
 cd DotNetMvcWeb
 dotnet new gitignore
 ```
+
+## 架構概念：MVC 與 Razor Pages 的差異
+
+在 .NET 網頁開發中，常見的兩種架構模式為 **MVC (Model-View-Controller)** 與 **Razor Pages**：
+
+- **Razor Pages**:
+  - **以「頁面」為中心 (Page-Focused)**：每個頁面 (Page) 都有對應的後端程式碼 (PageModel)，職責清晰且檔案結構集中。
+  - **適合場景**：適合大部分標準的 Web 應用程式、簡單的表單處理、以及資料流較為單純的情境。
+
+- **MVC (Model-View-Controller)**:
+  - **職責分離 (Separation of Concerns)**：將應用程式嚴格劃分為模型 (資料與商業邏輯)、視圖 (UI 呈現) 及控制器 (處理請求並溝通 Model 與 View)。
+  - **適合場景**：
+    1. **大型且複雜的應用程式**：當專案規模龐大，需要嚴謹的架構來劃分各組件時。
+    2. **高度客製化或複雜的路由需求**：MVC 支援非常彈性的路由設計。
+    3. **已有明確分工的開發團隊**：前端與後端開發者可以各自專注於 View 與 Controller/Model 的開發，互不干擾。
