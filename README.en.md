@@ -21,8 +21,15 @@ You can run this project using the .NET CLI in your terminal. Please ensure you 
    ```
 
 3. **Run the project**:
+   - **Normal Run Mode:**
    ```bash
    dotnet run
+   ```
+
+   - **Developer Mode (Hot Reload):**
+   (Recommended for development. When you modify and save the code, the API server will automatically reload without requiring a manual restart.)
+   ```bash
+   dotnet watch run
    ```
 
 4. **Browse the website**:
