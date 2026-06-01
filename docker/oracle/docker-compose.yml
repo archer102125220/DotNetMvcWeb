@@ -10,5 +10,7 @@ services:
       ORACLE_PWD: OracleFreeAbc123
     volumes:
       - dot-net-mvc-oracle-data:/opt/oracle/oradata
+      # 將初始化腳本掛載到啟動資料夾，容器啟動時會自動執行 (若是首次建立)
+      - ./init.sql:/opt/oracle/scripts/startup/01_init.sql
 volumes:
   dot-net-mvc-oracle-data:
