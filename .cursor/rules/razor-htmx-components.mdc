@@ -1,0 +1,29 @@
+---
+description: Component Architecture - HTMX vs ViewComponents vs PartialViews
+globs: ["**/*.cshtml", "**/*Controller.cs", "**/*ViewComponent.cs"]
+alwaysApply: true
+---
+
+# Razor UI Component Architecture
+
+In .NET MVC + HTMX, we do not use React/Next.js concepts (Client/Server components, hooks). Instead, we modularize UI using the following strategies:
+
+## 1. PartialViews (`Html.PartialAsync`)
+Use for simple, reusable UI chunks that **do not need independent data fetching**.
+- They inherit the parent's `ViewModel` or take a simple data model passed from the parent view.
+- Equivalent to a stateless "dumb" component in React.
+- **When to use:** Reusable buttons, cards, headers, form inputs.
+
+## 2. ViewComponents
+Use for complex UI elements that **require their own backend logic and database queries**.
+- They run independently of the main Controller action.
+- Equivalent to a React "Server Component" with its own data fetching.
+- **When to use:** Shopping carts, dynamic navigation bars, user profile sidebars, comment sections.
+- **Usage:** `@await Component.InvokeAsync("ShoppingCart")`
+
+## 3. HTMX for Interactivity
+Use HTMX to handle client-side state changes and partial page reloads instead of `useState`/`useEffect`.
+- Instead of using `useEffect` to fetch data on click, use `hx-get="/api/data"` and `hx-target`.
+- Instead of using `useState` to track form validation, submit the form via `hx-post` and return a validation `PartialView` to replace the form.
+
+**Golden Rule:** Keep the frontend stateless. Let the server maintain state and return HTML fragments via HTMX.

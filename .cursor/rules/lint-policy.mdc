@@ -1,0 +1,21 @@
+---
+description: Lint Policy Rules
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Lint & Warning Policy (⚠️ CRITICAL)
+
+## Rule
+- **NEVER** add `#pragma warning disable`, `[SuppressMessage]`, or manually suppress C# compiler warnings without **explicit user instruction**.
+- **NEVER** use empty `catch (Exception) { }` blocks just to suppress runtime errors.
+
+## Workflow for Warnings/Errors
+When encountering lint warnings or C# compiler warnings:
+1. **Report** the warning/error to the user.
+2. **Explain** what is causing the issue and propose a proper fix.
+3. **Wait** for the user's explicit instruction to either fix it or add a suppression directive.
+4. Only add the suppression if explicitly told to do so, and always provide a brief justification comment next to the `#pragma` explaining *why* it is being suppressed.
+
+### Remember
+Always attempt to fix the root cause of the warning before resorting to suppression.

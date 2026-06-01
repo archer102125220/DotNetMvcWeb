@@ -1,0 +1,31 @@
+---
+description: Runtime Data Validation Rules
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# Runtime Data Validation (Strict C#)
+
+To ensure robustness, always use strict type checks and appropriate built-in C# methods for validation.
+
+### 1. String Validation
+- **Do NOT** use: `if (str == "")` or length checks.
+- **MUST use**: `string.IsNullOrEmpty(str)` or `string.IsNullOrWhiteSpace(str)` depending on the requirement.
+
+### 2. Null Validation
+- **Do NOT** use: `if (obj != null)`
+- **MUST use**: `if (obj is not null)` or the null-coalescing operator `??`.
+
+### 3. Collection/Array Validation
+- **Do NOT** use: `if (arr != null && arr.Length > 0)` manually if LINQ is available.
+- **MUST use**: `if (arr is not null && arr.Any())`.
+- **Empty Collections**: When returning an empty array/enumerable, prefer `Array.Empty<T>()` or `Enumerable.Empty<T>()` over `new T[0]` or `new List<T>()` to save memory allocations.
+
+### 4. Guard Clauses
+Use pattern matching and modern throw helpers at the start of methods to fail fast:
+- **Argument Null**: `ArgumentNullException.ThrowIfNull(paramName);`
+- **Argument Out of Range**: `ArgumentOutOfRangeException.ThrowIfNegative(num);`
+
+### 5. Type Checking and Casting
+- **Do NOT** use older `as` casting followed by null checking if you just want to use the object.
+- **MUST use**: Pattern matching `if (obj is MyClass myClass)` to safely cast and assign in one step.

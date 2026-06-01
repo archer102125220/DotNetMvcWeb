@@ -128,5 +128,8 @@ For more detailed rules, you MUST review the specific files located in the `.age
 - [lint-policy.md](.agent/rules/lint-policy.md): Warnings & Suppression rules
 - [backend-orm.md](.agent/rules/backend-orm.md): EF Core & Migrations
 - [mvc-views.md](.agent/rules/mvc-views.md): Razor Views & HTMX
+- [inline-styles.md](.agent/rules/inline-styles.md): Inline Styles Policy for Razor
+- [razor-htmx-components.md](.agent/rules/razor-htmx-components.md): ViewComponents vs PartialViews
+- [lazy-loading.md](.agent/rules/lazy-loading.md): HTMX Lazy Loading UI
 - [no-scripts.md](.agent/rules/no-scripts.md): No Bash/Sed Script Refactoring
 - [project-instructions.md](.agent/rules/project-instructions.md): Overall instructions
