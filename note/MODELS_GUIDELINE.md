@@ -27,10 +27,15 @@ dotnet add package Oracle.EntityFrameworkCore
 ### 2. 資料庫連線設定
 
 **設定 `appsettings.json`：**
+本專案支援多種資料庫，您可以依據環境選擇對應的連線字串。以下提供四大資料庫的設定範例（皆使用預設的 `dot-net-mvc-web` 帳號）：
+
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;Data Source=localhost:1521/FREEPDB1;"
+    "OracleConnection": "User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;Data Source=localhost:1521/FREEPDB1;",
+    "SqlServerConnection": "Server=localhost,1434;Database=DotNetMvcDb;User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;TrustServerCertificate=True;",
+    "PostgresConnection": "Host=localhost;Port=5432;Database=DotNetMvcDb;Username=dot-net-mvc-web;Password=DotNetMvcWebAbc123;",
+    "MySqlConnection": "Server=localhost;Port=3306;Database=DotNetMvcDb;User=dot-net-mvc-web;Password=DotNetMvcWebAbc123;"
   }
 }
 ```
@@ -63,8 +68,26 @@ using DotNetMvcWeb.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // 加入 DbContext 註冊
+// 請依照實際使用的資料庫，選擇對應的方法：
+
+// 1. Oracle (預設)
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
+
+// 2. SQL Server
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection")));
+
+// 3. PostgreSQL
+// builder.Services.AddDbContext<AppDbContext>(options =>
+//     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
+
+// 4. MySQL
+// builder.Services.AddDbContext<AppDbContext>(options =>
+// {
+//     var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+//     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+// });
 
 // ... 其他服務註冊
 
