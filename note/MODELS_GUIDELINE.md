@@ -17,11 +17,11 @@ dotnet add package Microsoft.EntityFrameworkCore
 dotnet add package Microsoft.EntityFrameworkCore.Design
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 
-# 資料庫 Provider (本專案預設以 SQL Server 為例)
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+# 資料庫 Provider (本專案預設以 Oracle 為例)
+dotnet add package Oracle.EntityFrameworkCore
+# 若使用 SQL Server 則為: dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 # 若使用 PostgreSQL 則為: dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 # 若使用 SQLite 則為: dotnet add package Microsoft.EntityFrameworkCore.Sqlite
-# 若使用 Oracle 則為: dotnet add package Oracle.EntityFrameworkCore
 ```
 
 ### 2. 資料庫連線設定
@@ -30,7 +30,7 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1434;Database=DotNetMvcDb;User Id=AppUser;Password=AppUser!123456789;TrustServerCertificate=True;"
+    "DefaultConnection": "User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;Data Source=localhost:1521/FREEPDB1;"
   }
 }
 ```
@@ -64,7 +64,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 加入 DbContext 註冊
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseOracle(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ... 其他服務註冊
 
