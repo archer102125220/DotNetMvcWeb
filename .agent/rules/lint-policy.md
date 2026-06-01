@@ -1,15 +1,9 @@
-# Lint & Warning Policy (⚠️ CRITICAL)
+# Warnings & Suppression rules (⚠️ CRITICAL)
 
-## Rule
-- **NEVER** add `#pragma warning disable`, `[SuppressMessage]`, or manually suppress C# compiler warnings without **explicit user instruction**.
-- **NEVER** use empty `catch (Exception) { }` blocks just to suppress runtime errors.
+## 1. Compiler Warnings
+- **Rule**: NEVER suppress warnings (e.g. `#pragma warning disable CS8600`) without explicit authorization from the developer.
+- **Rule**: When encountering a warning, fix the root cause (e.g., handle the null correctly) instead of hiding the warning.
+- **Exception**: If fixing it requires massive architectural changes that are out of scope, explain the situation to the user and request permission to add the pragma.
 
-## Workflow for Warnings/Errors
-When encountering lint warnings or C# compiler warnings:
-1. **Report** the warning/error to the user.
-2. **Explain** what is causing the issue and propose a proper fix.
-3. **Wait** for the user's explicit instruction to either fix it or add a suppression directive.
-4. Only add the suppression if explicitly told to do so, and always provide a brief justification comment next to the `#pragma` explaining *why* it is being suppressed.
-
-### Remember
-Always attempt to fix the root cause of the warning before resorting to suppression.
+## 2. Empty Catch Blocks
+- **Rule**: NEVER use empty catch blocks (`catch (Exception) { }`). At minimum, log the exception using `ILogger`. Swallowing exceptions makes debugging impossible.

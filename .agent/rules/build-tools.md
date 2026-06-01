@@ -1,25 +1,14 @@
-# Build & Dev Tooling
+# .NET Build & Dev Tooling
 
-This project uses the standard .NET CLI (`dotnet`) for all build, development, and execution tasks.
+## 1. CLI Commands
+- **Run**: `dotnet run` (Runs the application).
+- **Hot Reload**: `dotnet watch run` (Watches for file changes and re-compiles/re-loads the app).
+- **Build**: `dotnet build` (Compiles the application without running it).
 
-## Commands
+## 2. Environments
+- Use `ASPNETCORE_ENVIRONMENT` to control the environment (`Development`, `Staging`, `Production`).
+- Configuration is loaded from `appsettings.json`, then overridden by `appsettings.{Environment}.json`.
 
-### Development
-- **Run Application**: `dotnet run`
-- **Hot Reload (Watch)**: `dotnet watch` (Monitors source code and automatically reloads the browser when files change).
-
-### Build & Clean
-- **Build**: `dotnet build`
-- **Clean**: `dotnet clean`
-
-### Database (Entity Framework Core CLI)
-- **Add Migration**: `dotnet ef migrations add <MigrationName>`
-- **Update Database**: `dotnet ef database update`
-- **Drop Database**: `dotnet ef database drop` (⚠️ USE WITH CAUTION)
-
-## Environment Check
-
-When starting the application, always check:
-1. `appsettings.json` and environment-specific `appsettings.Development.json`.
-2. Ensure connection strings map to the correct local or remote database.
-3. Check `Properties/launchSettings.json` if configuring different launch profiles or ports (e.g., IIS Express vs Kestrel).
+## 3. Package Management
+- Use `dotnet add package <PackageName>` to install NuGet packages.
+- Always check compatibility with `<TargetFramework>net10.0</TargetFramework>` before adding a package.

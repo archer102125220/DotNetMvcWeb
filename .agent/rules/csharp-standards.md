@@ -1,20 +1,14 @@
-# C# Coding Standards
+# C# Language and Type Safety Rules
 
-## Type Safety (MANDATORY)
+## 1. Nullable Reference Types
+- The project runs with `<Nullable>enable</Nullable>`.
+- **Rule**: Always handle nulls appropriately. Avoid using `!` (null-forgiving operator) unless you are absolutely certain the value cannot be null and the compiler simply cannot infer it.
+- **Rule**: Use `ArgumentNullException.ThrowIfNull(param)` at the start of methods to guard against null arguments.
 
-- **Nullable Reference Types**: `<Nullable>enable</Nullable>` is enabled by default. ALWAYS handle nulls properly.
-- **NEVER use `dynamic` or `object`** unless absolutely necessary (e.g., when dealing with untyped JSON or Reflection). Use precise typing.
-- **Limit `var` usage**: Only use implicit typing `var` when the type is blatantly obvious from the right side of the assignment (e.g., `var list = new List<string>();`). If it's not obvious, use the explicit type (e.g., `User user = await _userService.GetUserAsync();`).
-- **Generic Collections**: Prefer generic collections `List<T>`, `Dictionary<TKey, TValue>` over untyped arrays or `ArrayList`.
+## 2. Strong Typing
+- **Rule**: NEVER use `dynamic` or `object` when a specific type can be used.
+- **Rule**: When using `var`, it should only be used when the type is blatantly obvious from the right side of the assignment (e.g. `var user = new User();` or `var list = new List<string>();`). If it's the result of a method call where the type isn't obvious, specify the explicit type.
 
-## Examples
-
-```csharp
-// ❌ FORBIDDEN
-dynamic data = GetData();
-var result = ProcessSomething(); // Type is unclear
-
-// ✅ REQUIRED
-MyDataClass data = GetData();
-var userList = new List<User>(); // Obvious type
-```
+## 3. Pattern Matching
+- **Rule**: Prefer C# 8+ pattern matching (e.g., `if (obj is MyType myObj)`) instead of casting (`var myObj = obj as MyType; if (myObj != null)`).
+- **Rule**: Prefer `switch` expressions over `switch` statements for returning values.

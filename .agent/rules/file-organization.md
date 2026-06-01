@@ -1,23 +1,18 @@
-# File Organization Rules (ASP.NET MVC)
+# MVC Architecture & Structure
 
-## Standard Architecture
+## 1. Controllers
+- Keep Controllers thin. They should handle HTTP request routing, binding, returning Views, and returning status codes.
+- Business logic belongs in Services or Domain classes.
 
-| Directory | Purpose |
-|-----------|---------|
-| `Controllers/` | Handlers for incoming HTTP requests. Inherit from `Controller` (returning Views/HTMX partials) or `ControllerBase` (APIs). |
-| `Models/` | Domain entities, Entity Framework configurations, ViewModels (used to pass data to views), and DTOs. |
-| `Views/` | Razor views (`.cshtml`). Organized into subfolders matching Controller names (e.g., `Views/Home/`). |
-| `Views/Shared/` | Global layouts (`_Layout.cshtml`), partials (`_Partial.cshtml`), and ViewComponents. |
-| `Services/` | Business logic layer. Services should be injected into Controllers via Dependency Injection in `Program.cs`. |
-| `wwwroot/` | Static web assets. Contains `css/`, `js/`, `lib/`, `images/`. Files here are served directly to the client. |
+## 2. Models
+- **ViewModels**: Group properties needed for a specific view into a ViewModel class (e.g. `LoginViewModel`). Place in `Models/ViewModels`.
+- **Entities**: Represents database tables. Place in `Models/Entities`.
+- **DTOs**: Used for data transfer, often for JSON API responses. Place in `Models/DTOs`.
 
-## Styling (SCSS / CSS)
+## 3. Views
+- Organized by Controller name (e.g., `Views/Home/Index.cshtml`).
+- Shared views and layout go in `Views/Shared/`.
 
-- Place global stylesheets and variables in `wwwroot/css/`.
-- If using SCSS, place `_placeholders.scss` or `_variables.scss` in an organized subfolder like `wwwroot/scss/` and configure the build process to output to `wwwroot/css/`.
-- **Razor CSS Isolation**: You may optionally create `.cshtml.css` files alongside your views (e.g. `Index.cshtml.css`) for component-scoped styling.
-
-## Forbidden Practices
-- ❌ **NEVER put business logic directly in Razor Views (`.cshtml`)**. Keep views focused solely on rendering data from the ViewModel.
-- ❌ **NEVER instantiate dependencies manually using `new`**. Always use constructor Dependency Injection.
-- ❌ **NEVER bypass the Controller layer** for handling application flow.
+## 4. ViewComponents
+- Place ViewComponent C# classes in a `ViewComponents/` directory at the root.
+- Place their Razor views in `Views/Shared/Components/[ComponentName]/Default.cshtml`.
