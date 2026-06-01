@@ -1,7 +1,8 @@
+name: dot-net-mvc-web
 services:
-  db:
+  dot-net-mvc-web-oracle-free-db:
     image: container-registry.oracle.com/database/free:latest-lite
-    container_name: dot-net-mvc-web-oracle-free
+    container_name: dot-net-mvc-web-oracle-free-db
     # 移除 platform: linux/x86_64！因為 Oracle 23ai 支援原生 Mac ARM64 架構，不需模擬，速度極快。
     restart: no
     ports:

@@ -1,5 +1,6 @@
+name: dot-net-mvc-web
 services:
-  db:
+  dot-net-mvc-web-postgres:
     image: postgres:16
     container_name: dot-net-mvc-web-postgres
     restart: no

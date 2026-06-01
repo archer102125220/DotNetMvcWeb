@@ -1,7 +1,8 @@
+name: dot-net-mvc-web
 services:
-  mssql:
+  dot-net-mvc-web-mssql-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: dot-net-mvc-web-mssql
+    container_name: dot-net-mvc-web-mssql-db
     # 必加！Apple Silicon Mac 必須透過 Rosetta 跑 x86 架構
     platform: linux/amd64
     restart: no
