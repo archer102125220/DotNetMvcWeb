@@ -1,15 +1,84 @@
 # ASP.NET Core MVC: 資料模型 (Models) 與 EF Core 開發指南
 
-本指南整合了專案中關於資料模型 (`Models` 目錄) 的結構規範，以及 Entity Framework Core (EF Core) 的安裝、設定與深度檢查政策 (Deep Check Policy)。為維持專案架構清晰、安全且高效，請所有開發者嚴格遵守。
+本指南整合了專案中關於 Entity Framework Core (EF Core) 的安裝設定、資料模型 (`Models` 目錄) 的結構規範，以及深度檢查政策 (Deep Check Policy)。為維持專案架構清晰、安全且高效，請所有開發者嚴格遵守。
 
 ---
 
-## 📂 第一部分：Models 目錄結構與職責
+## 🛢️ 第一部分：Entity Framework Core (EF Core) 基礎安裝與連線設定
 
-在 `Models` 資料夾下，我們應將不同用途的模型進行分類：
+在定義資料庫實體模型 (Entities) 之前，必須先確保專案已正確安裝與配置 EF Core。
+
+### 1. 基礎安裝
+若專案尚未設定 EF Core，可依下列步驟透過 .NET CLI 完成核心套件與相關工具的安裝：
+
+```bash
+# 核心套件與 EF Core 工具
+dotnet add package Microsoft.EntityFrameworkCore
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Microsoft.EntityFrameworkCore.Tools
+
+# 資料庫 Provider (本專案預設以 SQL Server 為例)
+dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+# 若使用 PostgreSQL 則為: dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+# 若使用 SQLite 則為: dotnet add package Microsoft.EntityFrameworkCore.Sqlite
+# 若使用 Oracle 則為: dotnet add package Oracle.EntityFrameworkCore
+```
+
+### 2. 資料庫連線設定
+
+**設定 `appsettings.json`：**
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost,1434;Database=DotNetMvcDb;User Id=AppUser;Password=AppUser!123456789;TrustServerCertificate=True;"
+  }
+}
+```
+
+**建立 DbContext：**
+在 `Models` 或是 `Data` 資料夾中建立繼承自 `DbContext` 的類別（例如 `AppDbContext`）：
+```csharp
+using Microsoft.EntityFrameworkCore;
+
+namespace DotNetMvcWeb.Data;
+
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+    }
+
+    // 這裡定義 DbQuery 或是 DbSet
+    // public DbSet<User> Users { get; set; } = null!;
+}
+```
+
+**註冊 DbContext (`Program.cs`)：**
+在 `Program.cs` 檔案中，將 `AppDbContext` 註冊至依賴注入容器中：
+```csharp
+using Microsoft.EntityFrameworkCore;
+using DotNetMvcWeb.Data;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// 加入 DbContext 註冊
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// ... 其他服務註冊
+
+var app = builder.Build();
+```
+
+---
+
+## 📂 第二部分：Models 目錄結構與職責
+
+完成 ORM 設定後，我們應將不同用途的模型妥善分類放置於 `Models` 資料夾下：
 
 ### 1. `Entities/` (實體模型)
-- **用途**：代表資料庫的資料表結構，通常與 Entity Framework Core (EF Core) 搭配使用。
+- **用途**：代表資料庫的資料表結構，與 EF Core 直接對應。
 - **規則**：
   - **絕對不可以**直接將 Entity 傳遞給 Razor Views (`.cshtml`)，這會導致敏感資料（如密碼、雜湊值）外洩或引發 Lazy-Loading 的效能問題。
   - 僅在 `Data` (DbContext) 或 `Services` 層級中進行操作。
@@ -28,7 +97,7 @@
 
 ---
 
-## 🛡️ 第二部分：核心開發規範 (Controller-ViewModel 模式)
+## 🛡️ 第三部分：核心開發規範 (Controller-ViewModel 模式)
 
 ### 1. Thin Controllers 模式
 - **Always use ViewModels**：Controller 的職責是從 Service 取得資料 (Entity / DTO)，將其轉換為 ViewModel，然後傳遞給 View。
@@ -85,37 +154,9 @@
 
 ---
 
-## 🛢️ 第三部分：Entity Framework Core (EF Core) 實作指南
+## 🚧 第四部分：資料庫遷移 (Migrations) 與深度檢查政策
 
-既然 `Entities/` 是與資料庫互動的核心，以下整理了 EF Core 的標準設定與安全使用原則。
-
-### 1. 基礎安裝與設定
-若專案尚未設定 EF Core，可依下列步驟完成：
-
-```bash
-# 核心套件與工具
-dotnet add package Microsoft.EntityFrameworkCore
-dotnet add package Microsoft.EntityFrameworkCore.SqlServer
-dotnet add package Microsoft.EntityFrameworkCore.Design
-dotnet add package Microsoft.EntityFrameworkCore.Tools
-```
-
-**連線字串 (`appsettings.json`)：**
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost,1434;Database=DotNetMvcDb;User Id=AppUser;Password=AppUser!123456789;TrustServerCertificate=True;"
-  }
-}
-```
-
-**註冊 DbContext (`Program.cs`)：**
-```csharp
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-```
-
-### 2. 資料庫遷移 (Migrations) 安全規範
+### 1. 資料庫遷移 (Migrations) 安全規範
 
 ⚠️ **資料庫修改確認規範 (CRITICAL)**：
 在執行任何 Schema 變更前，**必須確認環境是否已部署至正式環境 (Production)**。
@@ -129,7 +170,7 @@ dotnet ef database update
 dotnet ef migrations remove
 ```
 
-### 3. EF Core 開發深度檢查政策 (Deep Check)
+### 2. EF Core 開發深度檢查政策 (Deep Check)
 
 開發或審查包含 EF Core 相關程式碼時，必須遵守以下安全與效能檢查標準：
 
@@ -163,6 +204,7 @@ public async Task<List<User>> GetActiveUsersAsync()
 ---
 
 ## 🎯 總結檢查清單 (Checklist)
+- [ ] 專案已確實安裝與設定 EF Core，並於 `Program.cs` 中註冊 DbContext。
 - [ ] 實體 (Entity) 是否被隔離，沒有直接傳遞給 View？
 - [ ] ViewModel 的命名是否明確且針對特定的 View？
 - [ ] 屬性的 Nullable (`?`) 標示是否精確？
