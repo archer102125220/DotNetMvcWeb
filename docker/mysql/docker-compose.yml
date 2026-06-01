@@ -10,5 +10,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 123456789
       MYSQL_DATABASE: dot_net_mvc_web_db
+      MYSQL_USER: dot-net-mvc-web
+      MYSQL_PASSWORD: DotNetMvcWebAbc123
     volumes:
       - ./data:/var/lib/mysql

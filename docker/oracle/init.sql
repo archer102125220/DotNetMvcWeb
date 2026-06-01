@@ -1,12 +1,35 @@
--- 切換到預設的 Pluggable Database (FREEPDB1)
-ALTER SESSION SET CONTAINER = FREEPDB1;
+-- ==============================================================================
+-- Oracle 資料庫與 MySQL / MSSQL 的核心差異：
+-- 
+-- 1. 在 Oracle 中，沒有 CREATE DATABASE 指令用來建立應用程式資料庫。
+--    Docker 容器啟動時，會預設建立好一個 Pluggable Database (PDB) 叫做 FREEPDB1。
+-- 2. 在 Oracle 中，User (帳號) 就等於 Schema (資料庫空間)。
+--    所以當我們 CREATE USER 時，就等於同時建立了一個同名的獨立資料庫實體空間。
+-- 3. 若需要一個帳號管理多個「資料庫」，最標準的做法是：
+--    建立主帳號並賦予 DBA 權限，然後在同一個 FREEPDB1 裡面建立多個 User/Schema。
+--    程式端即可透過同一個帳號，跨 Schema 存取資料 (例如: SELECT * FROM SCHEMA2.TableA)
+-- ==============================================================================
 
--- 如果需要重置，可以解除註解底下這行 (如果 user 已經存在會報錯，初次建立可忽略)
--- DROP USER dotnet_mvc_user CASCADE;
+-- 將當前 Session 切換到預設的可插拔資料庫 (FREEPDB1)
+ALTER SESSION SET CONTAINER=FREEPDB1;
 
--- 建立應用程式專用的 User (Schema)，這在 Oracle 中等同於建立一個獨立的 DB 空間
-CREATE USER dotnet_mvc_user IDENTIFIED BY "MvcOracleDb123!" DEFAULT TABLESPACE users QUOTA UNLIMITED ON users;
+-- 建立主帳號 (也就是主資料庫 Schema)
+-- 備註：帳號名稱若有包含連字號 (-) 必須使用雙引號包覆，否則會語法錯誤
+CREATE USER "dot-net-mvc-web" IDENTIFIED BY "DotNetMvcWebAbc123";
 
--- 賦予基本連線與資源權限
-GRANT CONNECT, RESOURCE TO dotnet_mvc_user;
-GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE, CREATE PROCEDURE TO dotnet_mvc_user;
+-- 賦予連線 (CONNECT)、資源建立權 (RESOURCE)，以及最高管理員權限 (DBA)
+-- 擁有 DBA 權限後，該帳號就能存取 FREEPDB1 內任意其他的 Schema 空間
+GRANT CONNECT, RESOURCE, DBA TO "dot-net-mvc-web";
+
+-- 開放該帳號(Schema)無限制的儲存空間配額，允許其自由建立 Tables
+ALTER USER "dot-net-mvc-web" QUOTA UNLIMITED ON USERS;
+
+-- ==============================================================================
+-- (補充範例) 若您未來需要新增「第二個資料庫空間」，只要取消下方註解即可建立：
+-- CREATE USER "DB_LOGS" IDENTIFIED BY "RandomPassword123";
+-- ALTER USER "DB_LOGS" QUOTA UNLIMITED ON USERS;
+-- 
+-- 屆時，您的主帳號 "dot-net-mvc-web" 因為擁有 DBA 權限，
+-- 可以直接跨區存取 DB_LOGS 的資料表。
+-- 例如在 EF Core 中可這樣設定: builder.ToTable("LogEntries", "DB_LOGS");
+-- ==============================================================================
