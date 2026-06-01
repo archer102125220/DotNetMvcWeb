@@ -1,6 +1,6 @@
 ---
-description: Lint Policy Rules
-globs: ["**/*"]
+description: Lint and Warning Suppression Policy - no pragma disable without explicit approval
+globs: ["**/*.cs"]
 alwaysApply: true
 ---
 

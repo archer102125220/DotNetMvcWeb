@@ -1,15 +1,25 @@
-# ViewComponents vs PartialViews (HTMX)
+# Razor UI Component Architecture
 
-## 1. Partial Views (`@await Html.PartialAsync`)
-- **When to use**: For simple fragments of HTML that do not require independent data fetching. You must pass the required Model to it from the parent view.
-- **HTMX**: HTMX responses from Controllers generally return `PartialView("_MyFragment", model)` so that the client only receives the HTML snippet needed to update the DOM, not the full layout.
+In .NET MVC + HTMX, we do not use React/Next.js concepts (Client/Server components, hooks). Instead, we modularize UI using the following strategies:
 
-## 2. ViewComponents (`@await Component.InvokeAsync`)
-- **When to use**: For complex UI widgets that need to run their own business logic or fetch their own data from the database (e.g., a Shopping Cart dropdown, a recent news widget).
-- **Benefit**: Keeps your main Controller clean, because the parent Controller doesn't have to populate the ViewComponent's data.
+## 1. PartialViews (`Html.PartialAsync`)
+Use for simple, reusable UI chunks that **do not need independent data fetching**.
+- They inherit the parent's `ViewModel` or take a simple data model passed from the parent view.
+- Equivalent to a stateless "dumb" component in React.
+- **When to use:** Reusable buttons, cards, headers, form inputs.
+- **HTMX**: Controllers return `PartialView("_MyFragment", model)` so the client receives only the HTML snippet to update the DOM, not the full layout.
 
-## 3. HTMX + ViewComponents
-- To return a ViewComponent from a Controller for an HTMX request, use:
-  ```csharp
-  return ViewComponent("ShoppingCart", new { userId = 123 });
-  ```
+## 2. ViewComponents
+Use for complex UI elements that **require their own backend logic and database queries**.
+- They run independently of the main Controller action.
+- Equivalent to a React "Server Component" with its own data fetching.
+- **When to use:** Shopping carts, dynamic navigation bars, user profile sidebars, comment sections.
+- **Usage:** `@await Component.InvokeAsync("ShoppingCart")`
+- **HTMX:** Return from Controller with `return ViewComponent("ShoppingCart", new { userId = 123 });`
+
+## 3. HTMX for Interactivity
+Use HTMX to handle client-side state changes and partial page reloads instead of `useState`/`useEffect`.
+- Instead of using `useEffect` to fetch data on click, use `hx-get="/api/data"` and `hx-target`.
+- Instead of using `useState` to track form validation, submit the form via `hx-post` and return a validation `PartialView` to replace the form.
+
+**Golden Rule:** Keep the frontend stateless. Let the server maintain state and return HTML fragments via HTMX.

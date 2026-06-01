@@ -2,16 +2,29 @@
 
 Always validate data correctly at runtime, especially when dealing with data crossing the boundary from client (HTMX/Forms) to server (Controllers).
 
-### Strings
-- **Rule**: Use `string.IsNullOrEmpty(str)` or `string.IsNullOrWhiteSpace(str)` instead of checking `str == null || str == ""`.
+### 1. String Validation
+- **Do NOT** use: `if (str == "")` or length checks.
+- **MUST use**: `string.IsNullOrEmpty(str)` or `string.IsNullOrWhiteSpace(str)` depending on the requirement.
 
-### Collections
-- **Rule**: When checking if an `IEnumerable<T>` has elements, use `.Any()` instead of `.Count() > 0`. `.Count()` may iterate the entire collection depending on the underlying type.
+### 2. Null Validation
+- **Do NOT** use: `if (obj != null)`
+- **MUST use**: `if (obj is not null)` or the null-coalescing operator `??`.
+- Use the null-conditional operator `?.` to chain access safely: `var name = user?.Profile?.Name ?? "Unknown";`
 
-### Objects and Nulls
-- **Rule**: Use the null-conditional operator `?.` and null-coalescing operator `??` to provide defaults and avoid `NullReferenceException`.
-  - Example: `var name = user?.Profile?.Name ?? "Unknown";`
+### 3. Collection/Array Validation
+- **Do NOT** use: `if (arr != null && arr.Length > 0)` manually if LINQ is available.
+- **MUST use**: `if (arr is not null && arr.Any())`.
+- When returning an empty collection, prefer `Array.Empty<T>()` or `Enumerable.Empty<T>()` over `new T[0]` or `new List<T>()` to avoid unnecessary allocations.
 
-### Model State Validation
-- **Rule**: In POST/PUT Controller actions, ALWAYS check `if (!ModelState.IsValid)` before proceeding. If invalid, return the view so validation errors are displayed.
-  - With HTMX, return the PartialView containing the form so the client gets the validation feedback without a full page reload.
+### 4. Guard Clauses
+Use pattern matching and modern throw helpers at the start of methods to fail fast:
+- **Argument Null**: `ArgumentNullException.ThrowIfNull(paramName);`
+- **Argument Out of Range**: `ArgumentOutOfRangeException.ThrowIfNegative(num);`
+
+### 5. Type Checking and Casting
+- **Do NOT** use older `as` casting followed by null checking.
+- **MUST use**: Pattern matching `if (obj is MyClass myClass)` to safely cast and assign in one step.
+
+### 6. Model State Validation (Controllers)
+- In POST/PUT Controller actions, ALWAYS check `if (!ModelState.IsValid)` before proceeding.
+- With HTMX: return the `PartialView` containing the form so the client receives validation feedback without a full page reload.

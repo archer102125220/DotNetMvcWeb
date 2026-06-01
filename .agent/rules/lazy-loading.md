@@ -1,15 +1,33 @@
-# HTMX Lazy Loading UI
+# Lazy Loading with HTMX
 
-## 1. Improving Perceived Performance
-- For heavy components (e.g., large graphs, complex queries), do not block the initial page load.
-- Use HTMX lazy loading to fetch the component asynchronously after the page renders.
+To optimize performance and defer the loading of heavy components, use **HTMX's load trigger**.
 
-## 2. Implementation
-- In the initial Razor view, render a skeleton or spinner inside a `div` with `hx-get` and `hx-trigger="load"`.
-  ```html
-  <div hx-get="/Widgets/HeavyChart" hx-trigger="load" hx-swap="outerHTML">
-      <!-- Loading Skeleton/Spinner -->
-      <div class="spinner">Loading chart...</div>
-  </div>
-  ```
-- The `HeavyChart` action method then does the expensive work and returns a `PartialView` containing the actual chart.
+## How to Lazy Load a ViewComponent or PartialView
+
+Instead of rendering a heavy ViewComponent synchronously on page load, render an empty placeholder that fetches the content immediately after the page loads.
+
+### Example:
+```html
+<!-- Placeholder container that fires a GET request on load -->
+<div hx-get="/Components/HeavyChart"
+     hx-trigger="load"
+     hx-swap="innerHTML">
+    <!-- Optional: Loading spinner -->
+    <div class="spinner">Loading chart...</div>
+</div>
+```
+
+### Controller Implementation:
+```csharp
+[HttpGet("/Components/HeavyChart")]
+public IActionResult GetHeavyChart()
+{
+    // Return a PartialView or invoke a ViewComponent
+    return ViewComponent("HeavyChart");
+}
+```
+
+## When to use Lazy Loading
+- Heavy database queries that block the initial page render.
+- Third-party widget integrations.
+- Below-the-fold content that the user doesn't see immediately.

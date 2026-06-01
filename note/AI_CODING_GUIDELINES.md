@@ -89,7 +89,6 @@
 * **Models/**：包含 Entity 類別、ViewModels 及 DTOs。
 * **Views/**：Razor 視圖 (`.cshtml`) 的資料夾結構必須與 Controller 名稱對齊 (如 `Views/Home/Index.cshtml`)。
 * **wwwroot/**：存放靜態資源 (CSS, JS, 圖片, 第三方函式庫)。
-* **展示區 (Demo Views)**：功能展示的全頁內容應放於 `Controllers/DemoController.cs` 與 `Views/Demo/`，命名採用 PascalCase (如 `BannerDemo.cshtml`)。相關子元件放於 `Views/Demo/Components/`。
 * **ASP.NET Core 穩定 API**：優先使用標準的 MVC 模式與內建依賴注入。除非舊有程式碼必需，否則使用 `System.Text.Json` 而非 `Newtonsoft.Json`。
 
 ---

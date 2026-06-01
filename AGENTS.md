@@ -48,13 +48,6 @@ This ensures users make informed decisions about potentially risky actions.
 - **Shared Components**: Shared partials or ViewComponents should have their own isolated root class, e.g., `.image_upload`.
 - **Style Reuse**: Define `%placeholder_name` in SCSS and use `@extend` or `@use` for reuse across views without muddying the HTML class lists. Keep HTML element classes strictly tied to the DOM structure of that specific view.
 
-### Demo Views/Controllers
-- Full-page demonstrations of features should be placed in `Controllers/DemoController.cs` and `Views/Demo/`.
-- Naming: Actions and Views should use PascalCase (e.g., `public IActionResult BannerDemo()`, `BannerDemo.cshtml`).
-- Rules:
-  - Full-page content → `Views/Demo/[ViewName].cshtml`
-  - Associated sub-components → `Views/Demo/Components/` or `Views/Shared/Components/`
-
 ### Razor Views & HTMX (⚠️ CRITICAL)
 - **Interactivity**: Use **HTMX** attributes (`hx-get`, `hx-post`, `hx-target`, `hx-swap`) for interactivity instead of writing custom AJAX/Vanilla JS, unless HTMX cannot solve the problem.
 - **Partial Views**: When returning from a controller for an HTMX request, return `PartialView("_MyComponent")` instead of `View()`.

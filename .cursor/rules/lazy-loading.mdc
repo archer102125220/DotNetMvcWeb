@@ -1,12 +1,12 @@
 ---
-description: Lazy Loading patterns using HTMX
-globs: ["**/*.cshtml"]
+description: Lazy Loading patterns with HTMX - defer heavy ViewComponents after page load
+globs: ["**/*.cshtml", "**/*Controller.cs"]
 alwaysApply: true
 ---
 
 # Lazy Loading with HTMX
 
-To optimize performance and defer the loading of heavy components (equivalent to Next.js `dynamic import`), use **HTMX's load trigger**.
+To optimize performance and defer the loading of heavy components, use **HTMX's load trigger**.
 
 ## How to Lazy Load a ViewComponent or PartialView
 
@@ -15,8 +15,8 @@ Instead of rendering a heavy ViewComponent synchronously on page load, render an
 ### Example:
 ```html
 <!-- Placeholder container that fires a GET request on load -->
-<div hx-get="/Components/HeavyChart" 
-     hx-trigger="load" 
+<div hx-get="/Components/HeavyChart"
+     hx-trigger="load"
      hx-swap="innerHTML">
     <!-- Optional: Loading spinner -->
     <div class="spinner">Loading chart...</div>

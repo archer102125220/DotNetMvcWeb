@@ -1,6 +1,6 @@
 ---
-description: Runtime Data Validation Rules
-globs: ["**/*"]
+description: Runtime Data Validation - null checks, string validation, guard clauses
+globs: ["**/*.cs"]
 alwaysApply: true
 ---
 
@@ -15,11 +15,12 @@ To ensure robustness, always use strict type checks and appropriate built-in C# 
 ### 2. Null Validation
 - **Do NOT** use: `if (obj != null)`
 - **MUST use**: `if (obj is not null)` or the null-coalescing operator `??`.
+- Use the null-conditional operator `?.` to chain access safely: `var name = user?.Profile?.Name ?? "Unknown";`
 
 ### 3. Collection/Array Validation
 - **Do NOT** use: `if (arr != null && arr.Length > 0)` manually if LINQ is available.
 - **MUST use**: `if (arr is not null && arr.Any())`.
-- **Empty Collections**: When returning an empty array/enumerable, prefer `Array.Empty<T>()` or `Enumerable.Empty<T>()` over `new T[0]` or `new List<T>()` to save memory allocations.
+- When returning an empty collection, prefer `Array.Empty<T>()` or `Enumerable.Empty<T>()` over `new T[0]` or `new List<T>()` to avoid unnecessary allocations.
 
 ### 4. Guard Clauses
 Use pattern matching and modern throw helpers at the start of methods to fail fast:
@@ -27,5 +28,9 @@ Use pattern matching and modern throw helpers at the start of methods to fail fa
 - **Argument Out of Range**: `ArgumentOutOfRangeException.ThrowIfNegative(num);`
 
 ### 5. Type Checking and Casting
-- **Do NOT** use older `as` casting followed by null checking if you just want to use the object.
+- **Do NOT** use older `as` casting followed by null checking.
 - **MUST use**: Pattern matching `if (obj is MyClass myClass)` to safely cast and assign in one step.
+
+### 6. Model State Validation (Controllers)
+- In POST/PUT Controller actions, ALWAYS check `if (!ModelState.IsValid)` before proceeding.
+- With HTMX: return the `PartialView` containing the form so the client receives validation feedback without a full page reload.

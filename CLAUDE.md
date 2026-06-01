@@ -49,10 +49,32 @@ This ensures users make informed decisions about potentially risky actions.
 - **ViewComponents**: For complex, reusable UI blocks that require backend logic, use ViewComponents (`@await Component.InvokeAsync(...)`) instead of standard PartialViews.
 - **Scripts**: Avoid writing inline `<script>` tags inside Partial Views. Scope scripts appropriately or use HTMX events.
 
-### Entity Framework Core (EF Core) Best Practices
+### Entity Framework Core (EF Core) Best Practices & Deep Check Policy (⚠️ CRITICAL)
 - **Async First**: ALWAYS use async/await methods for database operations (`ToListAsync()`, `FirstOrDefaultAsync()`, `SaveChangesAsync()`). Synchronous DB calls are forbidden.
 - **No Tracking**: For read-only queries, use `.AsNoTracking()` to improve performance.
 - **Dependency Injection**: Always resolve `DbContext` via DI constructor injection. Never instantiate it with `new AppDbContext()`.
+
+When reviewing or refactoring backend code (C# Controllers, Services, Data Access), you MUST perform TWO rounds of checks:
+
+#### Round 1: Basic Check
+- ✅ Standard syntax and proper `using` imports.
+- ✅ Proper dependency injection used (no `new Service()`).
+- ✅ Variable naming and basic Null checks.
+
+#### Round 2: Deep Check (⚠️ MANDATORY)
+
+| Anti-Pattern | Correct Pattern | Priority |
+|--------------|----------------|----------|
+| Missing `await` / returning un-awaited Task improperly | Explicit `await` or proper Task handling | 🔴 High |
+| N+1 Query Problem inside loops | Use `.Include()`, `.Select()`, or fetch data in bulk prior to loop | 🔴 High |
+| Un-disposed `IDisposable` (Streams, HttpClients) | Wrap in `using (...) { }` or `using var obj = ...;` | 🔴 High |
+| Synchronous EF Core DB calls (`.ToList()`) | `await .ToListAsync()` | 🟡 Medium |
+| Tracking entities for Read-Only operations | Append `.AsNoTracking()` | 🟡 Medium |
+
+**CRITICAL**: If you only perform Round 1 checks, you MUST explicitly state:
+> "⚠️ I have only performed basic checks. EF Core and Memory deep checks are still required."
+
+
 
 ### Internationalization (i18n)
 - Use standard `Microsoft.AspNetCore.Mvc.Localization`.
