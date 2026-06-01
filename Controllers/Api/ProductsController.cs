@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DotNetMvcWeb.Models;
 
@@ -10,14 +13,22 @@ namespace DotNetMvcWeb.Controllers.Api;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
+    private readonly IProductRepository _productRepository;
+
+    public ProductsController(IProductRepository productRepository)
+    {
+        _productRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
+    }
+
     /// <summary>
     /// 取得所有產品列表
     /// </summary>
     /// <returns>產品列表</returns>
     [HttpGet]
-    public ActionResult<IEnumerable<Product>> GetProducts()
+    public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
     {
-        return Ok(ProductRepository.GetAll());
+        IEnumerable<Product> products = await _productRepository.GetAllAsync();
+        return Ok(products);
     }
 
     /// <summary>
@@ -26,11 +37,11 @@ public class ProductsController : ControllerBase
     /// <param name="id">產品 ID</param>
     /// <returns>產品詳細資訊</returns>
     [HttpGet("{id}")]
-    public ActionResult<Product> GetProduct(int id)
+    public async Task<ActionResult<Product>> GetProduct(int id)
     {
-        var product = ProductRepository.GetById(id);
+        Product? product = await _productRepository.GetByIdAsync(id);
         
-        if (product == null)
+        if (product is null)
         {
             return NotFound(new { message = $"找不到 ID 為 {id} 的產品。" });
         }
@@ -44,9 +55,14 @@ public class ProductsController : ControllerBase
     /// <param name="product">產品資訊</param>
     /// <returns>新增成功後的產品</returns>
     [HttpPost]
-    public ActionResult<Product> CreateProduct([FromBody] Product product)
+    public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
     {
-        ProductRepository.Add(product);
+        if (product is null)
+        {
+            return BadRequest();
+        }
+
+        await _productRepository.AddAsync(product);
         return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
     }
 
@@ -57,15 +73,21 @@ public class ProductsController : ControllerBase
     /// <param name="product">更新的產品內容</param>
     /// <returns>無回傳內容 (204 No Content)</returns>
     [HttpPut("{id}")]
-    public IActionResult UpdateProduct(int id, [FromBody] Product product)
+    public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
     {
-        if (ProductRepository.GetById(id) == null)
+        if (product is null)
+        {
+            return BadRequest();
+        }
+
+        Product? existingProduct = await _productRepository.GetByIdAsync(id);
+        if (existingProduct is null)
         {
             return NotFound(new { message = $"找不到 ID 為 {id} 的產品，無法更新。" });
         }
 
         product.Id = id;
-        ProductRepository.Update(product);
+        await _productRepository.UpdateAsync(product);
 
         return NoContent();
     }
@@ -76,14 +98,15 @@ public class ProductsController : ControllerBase
     /// <param name="id">要刪除的產品 ID</param>
     /// <returns>無回傳內容 (204 No Content)</returns>
     [HttpDelete("{id}")]
-    public IActionResult DeleteProduct(int id)
+    public async Task<IActionResult> DeleteProduct(int id)
     {
-        if (ProductRepository.GetById(id) == null)
+        Product? existingProduct = await _productRepository.GetByIdAsync(id);
+        if (existingProduct is null)
         {
             return NotFound(new { message = $"找不到 ID 為 {id} 的產品，無法刪除。" });
         }
 
-        ProductRepository.Delete(id);
+        await _productRepository.DeleteAsync(id);
 
         return NoContent();
     }
