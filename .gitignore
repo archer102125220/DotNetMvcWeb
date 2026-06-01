@@ -484,4 +484,4 @@ $RECYCLE.BIN/
 
 docker/*/data/*
 docker/*/mssql_data/*
-docker/*/postgres/pg_data/*
+docker/*/pg_data/*
