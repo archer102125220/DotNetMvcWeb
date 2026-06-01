@@ -21,8 +21,13 @@ dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Oracle.EntityFrameworkCore
 # 若使用 SQL Server 則為: dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 # 若使用 PostgreSQL 則為: dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+# 若使用 MySQL 則為: dotnet add package Pomelo.EntityFrameworkCore.MySql
 # 若使用 SQLite 則為: dotnet add package Microsoft.EntityFrameworkCore.Sqlite
 ```
+
+> [!NOTE]
+> **關於 MySQL (Pomelo) 的 NU1608 警告**
+> 在較新的 .NET / EF Core 版本（例如 EF Core 10）中安裝 `Pomelo.EntityFrameworkCore.MySql` 時，編譯時可能會遇到 `NU1608` 警告。這是因為 Pomelo 官方更新進度通常稍微落後於 EF Core 的最新主要版本。這屬於已知現象，通常不會影響基礎功能運作。待 Pomelo 釋出對應的 EF Core 10 版本後，再透過 NuGet 更新套件即可消除此警告。
 
 ### 2. 資料庫連線設定
 
