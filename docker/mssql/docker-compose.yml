@@ -1,0 +1,16 @@
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dot-net-mvc-web-mssql
+    # 必加！Apple Silicon Mac 必須透過 Rosetta 跑 x86 架構
+    platform: linux/amd64
+    restart: no
+    ports:
+      - "1434:1433" # mssql 預設 port 為 1433
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "MSSQL!123456789"
+      MSSQL_PID: "Developer"
+      MSSQL_COLLATION: "Chinese_Taiwan_Stroke_CI_AS"
+    volumes:
+      - ./mssql_data:/var/opt/mssql
