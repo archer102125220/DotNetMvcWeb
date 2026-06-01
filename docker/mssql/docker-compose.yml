@@ -14,3 +14,6 @@ services:
       MSSQL_COLLATION: "Chinese_Taiwan_Stroke_CI_AS"
     volumes:
       - ./mssql_data:/var/opt/mssql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    command: /bin/bash /docker-entrypoint-initdb.d/entrypoint.sh
