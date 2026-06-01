@@ -482,6 +482,7 @@ $RECYCLE.BIN/
 *.swp
 
 
+#docker-DB-Data
 docker/*/data/*
 docker/*/mssql_data/*
 docker/*/pg_data/*
