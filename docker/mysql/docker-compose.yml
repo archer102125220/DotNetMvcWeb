@@ -13,4 +13,4 @@ services:
       MYSQL_USER: dot-net-mvc-web
       MYSQL_PASSWORD: DotNetMvcWebAbc123
     volumes:
-      - ./data:/var/lib/mysql
+      - ./mysql_data:/var/lib/mysql
