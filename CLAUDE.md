@@ -1,4 +1,4 @@
-# Project Instructions for Gemini (DotNet MVC)
+# Project Instructions for Claude (DotNet MVC)
 
 When working on this project, you MUST follow the coding standards defined below.
 
@@ -37,7 +37,7 @@ This ensures users make informed decisions about potentially risky actions.
 - **Multi-word Segment**: `.image_upload` (underscore `_` separates words **WITHIN** a single segment)
 - **State**: `[data-is-active='true']` (HTML data attribute)
 
-#### 🛑 Critical Disambiguation for Gemini:
+#### 🛑 Critical Disambiguation for Claude:
 - **Hierarchy (Hyphen `-`)**: Use when adding a new structural level or generic container.
   - ✅ `.controls-group` (`group` is a sub-element of `controls`)
 - **Multi-word Segment (Underscore `_`)**: Use when the name describes a SINGLE specific concept that happens to need two words.
@@ -116,17 +116,17 @@ This ensures users make informed decisions about potentially risky actions.
 - **Views/**: Razor views (`.cshtml`). Must align with Controller names (e.g., `Views/Home/Index.cshtml`).
 - **wwwroot/**: Static assets (CSS, JS, Images, Libs).
 
-For more detailed rules, you MUST review the specific files located in the `.agent/rules/` directory:
-- [csharp-standards.md](.agent/rules/csharp-standards.md): C# Language and Type Safety rules
-- [css-naming.md](.agent/rules/css-naming.md): CSS/SCSS Naming Conventions (BEM)
-- [css-property-order.md](.agent/rules/css-property-order.md): CSS Property Order
-- [runtime-data-validation.md](.agent/rules/runtime-data-validation.md): Runtime Null & Data Validation
-- [security-policy.md](.agent/rules/security-policy.md): Security & XSS/SQLi Policies
-- [i18n.md](.agent/rules/i18n.md): Localization / i18n
-- [build-tools.md](.agent/rules/build-tools.md): .NET Build & Dev Tooling
-- [file-organization.md](.agent/rules/file-organization.md): MVC Architecture & Structure
-- [lint-policy.md](.agent/rules/lint-policy.md): Warnings & Suppression rules
-- [backend-orm.md](.agent/rules/backend-orm.md): EF Core & Migrations
-- [mvc-views.md](.agent/rules/mvc-views.md): Razor Views & HTMX
-- [no-scripts.md](.agent/rules/no-scripts.md): No Bash/Sed Script Refactoring
-- [project-instructions.md](.agent/rules/project-instructions.md): Overall instructions
+For more detailed rules, you MUST review the specific files located in the `.claude/rules/` directory:
+- [csharp-standards.md](.claude/rules/csharp-standards.md): C# Language and Type Safety rules
+- [css-naming.md](.claude/rules/css-naming.md): CSS/SCSS Naming Conventions (BEM)
+- [css-property-order.md](.claude/rules/css-property-order.md): CSS Property Order
+- [runtime-data-validation.md](.claude/rules/runtime-data-validation.md): Runtime Null & Data Validation
+- [security-policy.md](.claude/rules/security-policy.md): Security & XSS/SQLi Policies
+- [i18n.md](.claude/rules/i18n.md): Localization / i18n
+- [build-tools.md](.claude/rules/build-tools.md): .NET Build & Dev Tooling
+- [file-organization.md](.claude/rules/file-organization.md): MVC Architecture & Structure
+- [lint-policy.md](.claude/rules/lint-policy.md): Warnings & Suppression rules
+- [backend-orm.md](.claude/rules/backend-orm.md): EF Core & Migrations
+- [mvc-views.md](.claude/rules/mvc-views.md): Razor Views & HTMX
+- [no-scripts.md](.claude/rules/no-scripts.md): No Bash/Sed Script Refactoring
+- [project-instructions.md](.claude/rules/project-instructions.md): Overall instructions
