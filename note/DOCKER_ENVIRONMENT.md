@@ -14,7 +14,23 @@
 
 ---
 
-## 🛢️ MSSQL 環境設定與自動初始化
+## 🔑 統一環境變數與連線資訊
+
+為了方便切換與測試，本專案在所有資料庫環境中，皆預設配置了相同的應用程式專屬帳號與密碼 (取代預設的高權限 `root` / `sa` / `postgres` 帳號)：
+- **統一帳號 (User)**: `dot-net-mvc-web`
+- **統一密碼 (Password)**: `DotNetMvcWebAbc123`
+- **預設資料庫名稱**: 依資料庫特性而定 (見下表)
+
+| 資料庫服務 | 對外 Port | 資料庫名稱 / Schema | 連線帳號 | 連線密碼 | 備註 |
+| --- | --- | --- | --- | --- | --- |
+| **MSSQL** (預設) | `1434` (對應內部 1433) | `DotNetMvcDb` | `dot-net-mvc-web` | `DotNetMvcWebAbc123` | Apple Silicon Mac 需 Rosetta (`linux/amd64`) |
+| **MySQL** | `3307` (對應內部 3306) | `dot_net_mvc_web_db` | `dot-net-mvc-web` | `DotNetMvcWebAbc123` | Apple Silicon Mac 需指定 `linux/x86_64` |
+| **PostgreSQL**| `5433` (對應內部 5432) | `dot_net_mvc_web_db` | `dot-net-mvc-web` | `DotNetMvcWebAbc123` | |
+| **Oracle 23ai**| `1522` (對應內部 1521) | `FREEPDB1` (PDB) <br> Schema: `dot-net-mvc-web` | `dot-net-mvc-web` | `DotNetMvcWebAbc123` | 原生支援 Mac ARM64 架構 |
+
+---
+
+## 🛢️ MSSQL 環境設定與自動初始化 (預設)
 
 為了避免使用預設的高權限 `sa` 帳號進行應用程式連線，並自動為專案建立專屬資料庫，我們在 `docker/mssql/` 實作了「容器啟動自動初始化」的機制。
 
@@ -38,15 +54,15 @@
 ### 3. `init.sql` (資料庫與帳號建立腳本)
 本腳本包含了「防呆與冪等性 (Idempotent)」的設計（即多次執行也不會引發錯誤），其主要任務：
 1. **建立資料庫**：建立名為 `DotNetMvcDb` 的資料庫。
-2. **建立登入與使用者 (Login & User)**：建立應用程式專用的帳號 `AppUser`，密碼設定為 `AppUser!123456789`。
-3. **權限配置**：將 `AppUser` 加入 `db_owner` 角色，確保 EF Core 能順利執行 Migrations 以及一般讀寫操作。
+2. **建立登入與使用者 (Login & User)**：建立應用程式專用的帳號 `dot-net-mvc-web`，密碼設定為 `DotNetMvcWebAbc123`。
+3. **權限配置**：將此使用者加入 `db_owner` 角色，確保 EF Core 能順利執行 Migrations 以及一般讀寫操作。
 
 ---
 
 ## 🚀 常用操作指令
 
 ### 啟動資料庫服務
-開啟終端機，切換到 `docker/mssql` 目錄並執行啟動指令：
+開啟終端機，切換到指定的資料庫目錄（以 MSSQL 為例）並執行啟動指令：
 ```bash
 cd docker/mssql
 docker-compose up -d
@@ -57,10 +73,10 @@ docker-compose up -d
 ```bash
 docker-compose logs -f
 ```
-你會在 Log 底部看到 `SQL Server is up - running initialization script...` 以及 `Initialization finished.` 的字樣。
+*(在 MSSQL 的 Log 中你會在底部看到 `SQL Server is up - running initialization script...` 以及 `Initialization finished.` 的字樣)*
 
 ### 清除並重置資料庫
-如果你修改了 `init.sql` 想重新套用（例如更改預設密碼或資料庫名稱），需要清除原有的 Volume 才能觸發重新初始化：
+如果你修改了 `init.sql` 或環境變數想重新套用，需要清除原有的 Volume 才能觸發重新初始化：
 ```bash
 # 停止容器並刪除 Volume (注意：這會清空所有的資料庫資料！)
 docker-compose down -v
@@ -72,5 +88,6 @@ docker-compose up -d
 ---
 
 ## 💡 開發注意事項
-- 在 `.NET MVC` 的 `appsettings.json` 中設定連線字串 (Connection String) 時，請使用初始化好的專屬帳號 (例如：`Server=localhost,1434;Database=DotNetMvcDb;User Id=AppUser;Password=AppUser!123456789;TrustServerCertificate=True;`)，**不要**使用 `sa`。
+- 在 `.NET MVC` 的 `appsettings.json` 中設定連線字串 (Connection String) 時，請參考上方表格中的對外 Port、帳號與密碼，**不要**使用高權限管理員帳號 (`sa`, `root`, `postgres`)。
+  - MSSQL 範例：`Server=localhost,1434;Database=DotNetMvcDb;User Id=dot-net-mvc-web;Password=DotNetMvcWebAbc123;TrustServerCertificate=True;`
 - 專案程式碼如果需要依賴新的資料庫欄位或表，應優先透過 EF Core 的 Migrations (`dotnet ef migrations add ...`) 來處理，盡量不要手動去改 `init.sql`，`init.sql` 僅負責「基礎環境與權限」的建置。
