@@ -30,7 +30,9 @@
 - ⚖️ **[ORM 架構比較 (orm-architecture-comparison.md)](./orm-architecture-comparison.md)**
   - 詳細對比了 Entity Framework Core 與 Dapper 的差異以及各自的使用情境。
 - 🛢️ **[Oracle MVC 整合 Demo 指南 (oracle-mvc-demo-guide.md)](./oracle-mvc-demo-guide.md)**
-  - 在 ASP.NET Core MVC 中如何連接與操作 Oracle 資料庫的示範指南。
+  - 介紹如何結合 EF Core、Oracle 資料庫與前端 HTMX 實現無重整的 CRUD 操作，以及在 ASP.NET Core MVC 中操作 Oracle 的示範。
+- 🔌 **[Oracle API 開發指南 (oracle-api-guide.md)](./oracle-api-guide.md)**
+  - 提供給前端 (Vue, React, Nuxt) 串接的純 JSON RESTful API 使用說明與端點介紹。
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**
   - Oracle 常用的 SQL 指令、Docker 容器操作及常用語法速查。
 - 🎭 **[Mock Database 實作指南 (mock_database_guide.md)](./mock_database_guide.md)**
