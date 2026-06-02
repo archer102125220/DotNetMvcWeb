@@ -54,7 +54,35 @@ return PartialView("_CreateOrEdit", item);
 
 ---
 
-## 3. CSS 命名規範 (BEM)
+## 3. 原生 SQL (Raw SQL) 搜尋與 HTMX 防抖 (Debounce)
+
+本模組示範了如何同時結合「後端 EF Core 原生 SQL」與「前端 HTMX 即時搜尋」：
+
+### 後端實作：安全的 Raw SQL
+在 `OracleDemoController.cs` 中，我們示範了如何透過 `FromSqlInterpolated` 來執行原生的 Oracle SQL 查詢：
+```csharp
+var searchPattern = $"%{keyword}%";
+return await _context.OracleDemoItems
+    .FromSqlInterpolated($"SELECT * FROM \"OracleDemoItems\" WHERE \"Name\" LIKE {searchPattern}")
+    .AsNoTracking()
+    .OrderByDescending(i => i.CreatedAt)
+    .ToListAsync();
+```
+**安全防護重點**：寫原生 SQL 時，**強烈建議使用 `FromSqlInterpolated`**！EF Core 會自動在底層將變數 (`{searchPattern}`) 轉換為參數化查詢 (Parameterized Query)，這能 100% 防止 SQL Injection (資料隱碼攻擊)。同時，別忘了搭配 `.AsNoTracking()` 提升唯讀查詢效能。
+
+### 前端實作：HTMX 即時防抖搜尋
+在 `Index.cshtml` 的搜尋框中，我們加入了強大的觸發條件：
+```html
+<input type="text" 
+       hx-get="/OracleDemo/List"
+       hx-trigger="keyup changed delay:500ms, search"
+       hx-target="#oracle-demo-list-container">
+```
+* **防抖機制 (Debounce)**：`delay:500ms` 告訴 HTMX「在使用者停止打字半秒鐘後，才幫我送出請求」。這可以大幅減少對伺服器無意義的連線負擔，只用一行 HTML 屬性就實現了順滑的即時搜尋體驗！
+
+---
+
+## 4. CSS 命名規範 (BEM)
 
 在這個模組中，我們實踐了經過修改的 BEM 命名法，所有樣式都寫在 `wwwroot/css/oracle-demo.css` 中：
 
@@ -66,7 +94,7 @@ return PartialView("_CreateOrEdit", item);
 
 ---
 
-## 4. 如何測試與執行
+## 5. 如何測試與執行
 
 1. **確保 Oracle 資料庫運行中**：請確認您透過 Docker 起的 `dot-net-mvc-web-oracle-free-db` 容器正在運作。
 2. **啟動專案**：在專案根目錄執行 `dotnet watch run`。

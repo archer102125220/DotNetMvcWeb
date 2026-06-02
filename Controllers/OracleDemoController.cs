@@ -26,13 +26,9 @@ namespace DotNetMvcWeb.Controllers
         /// GET: /OracleDemo
         /// 顯示主頁面，並載入初始資料列表
         /// </summary>
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? keyword = null)
         {
-            // 使用 AsNoTracking() 進行唯讀查詢，提升效能 (Deep Check 規範)
-            var items = await _context.OracleDemoItems
-                .AsNoTracking()
-                .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync();
+            var items = await GetItemsAsync(keyword);
             return View(items);
         }
 
@@ -40,13 +36,35 @@ namespace DotNetMvcWeb.Controllers
         /// GET: /OracleDemo/List
         /// 專門給 HTMX 呼叫，用來回傳更新後的資料列表 Partial View
         /// </summary>
-        public async Task<IActionResult> List()
+        public async Task<IActionResult> List(string? keyword = null)
         {
-            var items = await _context.OracleDemoItems
+            var items = await GetItemsAsync(keyword);
+            return PartialView("_DemoList", items);
+        }
+
+        /// <summary>
+        /// 取得資料列表 (支援 Raw SQL 關鍵字搜尋)
+        /// </summary>
+        private async Task<List<OracleDemoItem>> GetItemsAsync(string? keyword)
+        {
+            // 如果有輸入關鍵字，就使用原生 SQL 進行查詢
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                var searchPattern = $"%{keyword}%";
+                // ⚠️ 深度檢查注意：使用 FromSqlInterpolated 會自動進行參數化，安全防止 SQL Injection。
+                // 另外，查詢後仍必須加上 .AsNoTracking() 來進行唯讀優化。
+                return await _context.OracleDemoItems
+                    .FromSqlInterpolated($"SELECT * FROM \"OracleDemoItems\" WHERE \"Name\" LIKE {searchPattern}")
+                    .AsNoTracking()
+                    .OrderByDescending(i => i.CreatedAt)
+                    .ToListAsync();
+            }
+
+            // 如果沒有關鍵字，就使用一般的 LINQ 查詢全部
+            return await _context.OracleDemoItems
                 .AsNoTracking()
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
-            return PartialView("_DemoList", items);
         }
 
         /// <summary>

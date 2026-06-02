@@ -14,16 +14,31 @@
     <div class="oracle_demo_page-header d-flex justify-content-between align-items-center mb-4">
         <h1 class="oracle_demo_page-title">Oracle Database Demonstration</h1>
         
-        <!--
-          透過 HTMX 發送 GET 請求到 /OracleDemo/Create 取得新增表單 (Partial View)
-          並將結果放入 (hx-target) id 為 oracle-demo-form-container 的元素中
-        -->
-        <button class="oracle_demo_page-create_btn btn btn-primary"
-                hx-get="@Url.Action("Create", "OracleDemo")"
-                hx-target="#oracle-demo-form-container"
-                hx-swap="innerHTML">
-            Create New Item
-        </button>
+        <div class="d-flex gap-2">
+            <!-- 
+              搜尋框 (示範 Raw SQL 查詢)：
+              透過 HTMX，當使用者輸入文字 (keyup) 並停頓 500ms 後，會發送 GET /OracleDemo/List?keyword=xxx
+              並自動替換下方的列表 
+            -->
+            <input type="text" 
+                   name="keyword" 
+                   class="form-control" 
+                   placeholder="搜尋名稱 (Raw SQL)..."
+                   hx-get="@Url.Action("List", "OracleDemo")"
+                   hx-trigger="keyup changed delay:500ms, search"
+                   hx-target="#oracle-demo-list-container" />
+
+            <!--
+              透過 HTMX 發送 GET 請求到 /OracleDemo/Create 取得新增表單 (Partial View)
+              並將結果放入 (hx-target) id 為 oracle-demo-form-container 的元素中
+            -->
+            <button class="oracle_demo_page-create_btn btn btn-primary text-nowrap"
+                    hx-get="@Url.Action("Create", "OracleDemo")"
+                    hx-target="#oracle-demo-form-container"
+                    hx-swap="innerHTML">
+                Create New Item
+            </button>
+        </div>
     </div>
 
     <div class="row">
