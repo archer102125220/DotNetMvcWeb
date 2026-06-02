@@ -1,0 +1,67 @@
+@model IEnumerable<DotNetMvcWeb.Models.OracleDemoItem>
+
+<!--
+  資料列表 Partial View：
+  專門負責渲染資料表格。當有新增、編輯或刪除操作完成時，Controller 會回傳更新後的此 View，
+  並由 HTMX 自動替換到畫面上的 #oracle-demo-list-container 中。
+-->
+<div class="oracle_demo_page-table_wrapper table-responsive">
+    <table class="table table-hover table-bordered bg-white shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <!-- 將 UTC 時間轉換為本地時間顯示 -->
+                        <td>@item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>
+                            <!--
+                              編輯按鈕：
+                              發送 GET 請求取得編輯表單，並將表單渲染到左側的 form-container 中
+                            -->
+                            <button class="btn btn-sm btn-outline-secondary me-2"
+                                    hx-get="@Url.Action("Edit", "OracleDemo", new { id = item.Id })"
+                                    hx-target="#oracle-demo-form-container"
+                                    hx-swap="innerHTML">
+                                Edit
+                            </button>
+                            
+                            <!--
+                              刪除按鈕：
+                              發送 POST 請求執行刪除操作，成功後直接將更新後的列表替換目前的列表容器。
+                              hx-confirm 會在送出請求前跳出瀏覽器的確認對話框。
+                            -->
+                            <form hx-post="@Url.Action("Delete", "OracleDemo", new { id = item.Id })"
+                                  hx-target="#oracle-demo-list-container"
+                                  hx-swap="innerHTML"
+                                  hx-confirm="Are you sure you want to delete this item?"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No items found in the database.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,15 +1,37 @@
 using Scalar.AspNetCore;
 
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DotNetMvcWeb.Models.IProductRepository, DotNetMvcWeb.Models.ProductRepository>();
 
+builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
+    options.UseOracle(builder.Configuration.GetConnectionString("OracleDemoConnection")));
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// 呼叫我們自訂的第二種 Seed Data 方式 (DbInitializer)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<DotNetMvcWeb.Data.AppDbContext>();
+        // 執行外部獨立的 Seed 邏輯
+        DotNetMvcWeb.Seeders.DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred seeding the DB.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

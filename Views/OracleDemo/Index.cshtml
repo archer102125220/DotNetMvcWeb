@@ -1,0 +1,51 @@
+@model IEnumerable<DotNetMvcWeb.Models.OracleDemoItem>
+@{
+    ViewData["Title"] = "Oracle DB Demo";
+}
+
+<!--
+  主頁面 (Index)：
+  這裡使用了 HTMX 來處理前端與後端的非同步互動，而不需要寫任何 JavaScript。
+  主要有兩個區塊：
+  1. #oracle-demo-form-container：用來顯示新增或編輯表單的區塊
+  2. #oracle-demo-list-container：用來顯示資料列表的區塊
+-->
+<div class="oracle_demo_page">
+    <div class="oracle_demo_page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="oracle_demo_page-title">Oracle Database Demonstration</h1>
+        
+        <!--
+          透過 HTMX 發送 GET 請求到 /OracleDemo/Create 取得新增表單 (Partial View)
+          並將結果放入 (hx-target) id 為 oracle-demo-form-container 的元素中
+        -->
+        <button class="oracle_demo_page-create_btn btn btn-primary"
+                hx-get="@Url.Action("Create", "OracleDemo")"
+                hx-target="#oracle-demo-form-container"
+                hx-swap="innerHTML">
+            Create New Item
+        </button>
+    </div>
+
+    <div class="row">
+        <!-- 表單顯示區塊 (Form Container) -->
+        <div class="col-md-4">
+            <div id="oracle-demo-form-container" class="oracle_demo_page-form_container card p-3 shadow-sm">
+                <!-- 預設狀態下的提示文字，當點擊「新增」或「編輯」時，這裡的內容會被替換掉 -->
+                <p class="text-muted mb-0">Select an item to edit or click 'Create New Item'.</p>
+            </div>
+        </div>
+
+        <!-- 資料列表區塊 (List Container) -->
+        <div class="col-md-8">
+            <div id="oracle-demo-list-container" class="oracle_demo_page-list_container">
+                <!-- 初始載入時，直接透過 Razor 渲染部分視圖 (_DemoList) -->
+                @await Html.PartialAsync("_DemoList", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- 引入 HTMX 腳本庫，讓上述的 hx-* 屬性生效 -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+}

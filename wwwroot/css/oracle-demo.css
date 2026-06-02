@@ -1,0 +1,41 @@
+/* BEM styling for Oracle Demo Page */
+
+.oracle_demo_page {
+    padding: 20px 0;
+}
+
+.oracle_demo_page-header {
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 15px;
+}
+
+.oracle_demo_page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+.oracle_demo_page-form_container {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    min-height: 250px;
+}
+
+.oracle_demo_page-table_wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* HTMX Transition styling */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+
+.htmx-request .htmx-indicator {
+    opacity: 1;
+}
+
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
