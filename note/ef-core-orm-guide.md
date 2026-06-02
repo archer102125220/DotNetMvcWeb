@@ -3,6 +3,7 @@
 本文件記錄了在 .NET MVC 專案中使用 EF Core (搭配 Oracle 資料庫) 的核心觀念、常用指令，以及實務上常遇到的錯誤與踩雷經驗。
 
 > 💡 **相關閱讀**：如果您想了解這些資料庫操作是如何與前端 UI (MVC + HTMX) 結合的，請參考 [Oracle Database MVC & HTMX 實作導讀指南](./oracle-mvc-demo-guide.md)。
+> 💡 **進階概念**：想了解為什麼 EF Core 與 Node.js/PHP 的 ORM 在核心設計上有如此巨大的差異？請參考 [ORM 設計哲學比較：Code-First vs Migration-First](./orm-architecture-comparison.md)。
 
 ---
 
