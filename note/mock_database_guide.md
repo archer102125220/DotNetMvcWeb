@@ -82,6 +82,29 @@ builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 
 ---
 
+## 5. 進階觀念：MVC 與 API Controller 的邏輯複用 (Service Layer)
+
+你可能會發現 `ProductsController` 與 `Api/ProductsController` 裡面有重複的程式碼（例如都會呼叫 `await _productRepository.GetAllAsync()` 並檢查是否為 null）。
+這帶出了一個重要的架構觀念：**Controller 適合做邏輯複用嗎？**
+
+### A. 為什麼它們目前看起來很像？
+因為現在專案只做極度簡單的 CRUD (新增/讀取/更新/刪除)，邏輯薄到只有一兩行程式碼，在這種情況下（被稱為「貧血模型」），直接讓 Controller 呼叫 Repository 是可以接受的。
+
+### B. 當專案變大時該怎麼辦？(三層式架構)
+在真實的企業級專案中，「新增產品」可能還伴隨著：檢查價格不得為負數、檢查名稱是否重複、寫入 Log、寄送通知 Email 等等。
+如果我們把這些 **「商業邏輯 (Business Logic)」** 寫在 Controller 裡面（Fat Controller），MVC 和 API 兩邊就會出現大量重複且難以維護的程式碼。
+
+> **⚠️ 絕對不要讓 MVC Controller 去繼承或呼叫 API Controller。**
+
+標準的 .NET MVC 解決方案是抽出一個 **「服務層 (Service Layer)」**：
+1. **建立 `ProductService`**：將商業邏輯與 Repository 的呼叫包裝在裡面。
+2. **註冊服務**：在 `Program.cs` 加上 `builder.Services.AddScoped<ProductService>();`。
+3. **注入 Controller**：MVC 與 API Controller 都改為注入 `ProductService` 而非直接注入 Repository。
+
+這樣一來，Controller 就只負責「接收 HTTP 請求」與「決定回傳格式 (HTML 或 JSON)」，達到完美的**關注點分離 (Separation of Concerns)**。
+
+---
+
 ## 總結與下一步
 
 透過這套模擬架構，你可以在完全不需要安裝 SQL Server 或設定連線字串的情況下，專心學習 **Controller 的路由**、**依賴注入**以及 **MVC 的視圖渲染**。
