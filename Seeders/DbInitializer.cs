@@ -26,7 +26,7 @@ namespace DotNetMvcWeb.Seeders
             // 建立要動態寫入的資料
             // 在這種作法下，我們就可以自由使用 DateTime.UtcNow 或其他動態函式，
             // 甚至可以使用像是 Bogus 這樣的套件來生成隨機的假資料。
-            var dynamicItems = new OracleDemoItem[]
+            OracleDemoItem[] dynamicItems = new OracleDemoItem[]
             {
                 new OracleDemoItem 
                 { 

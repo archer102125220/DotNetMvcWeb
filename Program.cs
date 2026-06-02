@@ -2,7 +2,7 @@ using Scalar.AspNetCore;
 
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -14,21 +14,21 @@ builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // 呼叫我們自訂的第二種 Seed Data 方式 (DbInitializer)
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    IServiceProvider services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<DotNetMvcWeb.Data.AppDbContext>();
+        DotNetMvcWeb.Data.AppDbContext context = services.GetRequiredService<DotNetMvcWeb.Data.AppDbContext>();
         // 執行外部獨立的 Seed 邏輯
         DotNetMvcWeb.Seeders.DbInitializer.Initialize(context);
     }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
+        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred seeding the DB.");
     }
 }

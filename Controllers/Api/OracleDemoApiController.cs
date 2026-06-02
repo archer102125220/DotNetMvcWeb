@@ -34,8 +34,8 @@ namespace DotNetMvcWeb.Controllers
             // ⚠️ 深度檢查: 讀取資料必須使用 AsNoTracking() 進行優化
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                var searchPattern = $"%{keyword}%";
-                var searchResult = await _context.OracleDemoItems
+                string searchPattern = $"%{keyword}%";
+                List<OracleDemoItem> searchResult = await _context.OracleDemoItems
                     .FromSqlInterpolated($"SELECT * FROM \"OracleDemoItems\" WHERE \"Name\" LIKE {searchPattern}")
                     .AsNoTracking()
                     .OrderByDescending(i => i.CreatedAt)
@@ -44,7 +44,7 @@ namespace DotNetMvcWeb.Controllers
                 return Ok(searchResult);
             }
 
-            var items = await _context.OracleDemoItems
+            List<OracleDemoItem> items = await _context.OracleDemoItems
                 .AsNoTracking()
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
@@ -61,7 +61,7 @@ namespace DotNetMvcWeb.Controllers
         {
             // 由於 FindAsync 會做 tracking，但這裡只是單純回傳，
             // 若要嚴謹可改用 FirstOrDefaultAsync 搭配 AsNoTracking
-            var item = await _context.OracleDemoItems
+            OracleDemoItem? item = await _context.OracleDemoItems
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -132,7 +132,7 @@ namespace DotNetMvcWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {
-            var item = await _context.OracleDemoItems.FindAsync(id);
+            OracleDemoItem? item = await _context.OracleDemoItems.FindAsync(id);
             if (item == null)
             {
                 return NotFound(new { message = "找不到指定的項目，可能已被刪除" });

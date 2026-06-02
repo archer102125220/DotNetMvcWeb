@@ -28,7 +28,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Index(string? keyword = null)
         {
-            var items = await GetItemsAsync(keyword);
+            List<OracleDemoItem> items = await GetItemsAsync(keyword);
             return View(items);
         }
 
@@ -38,7 +38,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> List(string? keyword = null)
         {
-            var items = await GetItemsAsync(keyword);
+            List<OracleDemoItem> items = await GetItemsAsync(keyword);
             return PartialView("_DemoList", items);
         }
 
@@ -50,7 +50,7 @@ namespace DotNetMvcWeb.Controllers
             // 如果有輸入關鍵字，就使用原生 SQL 進行查詢
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                var searchPattern = $"%{keyword}%";
+                string searchPattern = $"%{keyword}%";
                 // ⚠️ 深度檢查注意：使用 FromSqlInterpolated 會自動進行參數化，安全防止 SQL Injection。
                 // 另外，查詢後仍必須加上 .AsNoTracking() 來進行唯讀優化。
                 return await _context.OracleDemoItems
@@ -108,7 +108,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            var item = await _context.OracleDemoItems.FindAsync(id);
+            OracleDemoItem? item = await _context.OracleDemoItems.FindAsync(id);
             if (item == null) return NotFound();
             
             return PartialView("_CreateOrEdit", item);
@@ -156,7 +156,7 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.OracleDemoItems.FindAsync(id);
+            OracleDemoItem? item = await _context.OracleDemoItems.FindAsync(id);
             if (item != null)
             {
                 _context.OracleDemoItems.Remove(item);
