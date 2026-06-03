@@ -57,3 +57,5 @@
   - 針對熟悉 TypeScript 的前端/Node.js 開發者，快速對應 C# 語法並適應本專案極為嚴格的強型別與 EF Core 開發規範。
 - 📘 **[TypeScript vs .NET 6 (C# 10) 語法差異筆記 (typescript-vs-dotnet6-csharp.md)](./typescript-vs-dotnet6-csharp.md)**
   - 專門針對 .NET 6 (C# 10) 撰寫的對照筆記，包含 LINQ、File-scoped namespaces、Records 以及 Lambda 推斷等 LTS 版本特性的介紹。
+- 📘 **[TypeScript vs .NET Framework (C# 7.3) 語法差異筆記 (typescript-vs-dotnet-framework-csharp.md)](./typescript-vs-dotnet-framework-csharp.md)**
+  - 給熟悉現代 TypeScript 開發者，在接手古老 .NET Framework 專案時的「語法降級」衝擊指南，探討缺乏 Null 安全機制、冗長寫法與非同步陷阱的應對方式。
