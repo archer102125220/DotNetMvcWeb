@@ -55,3 +55,5 @@
   - 比較與近代 LTS 版本 (.NET 6 / C# 10) 之間的細微語法升級與功能演進。
 - 📘 **[TypeScript vs C# 語法差異筆記 (typescript-vs-csharp.md)](./typescript-vs-csharp.md)**
   - 針對熟悉 TypeScript 的前端/Node.js 開發者，快速對應 C# 語法並適應本專案極為嚴格的強型別與 EF Core 開發規範。
+- 📘 **[TypeScript vs .NET 6 (C# 10) 語法差異筆記 (typescript-vs-dotnet6-csharp.md)](./typescript-vs-dotnet6-csharp.md)**
+  - 專門針對 .NET 6 (C# 10) 撰寫的對照筆記，包含 LINQ、File-scoped namespaces、Records 以及 Lambda 推斷等 LTS 版本特性的介紹。
