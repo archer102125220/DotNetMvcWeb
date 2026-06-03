@@ -93,10 +93,49 @@
 * **觸發時機**：在 `DbContext` 初始化，準備連線到資料庫之前。
 * **功用**：用來設定資料庫 Provider（例如 Oracle, SQL Server）與連線字串。在現代 ASP.NET Core 專案中，通常已被 `Program.cs` 裡的 Dependency Injection 取代，但開發單體 Console App 時仍會用到。
 
+**範例程式碼：**
+```csharp
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+{
+    if (!optionsBuilder.IsConfigured)
+    {
+        optionsBuilder.UseOracle("你的連線字串");
+    }
+}
+```
+
 ### 2. 覆寫 `SaveChanges` / `SaveChangesAsync` (寫入前攔截)
 這是日常開發中最常被覆寫的生命週期方法。
 * **觸發時機**：當呼叫 `SaveChanges()`，EF Core 準備將 C# 裡的變更轉換成 SQL 語法寫入資料庫的「前一刻」。
 * **常見應用**：**自動記錄時間 (Auditing)** 與 **軟刪除 (Soft Delete)**。例如，利用 `ChangeTracker` 自動為所有新增或修改的資料壓上 `CreatedAt` 和 `UpdatedAt` 時間，就不需要在每個 Controller 裡手動寫入。
+
+**範例程式碼（自動記錄時間）：**
+```csharp
+public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+{
+    // 透過 ChangeTracker 找出所有正在被「新增」或「修改」的實體
+    var entries = ChangeTracker.Entries()
+        .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+    foreach (var entry in entries)
+    {
+        // 假設你的 Model 有 UpdatedAt 屬性，在這裡統一壓上當前時間
+        if (entry.Property("UpdatedAt") != null)
+        {
+            entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+        }
+
+        // 如果是新增的，順便壓上 CreatedAt
+        if (entry.State == EntityState.Added && entry.Property("CreatedAt") != null)
+        {
+            entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+        }
+    }
+
+    // 處理完後，再呼叫原本的 SaveChanges 去真正執行 SQL
+    return base.SaveChangesAsync(cancellationToken);
+}
+```
 
 ### 3. EF Core 攔截器 (Interceptors)
 針對更複雜或底層的需求，EF Core 提供了 Interceptors 機制，能將攔截邏輯從 DbContext 中抽離出來。
