@@ -21,6 +21,8 @@
   - 如何使用 Docker 運行本專案與周邊服務。
 - 🚀 **[部署指南 (DEPLOYMENT.md)](./DEPLOYMENT.md)**
   - 應用程式發布與部署至正式/測試環境的說明。
+- 🤫 **[.NET 環境變數與機密管理筆記 (dotnet-env-and-secrets.md)](./dotnet-env-and-secrets.md)**
+  - 在 .NET 中使用 appsettings.json 與 User Secrets 管理環境變數與機密的教學。
 
 ## 🗄️ 資料庫與 ORM (Database & ORM)
 記錄了各種資料庫系統（包含 Oracle）以及 Entity Framework Core 相關的教學與操作指令。
