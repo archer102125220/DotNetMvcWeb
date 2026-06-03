@@ -53,3 +53,5 @@
   - 詳細記錄從古老的 .NET Framework (C# 7.3) 遷移或退回開發時，在底層架構、專案結構、DI、CLI 工具以及 C# 語法上的巨大鴻溝。
 - ⚡ **[.NET 10 vs .NET 6 差異筆記 (dotnet10-vs-dotnet6.md)](./dotnet10-vs-dotnet6.md)**
   - 比較與近代 LTS 版本 (.NET 6 / C# 10) 之間的細微語法升級與功能演進。
+- 📘 **[TypeScript vs C# 語法差異筆記 (typescript-vs-csharp.md)](./typescript-vs-csharp.md)**
+  - 針對熟悉 TypeScript 的前端/Node.js 開發者，快速對應 C# 語法並適應本專案極為嚴格的強型別與 EF Core 開發規範。
