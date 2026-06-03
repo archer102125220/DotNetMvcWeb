@@ -18,9 +18,11 @@
             <!--
               透過 HTMX 發送 GET 請求到 /OracleDemoCategory/Create 取得新增表單 (Partial View)
               並將結果放入 (hx-target) id 為 oracle-demo-category-form-container 的元素中
+              [教學註解] 加入 hx-push-url="true" 將網址同步改為 /Create，保持使用者體驗一致性。
             -->
             <button class="oracle_demo_page-create_btn btn btn-primary text-nowrap"
                     hx-get="@Url.Action("Create", "OracleDemoCategory")"
+                    hx-push-url="true"
                     hx-target="#oracle-demo-category-form-container"
                     hx-swap="innerHTML">
                 Create New Category
@@ -32,8 +34,19 @@
         <!-- 表單顯示區塊 (Form Container) -->
         <div class="col-md-4">
             <div id="oracle-demo-category-form-container" class="oracle_demo_page-form_container card p-3 shadow-sm">
-                <!-- 預設狀態下的提示文字，當點擊「新增」或「編輯」時，這裡的內容會被替換掉 -->
-                <p class="text-muted mb-0">Select a category to edit or click 'Create New Category'.</p>
+                <!-- 
+                  [教學註解] 漸進式增強 (Progressive Enhancement)：
+                  配合 Controller 傳來的 ViewBag.ActiveItem，如果是重新整理帶有 Id 的網址，
+                  直接在此處渲染表單，避免畫面空白或跑回初始狀態。
+                -->
+                @if (ViewBag.ActiveItem != null)
+                {
+                    @await Html.PartialAsync("_CreateOrEdit", (DotNetMvcWeb.Models.OracleDemoCategory)ViewBag.ActiveItem)
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Select a category to edit or click 'Create New Category'.</p>
+                }
             </div>
         </div>
 

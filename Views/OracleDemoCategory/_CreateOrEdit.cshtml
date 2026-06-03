@@ -33,10 +33,14 @@
     </div>
 
     <div class="d-flex justify-content-end gap-2 mt-4">
-        <!-- 取消按鈕：直接使用 JavaScript 將表單區塊還原為預設文字 -->
+        <!-- 
+          取消按鈕：
+          直接使用 JavaScript 將表單區塊還原為預設文字。
+          [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /OracleDemoCategory。
+        -->
         <button type="button" 
                 class="btn btn-light" 
-                onclick="document.getElementById('oracle-demo-category-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select a category to edit or click \'Create New Category\'.</p>'">
+                onclick="document.getElementById('oracle-demo-category-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select a category to edit or click \'Create New Category\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "OracleDemoCategory")');">
             Cancel
         </button>
         <button type="submit" class="btn btn-primary">Save</button>

@@ -25,22 +25,24 @@ namespace DotNetMvcWeb.Controllers
 
         /// <summary>
         /// GET: /OracleDemo
-        /// 顯示主頁面，並載入初始資料列表
+        /// 顯示主頁面，並載入初始資料列表。若為 HTMX 請求則回傳 PartialView。
         /// </summary>
         public async Task<IActionResult> Index(string? keyword = null)
         {
             List<OracleDemoItem> items = await GetItemsAsync(keyword);
-            return View(items);
-        }
 
-        /// <summary>
-        /// GET: /OracleDemo/List
-        /// 專門給 HTMX 呼叫，用來回傳更新後的資料列表 Partial View
-        /// </summary>
-        public async Task<IActionResult> List(string? keyword = null)
-        {
-            List<OracleDemoItem> items = await GetItemsAsync(keyword);
-            return PartialView("_DemoList", items);
+            // [教學註解] 漸進式增強 (Progressive Enhancement) 的核心：
+            // 透過檢查 Request Header 是否包含 "HX-Request"，我們可以知道這個請求是由 HTMX (AJAX) 發出的，
+            // 還是由瀏覽器直接重整 (F5) 或輸入網址發出的。
+            // 若為 HTMX 請求，我們只需要回傳清單的部分視圖 (PartialView)，不用回傳整個帶有 Layout 的網頁，節省頻寬。
+            if (Request.Headers.ContainsKey("HX-Request"))
+            {
+                return PartialView("_DemoList", items);
+            }
+
+            // 若為一般瀏覽器請求 (例如剛進來或重整)，則回傳完整的 View (包含 _Layout)
+            ViewBag.Keyword = keyword;
+            return View(items);
         }
 
         /// <summary>
@@ -70,8 +72,11 @@ namespace DotNetMvcWeb.Controllers
                 .ToListAsync();
         }
 
+
         /// <summary>
         /// GET: /OracleDemo/Create
+        /// 回傳「新增項目」的表單 Partial View，供 HTMX 載入到畫面上。
+        /// 
         /// 【程式碼撰寫與設定解說：如何載入 _CreateOrEdit.cshtml】
         /// 1. 路由對應：前端使用 `Url.Action("Create", "OracleDemo")` 會產生 `/OracleDemo/Create` 的網址。
         ///    ASP.NET Core 的預設路由機制會自動找到 `OracleDemoController` 底下名稱為 `Create` 的這個方法。
@@ -80,10 +85,25 @@ namespace DotNetMvcWeb.Controllers
         ///    - 框架會按照慣例到 `Views/OracleDemo/` 資料夾下尋找 `_CreateOrEdit.cshtml`。
         ///    - 將一個全新的空 `OracleDemoItem` 模型傳遞給該視圖，以便產生空表單。
         /// </summary>
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             PopulateCategoriesDropDownList();
-            return PartialView("_CreateOrEdit", new OracleDemoItem());
+            var model = new OracleDemoItem();
+
+            // [教學註解] 若是透過 HTMX 點擊「Create」按鈕進來，只回傳表單的部分 HTML
+            if (Request.Headers.ContainsKey("HX-Request"))
+            {
+                return PartialView("_CreateOrEdit", model);
+            }
+
+            // [教學註解] 漸進式增強 (Progressive Enhancement) - 處理重整問題：
+            // 若使用者直接重整 /OracleDemo/Create 網頁（此時不會有 HX-Request header），
+            // 我們如果只回傳 PartialView，畫面就會破版 (沒有選單與 CSS)。
+            // 因此我們將表單狀態 (model) 放入 ViewBag，然後改為渲染整頁的 "Index" 視圖。
+            // 這樣使用者重新整理時，就會看到完整的列表頁面，且左側自動開啟新增表單！
+            ViewBag.ActiveItem = model;
+            ViewBag.IsCreate = true;
+            return View("Index", await GetItemsAsync(null));
         }
 
         /// <summary>
@@ -100,8 +120,14 @@ namespace DotNetMvcWeb.Controllers
                 _context.Add(item);
                 await _context.SaveChangesAsync(); // 非同步寫入資料庫
                 
-                // 成功後，回傳更新後的列表給 HTMX 進行局部刷新
-                return await List();
+                // [教學註解] 狀態網址化 (URL State Sync) - 送出後的還原：
+                // 當成功新增後，我們利用 Response Header 告訴 HTMX 去推播 (Push) 一個新網址。
+                // 這樣可以把原本是 /OracleDemo/Create 的網址，自動還原回乾淨的 /OracleDemo，
+                // 確保使用者如果此時按下 F5，不會不小心又進入 Create 頁面發送 POST 請求。
+                Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemo"));
+                
+                // 重新呼叫 Index() 取得最新列表並回傳 (因為是 HTMX 請求，Index 會自動回傳 PartialView)
+                return await Index();
             }
             
             // 若驗證失敗，指示 HTMX 將錯誤表單重新渲染回表單區塊中
@@ -111,8 +137,11 @@ namespace DotNetMvcWeb.Controllers
             return PartialView("_CreateOrEdit", item);
         }
 
+
         /// <summary>
         /// GET: /OracleDemo/Edit/5
+        /// 根據 ID 回傳「編輯項目」的表單 Partial View，供 HTMX 載入到畫面上。
+        /// 
         /// 【程式碼撰寫與設定解說：如何載入 _CreateOrEdit.cshtml 作為編輯用】
         /// 1. 路由對應：前端使用 `Url.Action("Edit", "OracleDemo", new { id = item.Id })` 會產生如 `/OracleDemo/Edit/5` 的網址。
         ///    路由機制會對應到這個 `Edit(int? id)` 方法，並將網址結尾的數字作為 `id` 參數傳入。
@@ -128,7 +157,19 @@ namespace DotNetMvcWeb.Controllers
             if (item == null) return NotFound();
             
             PopulateCategoriesDropDownList(item.CategoryId);
-            return PartialView("_CreateOrEdit", item);
+
+            // [教學註解] 若是點擊列表的 Edit 按鈕 (HTMX 請求)，回傳表單的部分視圖
+            if (Request.Headers.ContainsKey("HX-Request"))
+            {
+                return PartialView("_CreateOrEdit", item);
+            }
+
+            // [教學註解] 漸進式增強 (Progressive Enhancement)：
+            // 處理使用者直接複製 /OracleDemo/Edit/5 貼給別人，或是直接 F5 重整頁面的情況。
+            // 把讀取到的 item 塞入 ViewBag，由 Index 視圖做整頁渲染，實現「無縫狀態接軌」。
+            ViewBag.ActiveItem = item;
+            ViewBag.IsEdit = true;
+            return View("Index", await GetItemsAsync(null));
         }
 
         /// <summary>
@@ -155,8 +196,9 @@ namespace DotNetMvcWeb.Controllers
                     else
                         throw;
                 }
-                // 更新成功，回傳列表 Partial View
-                return await List();
+                // 更新成功，回傳列表 Partial View，並還原網址
+                Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemo"));
+                return await Index();
             }
             
             // 驗證失敗，將錯誤表單重新渲染
@@ -181,8 +223,9 @@ namespace DotNetMvcWeb.Controllers
                 await _context.SaveChangesAsync();
             }
             
-            // 刪除成功後，回傳更新後的列表
-            return await List();
+            // 刪除成功後，回傳更新後的列表，並確保網址維持在根目錄
+            Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemo"));
+            return await Index();
         }
 
         // 檢查項目是否存在的輔助方法

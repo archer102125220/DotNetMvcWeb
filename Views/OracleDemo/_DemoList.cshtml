@@ -33,9 +33,12 @@
                             <!--
                               編輯按鈕：
                               發送 GET 請求取得編輯表單，並將表單渲染到左側的 form-container 中
+                              [教學註解] 加入 hx-push-url="true"，讓點擊編輯時網址列同步更新為 /Edit/{id}。
+                              使用者如果直接複製這個網址給別人，別人看到的畫面也會是開啟這個編輯表單的狀態。
                             -->
                             <button class="btn btn-sm btn-outline-secondary me-2"
                                     hx-get="@Url.Action("Edit", "OracleDemo", new { id = item.Id })"
+                                    hx-push-url="true"
                                     hx-target="#oracle-demo-form-container"
                                     hx-swap="innerHTML">
                                 Edit

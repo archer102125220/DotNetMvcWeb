@@ -14,6 +14,10 @@
   4. 渲染方式：依照 hx-swap="innerHTML" 指示，把右側舊的表格直接替換成新的表格。
   * 注意：如果後端驗證失敗 (例如沒填必填欄位)，Controller 會回傳狀態錯誤的 _CreateOrEdit 表單本身，並透過 HTTP Header (HX-Retarget) 指示 HTMX 改為替換左側的表單區塊，讓使用者看到錯誤訊息。
 -->
+<!--
+  根據 Model.Id 是否為 0 來決定送出的 Action 網址 (Create 或 Edit)。
+  送出後，預期 Controller 會回傳更新後的資料列表，因此 hx-target 設為 #oracle-demo-list-container
+-->
 <form hx-post="@(Model.Id == 0 ? Url.Action("Create", "OracleDemo") : Url.Action("Edit", "OracleDemo", new { id = Model.Id }))"
       hx-target="#oracle-demo-list-container"
       hx-swap="innerHTML"
@@ -51,10 +55,14 @@
     </div>
 
     <div class="d-flex justify-content-end gap-2 mt-4">
-        <!-- 取消按鈕：直接使用 JavaScript 將表單區塊還原為預設文字 -->
+        <!-- 
+          取消按鈕：
+          直接使用 JavaScript 將表單區塊還原為預設文字。
+          [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /OracleDemo。
+        -->
         <button type="button" 
                 class="btn btn-light" 
-                onclick="document.getElementById('oracle-demo-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select an item to edit or click \'Create New Item\'.</p>'">
+                onclick="document.getElementById('oracle-demo-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select an item to edit or click \'Create New Item\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "OracleDemo")');">
             Cancel
         </button>
         <button type="submit" class="btn btn-primary">Save</button>

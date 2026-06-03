@@ -20,11 +20,14 @@
               透過 HTMX，當使用者輸入文字 (keyup) 並停頓 500ms 後，會發送 GET /OracleDemo/List?keyword=xxx
               並自動替換下方的列表 
             -->
+            <!-- [教學註解] hx-push-url="true" 會讓 HTMX 在發出 GET 請求時，自動把請求的網址 (例如 /OracleDemo?keyword=xxx) 推播到瀏覽器的網址列，實現網址同步 -->
             <input type="text" 
                    name="keyword" 
                    class="form-control" 
                    placeholder="搜尋名稱 (Raw SQL)..."
-                   hx-get="@Url.Action("List", "OracleDemo")"
+                   value="@ViewBag.Keyword"
+                   hx-get="@Url.Action("Index", "OracleDemo")"
+                   hx-push-url="true"
                    hx-trigger="keyup changed delay:500ms, search"
                    hx-target="#oracle-demo-list-container" />
 
@@ -36,9 +39,13 @@
               4. 接收與替換：HTMX 收到 HTML 原始碼後，會找到畫面上的 hx-target (也就是 id="oracle-demo-form-container" 的元素)。
               5. 渲染方式：依照 hx-swap="innerHTML" 的指示，把該元素的「內部內容」替換成後端回傳的表單 HTML。
                  (也就是說，下方預設的那段 <p>Select an item...</p> 就會被 _CreateOrEdit 的內容給蓋掉！)
+              透過 HTMX 發送 GET 請求到 /OracleDemo/Create 取得新增表單 (Partial View)
+              並將結果放入 (hx-target) id 為 oracle-demo-form-container 的元素中
+              [教學註解] 同樣加上 hx-push-url="true"，點擊時網址會變成 /OracleDemo/Create，確保狀態可被分享或重整。
             -->
             <button class="oracle_demo_page-create_btn btn btn-primary text-nowrap"
                     hx-get="@Url.Action("Create", "OracleDemo")"
+                    hx-push-url="true"
                     hx-target="#oracle-demo-form-container"
                     hx-swap="innerHTML">
                 Create New Item
@@ -55,8 +62,20 @@
               HTMX 就會自動把後端回傳的 Partial View (_CreateOrEdit.cshtml) 塞進這裡！
             -->
             <div id="oracle-demo-form-container" class="oracle_demo_page-form_container card p-3 shadow-sm">
-                <!-- 預設狀態下的提示文字，當點擊「新增」或「編輯」時，這整段 <p> 會被 _CreateOrEdit.cshtml 的內容蓋掉 -->
-                <p class="text-muted mb-0">Select an item to edit or click 'Create New Item'.</p>
+                <!-- 
+                  [教學註解] Progressive Enhancement (漸進式增強) 的 View 實作：
+                  當使用者直接重整 /OracleDemo/Edit/5 或 /OracleDemo/Create 時，
+                  Controller 會把資料塞入 ViewBag.ActiveItem 並回傳整頁。
+                  我們在這裡判斷如果 ActiveItem 有值，就直接在畫面初始載入時把表單畫出來，達到「重整不破版、狀態不遺失」。
+                -->
+                @if (ViewBag.ActiveItem != null)
+                {
+                    @await Html.PartialAsync("_CreateOrEdit", (DotNetMvcWeb.Models.OracleDemoItem)ViewBag.ActiveItem)
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Select an item to edit or click 'Create New Item'.</p>
+                }
             </div>
         </div>
 
