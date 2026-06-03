@@ -35,7 +35,7 @@
 * **.NET 6**: MVC 與 Web API 的開發模式與現在相似，但 Blazor 當時的伺服器渲染 (SSR) 和 WebAssembly 模式是分開的。
 * **.NET 10**: ASP.NET Core 加入了更多現代 Web 開發功能。Blazor 迎來了 "Blazor United"（自 .NET 8 開始），允許在同一個專案中自由混合伺服器端渲染 (SSR)、SignalR 互動模式和 WebAssembly 互動模式。
 
-## 總結：當您回去維護 .NET 6 專案時的注意事項
+## 總結：回去維護 .NET 6 專案時的注意事項
 1. **語法限制**：將無法使用 `[]` 集合運算式、主要建構函式或 `"""` 多行原始字串，寫法會稍微囉嗦一點。
 2. **Program.cs**：.NET 6 雖然也支援頂層語句 (Top-level statements)，但某些架構可能還是用舊版的 `Startup.cs`（如果是從 .NET Core 3.1 升級上來的）。
 3. **效能**：執行速度與記憶體使用量可能不如 .NET 10 專案優秀。

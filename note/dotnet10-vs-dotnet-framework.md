@@ -44,7 +44,7 @@
   * 移除了 EDMX 視覺化介面，全面擁抱 Code-First 或是透過 CLI 反向工程生成程式碼 (Scaffold-DbContext)。
 
 ## 7. C# 語言版本差異 (C# 7.3 vs C# 14)
-這是一個極大的鴻溝，退回 .NET Framework 代表您將失去過去 6 年多來 C# 新增的所有便利語法。以下列出在 .NET Framework 中**無法使用**，且感受最深的功能與寫法差異：
+這是一個極大的鴻溝，退回 .NET Framework 代表將失去過去 6 年多來 C# 新增的所有便利語法。以下列出在 .NET Framework 中**無法使用**，且感受最深的功能與寫法差異：
 
 ### 1. 命名空間與 using 宣告 (C# 10+)
 * **.NET 10**: 支援 `global using` 和檔案範圍命名空間。
@@ -109,8 +109,8 @@
 * **模式比對 (Pattern matching)**：無法使用 `is { Property: > 10 }` 等強大邏輯比對。
 * **非同步串流**：沒有 `IAsyncEnumerable<T>` 和 `await foreach`。
 
-## 總結：當您維護 .NET Framework 專案時的注意事項
-1. **找不到 `appsettings.json`**：您需要習慣去解析 XML 格式的 `Web.config`。
+## 總結：維護 .NET Framework 專案時的注意事項
+1. **找不到 `appsettings.json`**：需要習慣去解析 XML 格式的 `Web.config`。
 2. **語法受限**：習慣了現代 C# 的語法糖後，寫舊版 C# 7.3 會有「綁手綁腳」的感覺，很多功能需要寫得比較冗長。
 3. **沒有原生的 DI**：要注意專案中是如何管理實例生命週期的，可能是手動 `new` 或是透過自訂的 Service Locator/IoC 容器。
 4. **只能在 Windows 上開發與部署**：必須依賴 IIS 或 IIS Express。
