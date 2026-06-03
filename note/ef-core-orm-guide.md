@@ -43,6 +43,8 @@ dotnet ef database drop
 
 ---
 
+> 💡 **運作原理進階**：如果你好奇 `dotnet ef migrations add` 是如何推斷並產生程式碼的，以及 Seed Data 是如何運作的，請參考 [EF Core Migrations 運作原理：Diffing 與 Seed Data](./ef-core-migration-mechanism.md)。
+
 ## 2. Migrations 檔案結構解析
 
 每當執行 `dotnet ef migrations add` 時，EF Core 其實會在 `Migrations` 資料夾內產生 **兩個** 檔案，它們扮演著不同但互補的角色：
