@@ -27,5 +27,16 @@ namespace DotNetMvcWeb.Models
         /// 預設值為當前的 UTC 時間
         /// </summary>
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        /// <summary>
+        /// 分類 ID (Foreign Key)
+        /// 選填，允許項目沒有分類
+        /// </summary>
+        public int? CategoryId { get; set; }
+
+        /// <summary>
+        /// 關聯的分類實體 (Navigation Property)
+        /// </summary>
+        public OracleDemoCategory? Category { get; set; }
     }
 }

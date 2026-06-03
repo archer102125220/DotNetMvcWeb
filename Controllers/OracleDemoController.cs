@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace DotNetMvcWeb.Controllers
@@ -55,6 +56,7 @@ namespace DotNetMvcWeb.Controllers
                 // 另外，查詢後仍必須加上 .AsNoTracking() 來進行唯讀優化。
                 return await _context.OracleDemoItems
                     .FromSqlInterpolated($"SELECT * FROM \"OracleDemoItems\" WHERE \"Name\" LIKE {searchPattern}")
+                    .Include(i => i.Category)
                     .AsNoTracking()
                     .OrderByDescending(i => i.CreatedAt)
                     .ToListAsync();
@@ -62,6 +64,7 @@ namespace DotNetMvcWeb.Controllers
 
             // 如果沒有關鍵字，就使用一般的 LINQ 查詢全部
             return await _context.OracleDemoItems
+                .Include(i => i.Category)
                 .AsNoTracking()
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
@@ -73,6 +76,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public IActionResult Create()
         {
+            PopulateCategoriesDropDownList();
             return PartialView("_CreateOrEdit", new OracleDemoItem());
         }
 
@@ -82,7 +86,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken] // 防止 CSRF 攻擊
-        public async Task<IActionResult> Create([Bind("Name,Description")] OracleDemoItem item)
+        public async Task<IActionResult> Create([Bind("Name,Description,CategoryId")] OracleDemoItem item)
         {
             if (ModelState.IsValid) // 檢查資料驗證是否通過
             {
@@ -97,6 +101,7 @@ namespace DotNetMvcWeb.Controllers
             // 若驗證失敗，指示 HTMX 將錯誤表單重新渲染回表單區塊中
             Response.Headers.Append("HX-Retarget", "#oracle-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
+            PopulateCategoriesDropDownList(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -111,6 +116,7 @@ namespace DotNetMvcWeb.Controllers
             OracleDemoItem? item = await _context.OracleDemoItems.FindAsync(id);
             if (item == null) return NotFound();
             
+            PopulateCategoriesDropDownList(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -120,7 +126,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreatedAt")] OracleDemoItem item)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CreatedAt,CategoryId")] OracleDemoItem item)
         {
             if (id != item.Id) return NotFound();
 
@@ -145,6 +151,7 @@ namespace DotNetMvcWeb.Controllers
             // 驗證失敗，將錯誤表單重新渲染
             Response.Headers.Append("HX-Retarget", "#oracle-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
+            PopulateCategoriesDropDownList(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -171,6 +178,12 @@ namespace DotNetMvcWeb.Controllers
         private bool OracleDemoItemExists(int id)
         {
             return _context.OracleDemoItems.Any(e => e.Id == id);
+        }
+
+        private void PopulateCategoriesDropDownList(object? selectedCategory = null)
+        {
+            var categoriesQuery = _context.OracleDemoCategories.OrderBy(c => c.Name);
+            ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
         }
     }
 }

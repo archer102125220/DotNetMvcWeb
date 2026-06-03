@@ -37,6 +37,7 @@ namespace DotNetMvcWeb.Controllers
                 string searchPattern = $"%{keyword}%";
                 List<OracleDemoItem> searchResult = await _context.OracleDemoItems
                     .FromSqlInterpolated($"SELECT * FROM \"OracleDemoItems\" WHERE \"Name\" LIKE {searchPattern}")
+                    .Include(i => i.Category)
                     .AsNoTracking()
                     .OrderByDescending(i => i.CreatedAt)
                     .ToListAsync();
@@ -45,6 +46,7 @@ namespace DotNetMvcWeb.Controllers
             }
 
             List<OracleDemoItem> items = await _context.OracleDemoItems
+                .Include(i => i.Category)
                 .AsNoTracking()
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
@@ -62,6 +64,7 @@ namespace DotNetMvcWeb.Controllers
             // 由於 FindAsync 會做 tracking，但這裡只是單純回傳，
             // 若要嚴謹可改用 FirstOrDefaultAsync 搭配 AsNoTracking
             OracleDemoItem? item = await _context.OracleDemoItems
+                .Include(i => i.Category)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(i => i.Id == id);
 

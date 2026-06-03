@@ -18,6 +18,11 @@ namespace DotNetMvcWeb.Data
         /// </summary>
         public DbSet<Models.OracleDemoItem> OracleDemoItems { get; set; }
         
+        /// <summary>
+        /// 定義 OracleDemoCategory 對應的資料表
+        /// </summary>
+        public DbSet<Models.OracleDemoCategory> OracleDemoCategories { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -29,6 +34,22 @@ namespace DotNetMvcWeb.Data
                 .IsRequired()
                 .HasMaxLength(200);
 
+            // 建立示範用的分類 Seed Data
+            modelBuilder.Entity<Models.OracleDemoCategory>().HasData(
+                new Models.OracleDemoCategory
+                {
+                    Id = 1,
+                    Name = "一般",
+                    CreatedAt = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
+                },
+                new Models.OracleDemoCategory
+                {
+                    Id = 2,
+                    Name = "重要",
+                    CreatedAt = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
+                }
+            );
+
             // 建立示範用的 Seed Data
             modelBuilder.Entity<Models.OracleDemoItem>().HasData(
                 new Models.OracleDemoItem
@@ -36,6 +57,7 @@ namespace DotNetMvcWeb.Data
                     Id = 1,
                     Name = "測試示範項目 1",
                     Description = "這是第一筆透過 EF Core Seed 建立的測試資料。",
+                    CategoryId = 1,
                     CreatedAt = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc)
                 },
                 new Models.OracleDemoItem
@@ -43,6 +65,7 @@ namespace DotNetMvcWeb.Data
                     Id = 2,
                     Name = "測試示範項目 2",
                     Description = "示範如何在 Oracle 資料庫中儲存繁體中文內容。",
+                    CategoryId = 2,
                     CreatedAt = new DateTime(2026, 6, 2, 10, 0, 0, DateTimeKind.Utc)
                 },
                 new Models.OracleDemoItem
@@ -50,6 +73,7 @@ namespace DotNetMvcWeb.Data
                     Id = 3,
                     Name = "教學用項目",
                     Description = "可以嘗試在畫面上點擊編輯或刪除這筆資料，測試 HTMX 的互動效果！",
+                    CategoryId = null,
                     CreatedAt = new DateTime(2026, 6, 2, 12, 0, 0, DateTimeKind.Utc)
                 }
             );

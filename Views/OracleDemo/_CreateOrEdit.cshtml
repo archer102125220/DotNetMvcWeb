@@ -33,6 +33,14 @@
     </div>
 
     <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+            <option value="">-- Select Category (Optional) --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
         <label asp-for="Description" class="form-label">Description</label>
         <textarea asp-for="Description" class="form-control" rows="3"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
