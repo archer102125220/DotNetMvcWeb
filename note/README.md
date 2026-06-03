@@ -27,6 +27,8 @@
 ## 🗄️ 資料庫與 ORM (Database & ORM)
 記錄了各種資料庫系統（包含 Oracle）以及 Entity Framework Core 相關的教學與操作指令。
 
+- 🎭 **[Mock Database 實作指南 (mock_database_guide.md)](./mock_database_guide.md)**
+  - 在不依賴實體資料庫的情況下，使用假資料進行開發的架構實作。
 - 🐘 **[EF Core ORM 開發指南 (ef-core-orm-guide.md)](./ef-core-orm-guide.md)**
   - Entity Framework Core 的整合、Migration 使用方式以及查詢最佳實踐。
 - ⚖️ **[ORM 架構比較 (orm-architecture-comparison.md)](./orm-architecture-comparison.md)**
@@ -37,8 +39,6 @@
   - 提供給前端 (Vue, React, Nuxt) 串接的純 JSON RESTful API 使用說明與端點介紹。
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**
   - Oracle 常用的 SQL 指令、Docker 容器操作及常用語法速查。
-- 🎭 **[Mock Database 實作指南 (mock_database_guide.md)](./mock_database_guide.md)**
-  - 在不依賴實體資料庫的情況下，使用假資料進行開發的架構實作。
 
 ## 🔐 核心功能與實作 (Core Features)
 針對特定核心功能的深入說明與實作教學。
