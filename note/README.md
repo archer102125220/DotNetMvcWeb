@@ -45,3 +45,11 @@
 
 - 🔑 **[JWT 身份驗證實作指南 (JWT_AUTHENTICATION.md)](./JWT_AUTHENTICATION.md)**
   - 在本專案中實作 JWT (JSON Web Token) 登入與 API 驗證的說明。
+
+## 🔄 版本差異與比較 (Version Comparisons)
+針對不同的 .NET 歷史版本與生態系差異進行的深入解析，幫助在不同架構間切換時快速適應。
+
+- 🕰️ **[.NET 10 vs .NET Framework 差異筆記 (dotnet10-vs-dotnet-framework.md)](./dotnet10-vs-dotnet-framework.md)**
+  - 詳細記錄從古老的 .NET Framework (C# 7.3) 遷移或退回開發時，在底層架構、專案結構、DI、CLI 工具以及 C# 語法上的巨大鴻溝。
+- ⚡ **[.NET 10 vs .NET 6 差異筆記 (dotnet10-vs-dotnet6.md)](./dotnet10-vs-dotnet6.md)**
+  - 比較與近代 LTS 版本 (.NET 6 / C# 10) 之間的細微語法升級與功能演進。
