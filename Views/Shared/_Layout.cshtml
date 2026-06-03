@@ -24,8 +24,8 @@
                     @{
                         string GetActiveStyle(string c, string? a = null)
                         {
-                            var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-                            var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                            string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                            string? currentAction = ViewContext.RouteData.Values["action"]?.ToString();
                             bool isMatch = string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase);
                             if (a != null)
                             {

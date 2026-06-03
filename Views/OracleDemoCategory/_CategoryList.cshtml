@@ -18,7 +18,7 @@
         <tbody>
             @if (Model != null && Model.Any())
             {
-                foreach (var item in Model)
+                foreach (DotNetMvcWeb.Models.OracleDemoCategory item in Model)
                 {
                     <tr>
                         <td>@item.Id</td>
