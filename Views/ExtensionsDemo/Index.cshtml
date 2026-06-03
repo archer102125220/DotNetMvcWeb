@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "擴充方法示範 (Extension Methods Demo)";
+}
+@using DotNetMvcWeb.Extensions
+
+<div class="extensions_demo_page mt-5 mb-5">
+    <div class="container">
+        <h1 class="mb-4">@ViewData["Title"]</h1>
+
+        <div class="card mb-4 border-info shadow-sm">
+            <div class="card-header bg-info text-white fw-bold">
+                💡 互動測試區：自己輸入文字測試！
+            </div>
+            <div class="card-body">
+                <form asp-action="Index" method="post">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="inputText" class="col-form-label">請輸入測試文字：</label>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" id="inputText" name="inputText" class="form-control" value="@ViewBag.TestInput" placeholder="請輸入一些文字..." required />
+                        </div>
+                        <div class="col-auto">
+                            <label for="maxLength" class="col-form-label">截斷長度：</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="number" id="maxLength" name="maxLength" class="form-control" value="@(ViewBag.TestLength ?? 10)" style="width: 100px;" required min="1" />
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-info text-white fw-bold">觸發測試</button>
+                        </div>
+                    </div>
+                </form>
+
+                @if (ViewBag.TestResult != null)
+                {
+                    <hr />
+                    <div class="alert alert-success mt-3 mb-0">
+                        <p class="mb-1"><strong>原始輸入：</strong> @ViewBag.TestInput</p>
+                        <p class="mb-0"><strong>截斷結果 (長度限制 @ViewBag.TestLength)：</strong> <span class="text-danger fw-bold fs-5">@ViewBag.TestResult</span></p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                1. 在 Controller 中使用擴充方法，並傳遞到 View
+            </div>
+            <div class="card-body">
+                <p><strong>原始字串：</strong> @ViewBag.OriginalText</p>
+                <p><strong>截斷後：</strong> <span class="text-danger">@ViewBag.ShortText</span></p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                2. 直接在 Razor View (.cshtml) 中使用擴充方法
+            </div>
+            <div class="card-body">
+                @{
+                    string viewString = "我們也可以直接在 HTML (Razor 語法) 裡面呼叫擴充方法，這對於前端畫面渲染非常有幫助！不需要再寫一堆 Helper 函數。";
+                }
+                <p><strong>原始字串：</strong> @viewString</p>
+                @* 就像呼叫原生方法一樣直接加上 .Truncate(20) *@
+                <p><strong>截斷後：</strong> <span class="text-danger">@viewString.Truncate(20)</span></p>
+            </div>
+        </div>
+
+        <a href="/" class="btn btn-outline-secondary">返回首頁</a>
+    </div>
+</div>

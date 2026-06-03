@@ -11,6 +11,8 @@
   - 介紹 MVC 專案的目錄結構及各資料夾的作用。
 - 📐 **[Models 開發規範與指南 (MODELS_GUIDELINE.md)](./MODELS_GUIDELINE.md)**
   - 包含 Entity, ViewModel, DTO 等 Models 的設計與驗證規範。
+- 🧩 **[C# 擴充方法教學與使用指南 (csharp-extensions-guide.md)](./csharp-extensions-guide.md)**
+  - 介紹 C# 中 Extension Methods 的概念、撰寫規範以及與前端 TypeScript 原型鏈對應的寫法。
 
 ## ⚙️ 環境與部署 (Environment & Deployment)
 在不同的作業系統或容器環境中順利把專案跑起來的指南。
