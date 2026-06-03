@@ -21,7 +21,7 @@
 
 ## 2. 進入資料庫 (使用 SQL*Plus)
 
-`sqlplus` 是 Oracle 官方的終端機連線工具。您可以直接在 Docker 容器內執行它，進行資料庫操作。
+`sqlplus` 是 Oracle 官方的終端機連線工具。可以直接在 Docker 容器內執行它，進行資料庫操作。
 
 *   **以一般使用者身份進入 SQL*Plus**
     ```bash
@@ -33,7 +33,7 @@
     ```
 
 ### SQL*Plus 內部常用快捷指令
-當您成功進入 `SQL> ` 提示字元後，可以使用以下系統指令：
+當成功進入 `SQL> ` 提示字元後，可以使用以下系統指令：
 *   `exit` 或 `quit`：離開 SQL*Plus 回到一般終端機。
 *   `clear screen` 或 `cl scr`：清除畫面。
 *   `describe [TableName];` 或 `desc [TableName];`：查看某張資料表的結構與欄位設計。
@@ -74,7 +74,7 @@ Oracle 的 SQL 語法與 MySQL 或 SQL Server 有些微不同，以下整理開�
     > 💡 **提示**：`SYSDATE` 或是 `CURRENT_TIMESTAMP` 是 Oracle 取得當前資料庫系統時間的內建變數。
 
 ### DUAL 虛擬表
-Oracle 強制規定所有的 `SELECT` 語句都**必須**有 `FROM`。如果您只想計算簡單的算式或取得時間，必須從內建的 `DUAL` 虛擬表中查詢：
+Oracle 強制規定所有的 `SELECT` 語句都**必須**有 `FROM`。如果只想計算簡單的算式或取得時間，必須從內建的 `DUAL` 虛擬表中查詢：
 ```sql
 SELECT SYSDATE FROM DUAL;
 SELECT 1 + 1 FROM DUAL;
@@ -85,7 +85,7 @@ SELECT 1 + 1 FROM DUAL;
 ## 4. 常見問題與踩坑 (Gotchas)
 
 1.  **區分大小寫 (Case Sensitivity)**
-    在 Oracle 中，如果您建表時沒有加雙引號，所有的名稱都會被轉成**全大寫**。但因為我們使用的是 EF Core，EF Core 預設會幫我們對欄位和表名加上雙引號，這會讓 Oracle 變成**嚴格區分大小寫**。
+    在 Oracle 中，如果建表時沒有加雙引號，所有的名稱都會被轉成**全大寫**。但因為我們使用的是 EF Core，EF Core 預設會幫我們對欄位和表名加上雙引號，這會讓 Oracle 變成**嚴格區分大小寫**。
     所以下 SQL 指令時，請務必記得加上雙引號：
     ```sql
     -- ❌ 錯誤 (會報錯 Table or view does not exist)
@@ -96,5 +96,5 @@ SELECT 1 + 1 FROM DUAL;
     ```
 
 2.  **IDENTITY 欄位與 EF Core 種子資料衝突 (ORA-00001)**
-    如果您在 EF Core 的 `OnModelCreating` 裡面使用了 `HasData` 手動指定 Id (如 Id=1, 2, 3) 來塞入種子資料，Oracle 內部的 Identity 流水號計數器**不會**自動跟著跳過這些 Id。當您後續想要從應用程式 Insert 新資料時，資料庫可能會嘗試給它 Id=1，進而發生 Primary Key 重複 (`ORA-00001`) 的錯誤。
+    如果在 EF Core 的 `OnModelCreating` 裡面使用了 `HasData` 手動指定 Id (如 Id=1, 2, 3) 來塞入種子資料，Oracle 內部的 Identity 流水號計數器**不會**自動跟著跳過這些 Id。當後續想要從應用程式 Insert 新資料時，資料庫可能會嘗試給它 Id=1，進而發生 Primary Key 重複 (`ORA-00001`) 的錯誤。
     *解決方法*：實務上，若要在 Oracle 使用 `HasData`，建議將固定種子資料的 Id 設為負數 (例如 `-1`, `-2`)，或者改用我們示範的 `DbInitializer.cs` 來動態新增種子資料。

@@ -28,7 +28,7 @@ dotnet publish -c Release -o ./publish
 
 ## 3. 部署策略 (Deployment Strategies)
 
-您可以根據基礎設施選擇合適的部署方式：
+可以根據基礎設施選擇合適的部署方式：
 
 ### 選項 A: 使用 Docker 部署 (推薦)
 
@@ -109,11 +109,11 @@ docker run -d -p 8080:8080 --name my-mvc-app dotnet-mvc-web:latest
 
 ### 選項 C: 部署到 Windows (使用 IIS)
 
-如果您在 Windows Server 上運行，IIS 是一個常見的選擇。
+如果在 Windows Server 上運行，IIS 是一個常見的選擇。
 
 1. 確保伺服器已安裝 **.NET Core Hosting Bundle**。
 2. 在 IIS 中建立一個新的網站。
-3. 將網站的實體路徑指向您的 `./publish` 資料夾。
+3. 將網站的實體路徑指向 `./publish` 資料夾。
 4. 設定應用程式集區 (Application Pool) 的「.NET CLR 版本」為 **「沒有受控程式碼」 (No Managed Code)**，因為 IIS 只負責反向代理，實際執行由 Kestrel 處理。
 
 ## 4. 常見問題與檢查清單

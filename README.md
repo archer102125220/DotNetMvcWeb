@@ -8,7 +8,7 @@
 
 ## 如何啟動專案
 
-您可以使用終端機 (Terminal) 透過 .NET CLI 啟動本專案。請確保您已安裝相應版本的 .NET SDK。
+可以使用終端機 (Terminal) 透過 .NET CLI 啟動本專案。請確保已安裝相應版本的 .NET SDK。
 
 1. **進入專案目錄**:
    ```bash
@@ -37,13 +37,13 @@
 
 ## 跨平台 IDE 開發指南
 
-如果您習慣使用 Visual Studio (Windows) 或其他全功能整合開發環境 (IDE) 來開啟此專案：
+如果習慣使用 Visual Studio (Windows) 或其他全功能整合開發環境 (IDE) 來開啟此專案：
 - 請直接使用 IDE 開啟專案資料夾，或透過開啟 `DotNetMvcWeb.csproj` 載入專案。
-- 專案已內建基礎的執行設定檔 (位在 `Properties/launchSettings.json` 內)，您可以選擇透過 IIS Express（若為 Windows）或是預設的 Kestrel 伺服器來啟動應用程式。
+- 專案已內建基礎的執行設定檔 (位在 `Properties/launchSettings.json` 內)，可以選擇透過 IIS Express（若為 Windows）或是預設的 Kestrel 伺服器來啟動應用程式。
 
 ## 如何從頭建立此專案
 
-若您想了解本專案是如何從零開始建立的，以下是使用 .NET CLI 的建立指令紀錄：
+若想了解本專案是如何從零開始建立的，以下是使用 .NET CLI 的建立指令紀錄：
 
 ### 1. 建立 MVC 專案
 在終端機中，執行以下指令以建立一個名為 `DotNetMvcWeb` 的 MVC 專案：

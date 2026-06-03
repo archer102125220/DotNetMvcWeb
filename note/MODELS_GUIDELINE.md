@@ -32,7 +32,7 @@ dotnet add package Oracle.EntityFrameworkCore
 ### 2. 資料庫連線設定
 
 **設定 `appsettings.json`：**
-本專案支援多種資料庫，您可以依據環境選擇對應的連線字串。以下提供四大資料庫的設定範例（皆使用預設的 `dot-net-mvc-web` 帳號）：
+本專案支援多種資料庫，可以依據環境選擇對應的連線字串。以下提供四大資料庫的設定範例（皆使用預設的 `dot-net-mvc-web` 帳號）：
 
 ```json
 {

@@ -1,6 +1,6 @@
 # DotNetMvcWeb 筆記與文件導覽 (Documentation Index)
 
-這是一份針對 `DotNetMvcWeb` 專案中各種筆記、開發指南與文件說明的導覽入口，您可以透過下方的分類快速跳轉到您需要的文件。
+這是一份針對 `DotNetMvcWeb` 專案中各種筆記、開發指南與文件說明的導覽入口，可以透過下方的分類快速跳轉到需要的文件。
 
 ## 📚 開發規範與指南 (Development Guidelines)
 這部分包含了專案的核心架構以及團隊開發所需要遵循的規範。
@@ -13,7 +13,7 @@
   - 包含 Entity, ViewModel, DTO 等 Models 的設計與驗證規範。
 
 ## ⚙️ 環境與部署 (Environment & Deployment)
-幫助您在不同的作業系統或容器環境中順利把專案跑起來。
+在不同的作業系統或容器環境中順利把專案跑起來的指南。
 
 - 🍏 **[Mac 下使用 asdf 安裝 .NET 環境指南 (ASDF_DOTNET_INSTALL_MAC.md)](./ASDF_DOTNET_INSTALL_MAC.md)**
   - 在 macOS 上使用 `asdf` 版本控制工具安裝 .NET SDK 的步驟。

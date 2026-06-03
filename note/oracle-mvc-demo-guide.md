@@ -1,8 +1,8 @@
 # Oracle Database MVC & HTMX 實作導讀指南
 
-這份文件是用來幫助您快速理解本專案中「Oracle Demo」模組的運作架構。我們成功地將 .NET Core MVC 與 Oracle 資料庫結合，並透過 HTMX 實現了現代化的無重整 (SPA-like) 體驗。
+這份文件是用來協助快速理解本專案中「Oracle Demo」模組的運作架構。我們成功地將 .NET Core MVC 與 Oracle 資料庫結合，並透過 HTMX 實現了現代化的無重整 (SPA-like) 體驗。
 
-> 💡 **相關閱讀**：如果您想深入了解本模組背後的資料庫設定、EF Core 常用指令及踩坑紀錄，請參考 [Entity Framework Core (EF Core) 實戰教學指南](./ef-core-orm-guide.md)。
+> 💡 **相關閱讀**：如果想深入了解本模組背後的資料庫設定、EF Core 常用指令及踩坑紀錄，請參考 [Entity Framework Core (EF Core) 實戰教學指南](./ef-core-orm-guide.md)。
 
 ---
 
@@ -96,7 +96,7 @@ return await _context.OracleDemoItems
 
 ## 5. 如何測試與執行
 
-1. **確保 Oracle 資料庫運行中**：請確認您透過 Docker 起的 `dot-net-mvc-web-oracle-free-db` 容器正在運作。
+1. **確保 Oracle 資料庫運行中**：請確認透過 Docker 起的 `dot-net-mvc-web-oracle-free-db` 容器正在運作。
 2. **啟動專案**：在專案根目錄執行 `dotnet watch run`。
-3. **前往頁面**：開啟瀏覽器前往 `http://localhost:<您的port>/OracleDemo`。
-4. **體驗功能**：您可以試著新增一筆資料、故意漏填名稱觸發驗證錯誤、修改現有資料、或是刪除資料。您會發現所有的操作都非常流暢，畫面完全不會發生閃爍或重整！
+3. **前往頁面**：開啟瀏覽器前往 `http://localhost:<port>/OracleDemo`。
+4. **體驗功能**：可以試著新增一筆資料、故意漏填名稱觸發驗證錯誤、修改現有資料、或是刪除資料。可以發現所有的操作都非常流暢，畫面完全不會發生閃爍或重整！

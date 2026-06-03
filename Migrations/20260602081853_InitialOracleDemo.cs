@@ -14,7 +14,7 @@ namespace DotNetMvcWeb.Migrations
     {
         /// <summary>
         /// Up 方法定義了「升級」資料庫結構時要執行的操作。
-        /// 當您執行 `dotnet ef database update` 時，就會執行這裡面的邏輯。
+        /// 當執行 `dotnet ef database update` 時，就會執行這裡面的邏輯。
         /// </summary>
         protected override void Up(MigrationBuilder migrationBuilder)
         {

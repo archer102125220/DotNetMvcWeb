@@ -1,6 +1,6 @@
 # Oracle Demo API 使用指南
 
-除了原本搭配 HTMX 的 MVC 畫面外，專案中也提供了一組純 JSON 格式的 RESTful API，方便您使用 Postman 測試，或是串接 Vue、React、Nuxt 等前端框架。
+除了原本搭配 HTMX 的 MVC 畫面外，專案中也提供了一組純 JSON 格式的 RESTful API，方便使用 Postman 測試，或是串接 Vue、React、Nuxt 等前端框架。
 
 ## 📍 API 基礎資訊
 

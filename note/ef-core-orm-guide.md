@@ -2,9 +2,9 @@
 
 本文件記錄了在 .NET MVC 專案中使用 EF Core (搭配 Oracle 資料庫) 的核心觀念、常用指令，以及實務上常遇到的錯誤與踩雷經驗。
 
-> 💡 **相關閱讀**：如果您想了解這些資料庫操作是如何與前端 UI (MVC + HTMX) 結合的，請參考 [Oracle Database MVC & HTMX 實作導讀指南](./oracle-mvc-demo-guide.md)。
+> 💡 **相關閱讀**：如果想了解這些資料庫操作是如何與前端 UI (MVC + HTMX) 結合的，請參考 [Oracle Database MVC & HTMX 實作導讀指南](./oracle-mvc-demo-guide.md)。
 > 💡 **進階概念**：想了解為什麼 EF Core 與 Node.js/PHP 的 ORM 在核心設計上有如此巨大的差異？請參考 [ORM 設計哲學比較：Code-First vs Migration-First](./orm-architecture-comparison.md)。
-> 💡 **資料庫指令**：如果您需要進入 Docker 容器內直接下達 Oracle SQL 指令除錯，請參考 [Oracle Database 常用指令與操作指南](./oracle-database-commands-guide.md)。
+> 💡 **資料庫指令**：如果需要進入 Docker 容器內直接下達 Oracle SQL 指令除錯，請參考 [Oracle Database 常用指令與操作指南](./oracle-database-commands-guide.md)。
 
 ---
 
@@ -45,15 +45,15 @@ dotnet ef database drop
 
 ## 2. Migrations 檔案結構解析
 
-每當您執行 `dotnet ef migrations add` 時，EF Core 其實會在 `Migrations` 資料夾內為您產生 **兩個** 檔案，它們扮演著不同但互補的角色：
+每當執行 `dotnet ef migrations add` 時，EF Core 其實會在 `Migrations` 資料夾內產生 **兩個** 檔案，它們扮演著不同但互補的角色：
 
 ### 1. 動作指令檔 (`[時間戳]_[名稱].cs`)
 * **這是什麼**：「給資料庫的施工圖」。
-* **功用**：包含了 `Up()` 與 `Down()` 兩個方法。記錄了要對資料庫執行什麼動作（例如 `CreateTable` 或 `InsertData`）。當您下達 `database update` 時，執行的就是這個檔案。
+* **功用**：包含了 `Up()` 與 `Down()` 兩個方法。記錄了要對資料庫執行什麼動作（例如 `CreateTable` 或 `InsertData`）。當下達 `database update` 時，執行的就是這個檔案。
 
 ### 2. 模型快照檔 (`[時間戳]_[名稱].Designer.cs`)
 * **這是什麼**：「施工完成後的 3D 建模圖」。
-* **功用**：這個檔案裡面沒有動作，而是記錄了當時 C# 程式碼中的 Model 結構。下次當您再次建立 Migration 時，EF Core 會把您「現在的 C# 程式碼」跟「這份 Designer 快照」做比對，藉此算出您到底改了哪些欄位，進而產生下一張施工圖。
+* **功用**：這個檔案裡面沒有動作，而是記錄了當時 C# 程式碼中的 Model 結構。下次當再次建立 Migration 時，EF Core 會把「現在的 C# 程式碼」跟「這份 Designer 快照」做比對，藉此算出到底改了哪些欄位，進而產生下一張施工圖。
 
 ### 💡 為什麼檔案會越來越多？
 Migrations 資料夾就像是資料庫的 **Git Commit 歷史紀錄**。每一次的異動都會產生新檔案。
@@ -62,14 +62,14 @@ Migrations 資料夾就像是資料庫的 **Git Commit 歷史紀錄**。每一�
 
 ### 💡 產生後需要手動編輯它們嗎？
 **預設情況下，這兩個檔案「都不應該編輯」！**
-它們是 EF Core 根據您的 C# 程式碼自動推算出來的產物。但如果您真的遇到了 EF Core 猜錯您意圖的情況（例如您只是**重新命名**了欄位，但 EF Core 卻判定為「刪除舊欄位並新增空欄位」），您可以這麼做：
+它們是 EF Core 根據 C# 程式碼自動推算出來的產物。但如果真的遇到了 EF Core 猜錯意圖的情況（例如只是**重新命名**了欄位，但 EF Core 卻判定為「刪除舊欄位並新增空欄位」），可以這麼做：
 
 1. **唯一能改的是 `.cs` 動作指令檔**：
-   您可以手動把 `DropColumn` 與 `AddColumn` 刪除，改成 `migrationBuilder.RenameColumn(...)`，以確保舊資料不會被清空。
+   可以手動把 `DropColumn` 與 `AddColumn` 刪除，改成 `migrationBuilder.RenameColumn(...)`，以確保舊資料不會被清空。
 2. **絕對禁止修改 `.Designer.cs` 模型快照檔**：
-   這個檔案是 EF Core 內部的「記憶卡」。如果您手動去竄改它，會導致 EF Core 的記憶跟您真實的 C# 程式碼「脫節 (Desync)」。當下次下達 `migrations add` 指令時，整個資料庫的遷移時間軸就會徹底亂掉。
+   這個檔案是 EF Core 內部的「記憶卡」。如果手動去竄改它，會導致 EF Core 的記憶跟真實的 C# 程式碼「脫節 (Desync)」。當下次下達 `migrations add` 指令時，整個資料庫的遷移時間軸就會徹底亂掉。
 3. **正確的修改流程**：
-   如果您下完指令發現產生的 Migration 內容是錯的（例如忘記加屬性），**請不要手動改檔案**。正確的做法是先執行 `dotnet ef migrations remove`，把 C# 程式碼改對後，再重新執行一次 `dotnet ef migrations add`！
+   如果下完指令發現產生的 Migration 內容是錯的（例如忘記加屬性），**請不要手動改檔案**。正確的做法是先執行 `dotnet ef migrations remove`，把 C# 程式碼改對後，再重新執行一次 `dotnet ef migrations add`！
 
 ---
 
