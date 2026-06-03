@@ -6,7 +6,7 @@
 
 ### appsettings.json (最主要的設定檔)
 這是 .NET 專案中最核心的設定檔，相當於把 `.env` 的內容結構化成 JSON 格式。
-* **分層機制**：可以建立 `appsettings.json` (全域共用)、`appsettings.Development.json` (開發環境專用)、`appsettings.Production.json` (正式環境專用)。
+* **分層機制**：可以建立 `appsettings.json` (全環境共用)、`appsettings.Development.json` (開發環境專用)、`appsettings.Production.json` (正式環境專用)。
 * .NET 會根據環境變數自動載入對應檔案，**後載入的設定會覆蓋先載入的設定**。
 
 ### Properties/launchSettings.json (本機開發的環境變數)
@@ -24,9 +24,13 @@
 
 User Secrets 會把設定檔存在電腦系統的**個人資料夾**中，完全與專案目錄結構分離，因此**絕對不可能被 commit 到 Git**。
 
-### Mac 上的 User Secrets 存在哪裡？
-在 Mac (以及 Linux) 上，當你儲存機密時，檔案會被建立在系統的隱藏資料夾中：
-`~/.microsoft/usersecrets/<你的專案機密ID>/secrets.json`
+### User Secrets 存在電腦的哪裡？
+根據不同的作業系統，User Secrets 會被儲存在不同的實體路徑下：
+
+* **Windows**:
+  `%APPDATA%\Microsoft\UserSecrets\<你的專案機密ID>\secrets.json`
+* **Mac / Linux**:
+  `~/.microsoft/usersecrets/<你的專案機密ID>/secrets.json`
 
 ## 3. User Secrets 操作教學 (CLI)
 
@@ -56,7 +60,16 @@ var dbPassword = builder.Configuration["Database:Password"];
 * **移除特定機密**：`dotnet user-secrets remove "Database:Password"`
 * **清除專案所有的機密**：`dotnet user-secrets clear`
 
-## 4. 總結比較：Node.js vs .NET
+## 4. Visual Studio (GUI) 操作方式
+
+如果你使用的是強大的 IDE，如 **Visual Studio** 或 **JetBrains Rider**，你可以完全不需要記上面的 CLI 指令：
+
+1. 在方案總管 (Solution Explorer) 中，**對著你的專案點擊右鍵**。
+2. 選擇 **「管理使用者機密」(Manage User Secrets)**。
+3. IDE 會自動幫你執行綁定，並直接在編輯器中打開那個隱藏的 `secrets.json` 檔案。
+4. 你可以直接在裡面像寫一般 JSON 檔一樣填入機密，存檔後立刻生效！
+
+## 5. 總結比較：Node.js vs .NET
 
 | 需求情境 | Node.js 常用做法 | .NET 官方推薦做法 |
 | :--- | :--- | :--- |
