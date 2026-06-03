@@ -6,14 +6,22 @@
 * **.NET 6**: 於 2021 年底發布，為長期支援 (LTS) 版本，但其官方支援已於 2024 年 11 月結束。
 * **.NET 10**: 目前專案使用的版本。微軟採用偶數版本為 LTS (長期支援)、奇數版本為 STS (標準支援) 的策略，.NET 10 提供最新的功能與效能最佳化。
 
-## 2. 搭配的 C# 語言版本
-這是在撰寫程式碼時最有感的差異：
-* **.NET 6 (搭配 C# 10)**: 支援了 Global Using (`global using`)、File-scoped namespace (`namespace MyProject;`)、Record structs 等功能。
-* **.NET 10 (搭配 C# 14)**: 包含自 C# 11 到 C# 14 累積的大量語法糖與功能，例如：
-  * **Raw string literals (原始字串常值)** (`"""`)：在處理 JSON 或 SQL 字串時非常方便。
-  * **List patterns (串列模式)**：更強大的模式比對。
-  * **Primary constructors (主要建構函式)**：讓類別與結構的依賴注入寫法更簡潔。
-  * **Collection expressions (集合運算式)**：例如 `List<int> list = [1, 2, 3];`。
+## 2. 搭配的 C# 語言版本與語法差異
+這是在撰寫程式碼時最有感的差異。值得注意的是，從 .NET 6 (C# 10) 到 .NET 10 (C# 14)，C# 的核心開發體驗已經非常接近，這與退回 .NET Framework 有著天壤之別。
+
+**在 .NET 6 (C# 10) 就已經具備的現代語法（與 .NET Framework 的主要分水嶺）：**
+* **Top-level statements (最上層陳述式)**：讓 `Program.cs` 不需要寫 `class Program` 和 `Main` 方法。
+* **Global Usings 與 File-scoped namespace**：大幅減少程式碼的縮排與冗餘的 using 宣告。
+* **Record 型別**：用來建立不可變資料模型 (DTOs) 非常方便。
+* **Switch 運算式與模式比對 (Pattern matching)**：取代傳統冗長的 switch-case。
+* **Nullable Reference Types (可為 null 的參考型別)**：有效防範 `NullReferenceException`。
+
+**從 .NET 6 到 .NET 10 (C# 14) 的「錦上添花」：**
+這幾年的進化主要是提供更多「語法糖」，讓寫法更簡短：
+* **Collection expressions (集合運算式)**：例如 `List<int> list = [1, 2, 3];`，取代傳統的 `new List<int> { ... }`。
+* **Primary constructors (主要建構函式)**：直接在類別名稱旁宣告參數，讓依賴注入 (DI) 的寫法更簡潔。
+* **Raw string literals (原始字串常值)** (`"""`)：在處理 JSON 或 SQL 等多行字串時不用再費心處理逸出字元。
+* **List patterns (串列模式)**：更強大的陣列與集合模式比對。
 
 ## 3. 效能與 AOT (提前編譯)
 * **.NET 6**: 雖然效能已經比早期的 .NET Core 3.1 提升很多，但 Native AOT 當時還處於實驗性階段。
