@@ -29,8 +29,13 @@
                    hx-target="#oracle-demo-list-container" />
 
             <!--
-              透過 HTMX 發送 GET 請求到 /OracleDemo/Create 取得新增表單 (Partial View)
-              並將結果放入 (hx-target) id 為 oracle-demo-form-container 的元素中
+              【HTMX 流程解說：如何顯示新增表單】
+              1. 觸發條件：使用者點擊這顆按鈕。
+              2. 發送請求：hx-get 告訴 HTMX 發送一個 HTTP GET 請求到 /OracleDemo/Create (這是由 Url.Action 產生的路徑)。
+              3. 後端處理：Controller 收到請求後，執行 Create() 方法，並回傳 "_CreateOrEdit.cshtml" 這個 Partial View (HTML 原始碼)。
+              4. 接收與替換：HTMX 收到 HTML 原始碼後，會找到畫面上的 hx-target (也就是 id="oracle-demo-form-container" 的元素)。
+              5. 渲染方式：依照 hx-swap="innerHTML" 的指示，把該元素的「內部內容」替換成後端回傳的表單 HTML。
+                 (也就是說，下方預設的那段 <p>Select an item...</p> 就會被 _CreateOrEdit 的內容給蓋掉！)
             -->
             <button class="oracle_demo_page-create_btn btn btn-primary text-nowrap"
                     hx-get="@Url.Action("Create", "OracleDemo")"
@@ -44,8 +49,13 @@
     <div class="row">
         <!-- 表單顯示區塊 (Form Container) -->
         <div class="col-md-4">
+            <!--
+              這就是上面 Create 按鈕 (以及列表中的 Edit 按鈕) 的目標容器 (hx-target="#oracle-demo-form-container")。
+              這是一個非常重要的 HTMX 概念：我們不需要寫 JS 操作 DOM，只要指定目標 ID，
+              HTMX 就會自動把後端回傳的 Partial View (_CreateOrEdit.cshtml) 塞進這裡！
+            -->
             <div id="oracle-demo-form-container" class="oracle_demo_page-form_container card p-3 shadow-sm">
-                <!-- 預設狀態下的提示文字，當點擊「新增」或「編輯」時，這裡的內容會被替換掉 -->
+                <!-- 預設狀態下的提示文字，當點擊「新增」或「編輯」時，這整段 <p> 會被 _CreateOrEdit.cshtml 的內容蓋掉 -->
                 <p class="text-muted mb-0">Select an item to edit or click 'Create New Item'.</p>
             </div>
         </div>

@@ -7,8 +7,12 @@
 <h4 class="mb-3">@(Model.Id == 0 ? "Create Item" : "Edit Item")</h4>
 
 <!--
-  根據 Model.Id 是否為 0 來決定送出的 Action 網址 (Create 或 Edit)。
-  送出後，預期 Controller 會回傳更新後的資料列表，因此 hx-target 設為 #oracle-demo-list-container
+  【HTMX 流程解說：表單送出後如何更新畫面？】
+  1. 表單送出：因為使用了 hx-post，當使用者點擊 Submit 時，HTMX 會攔截預設的整頁重整，改為發送非同步的 POST 請求 (到 Create 或 Edit)。
+  2. 後端處理：Controller 儲存完資料後，會呼叫 `List()` 方法，並回傳 "_DemoList.cshtml" (也就是最新的表格 HTML 原始碼)。
+  3. 接收與替換：HTMX 收到新的表格 HTML 後，會尋找 hx-target 指定的目標 (也就是右側的 id="oracle-demo-list-container")。
+  4. 渲染方式：依照 hx-swap="innerHTML" 指示，把右側舊的表格直接替換成新的表格。
+  * 注意：如果後端驗證失敗 (例如沒填必填欄位)，Controller 會回傳狀態錯誤的 _CreateOrEdit 表單本身，並透過 HTTP Header (HX-Retarget) 指示 HTMX 改為替換左側的表單區塊，讓使用者看到錯誤訊息。
 -->
 <form hx-post="@(Model.Id == 0 ? Url.Action("Create", "OracleDemo") : Url.Action("Edit", "OracleDemo", new { id = Model.Id }))"
       hx-target="#oracle-demo-list-container"

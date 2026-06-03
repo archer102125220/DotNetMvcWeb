@@ -40,6 +40,12 @@
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**
   - Oracle 常用的 SQL 指令、Docker 容器操作及常用語法速查。
 
+## 🌐 MVC 架構與前端互動 (MVC & Frontend Interaction)
+介紹 ASP.NET Core MVC 框架的底層機制，以及如何與現代前端技術（如 HTMX）進行無縫整合。
+
+- 🗺️ **[ASP.NET Core MVC 路由與視圖渲染機制教學 (mvc-routing-partial-view-guide.md)](./mvc-routing-partial-view-guide.md)**
+  - 解析從前端網址請求、Controller 路由對應，到回傳 PartialView 與模型綁定的完整底層運作機制。
+
 ## 🔐 核心功能與實作 (Core Features)
 針對特定核心功能的深入說明與實作教學。
 

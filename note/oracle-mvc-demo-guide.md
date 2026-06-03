@@ -3,6 +3,7 @@
 這份文件是用來協助快速理解本專案中「Oracle Demo」模組的運作架構。我們成功地將 .NET Core MVC 與 Oracle 資料庫結合，並透過 HTMX 實現了現代化的無重整 (SPA-like) 體驗。
 
 > 💡 **相關閱讀**：如果想深入了解本模組背後的資料庫設定、EF Core 常用指令及踩坑紀錄，請參考 [Entity Framework Core (EF Core) 實戰教學指南](./ef-core-orm-guide.md)。
+> 💡 **相關閱讀**：想了解這個模組是如何透過 Controller 與 View 的搭配，結合 HTMX 達成局部刷新的，請參考 [ASP.NET Core MVC 路由與視圖渲染機制教學](./mvc-routing-partial-view-guide.md)。
 
 ---
 

@@ -72,7 +72,13 @@ namespace DotNetMvcWeb.Controllers
 
         /// <summary>
         /// GET: /OracleDemo/Create
-        /// 回傳「新增項目」的表單 Partial View，供 HTMX 載入到畫面上
+        /// 【程式碼撰寫與設定解說：如何載入 _CreateOrEdit.cshtml】
+        /// 1. 路由對應：前端使用 `Url.Action("Create", "OracleDemo")` 會產生 `/OracleDemo/Create` 的網址。
+        ///    ASP.NET Core 的預設路由機制會自動找到 `OracleDemoController` 底下名稱為 `Create` 的這個方法。
+        /// 2. 回傳視圖：方法最後呼叫了 `PartialView("_CreateOrEdit", new OracleDemoItem())`。
+        ///    - 這裡明確指定了要尋找名稱為 `_CreateOrEdit` 的視圖檔案。
+        ///    - 框架會按照慣例到 `Views/OracleDemo/` 資料夾下尋找 `_CreateOrEdit.cshtml`。
+        ///    - 將一個全新的空 `OracleDemoItem` 模型傳遞給該視圖，以便產生空表單。
         /// </summary>
         public IActionResult Create()
         {
@@ -107,7 +113,12 @@ namespace DotNetMvcWeb.Controllers
 
         /// <summary>
         /// GET: /OracleDemo/Edit/5
-        /// 根據 ID 回傳「編輯項目」的表單 Partial View
+        /// 【程式碼撰寫與設定解說：如何載入 _CreateOrEdit.cshtml 作為編輯用】
+        /// 1. 路由對應：前端使用 `Url.Action("Edit", "OracleDemo", new { id = item.Id })` 會產生如 `/OracleDemo/Edit/5` 的網址。
+        ///    路由機制會對應到這個 `Edit(int? id)` 方法，並將網址結尾的數字作為 `id` 參數傳入。
+        /// 2. 回傳視圖：從資料庫撈出對應的 `item` 資料後，同樣呼叫 `PartialView("_CreateOrEdit", item)`。
+        ///    - 這表示「新增」和「編輯」共用了同一個 `.cshtml` 檔案。
+        ///    - 視圖內部會根據傳入的模型（`Model.Id == 0` 或有值）來決定顯示「Create」還是「Edit」的標題及行為。
         /// </summary>
         public async Task<IActionResult> Edit(int? id)
         {
