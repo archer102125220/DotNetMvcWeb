@@ -73,6 +73,43 @@ Oracle 的 SQL 語法與 MySQL 或 SQL Server 有些微不同，以下整理開�
     ```
     > 💡 **提示**：`SYSDATE` 或是 `CURRENT_TIMESTAMP` 是 Oracle 取得當前資料庫系統時間的內建變數。
 
+### 關聯查詢 (JOINs)
+在 Oracle 中，JOIN 語法與標準 SQL 相同。特別注意因為 EF Core 的關係，表名和欄位名通常需要加雙引號。
+
+> 💡 **語法解析：資料表別名 (Table Alias)**
+> 在下面的範例中，你會看到 `"OracleDemoItems" i` 或 `"OracleDemoCategories" c`。
+> 這裡的 `i` 和 `c` 是為資料表取的**簡短代稱 (別名)**。這樣在後面指定欄位時（例如 `i."CategoryId" = c."Id"`），就可以避免寫出冗長的完整表名，讓 SQL 語句更精簡易讀。
+
+*   **INNER JOIN (內連接)**
+    ```sql
+    SELECT i."Name", c."CategoryName"
+    FROM "OracleDemoItems" i
+    INNER JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id";
+    ```
+*   **LEFT JOIN (左外連接)**
+    ```sql
+    SELECT i."Name", c."CategoryName"
+    FROM "OracleDemoItems" i
+    LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id";
+    ```
+
+### 子查詢 (Subqueries)
+子查詢可以放在 `WHERE`, `SELECT`, 或是 `FROM` 中作為過濾條件或臨時表。
+*   **WHERE 條件子查詢**
+    ```sql
+    SELECT * FROM "OracleDemoItems"
+    WHERE "CategoryId" IN (
+        SELECT "Id" FROM "OracleDemoCategories" WHERE "IsActive" = 1
+    );
+    ```
+*   **EXISTS 子查詢** (通常效能較好，用於檢查關聯記錄是否存在)
+    ```sql
+    SELECT * FROM "OracleDemoCategories" c
+    WHERE EXISTS (
+        SELECT 1 FROM "OracleDemoItems" i WHERE i."CategoryId" = c."Id"
+    );
+    ```
+
 ### DUAL 虛擬表
 Oracle 強制規定所有的 `SELECT` 語句都**必須**有 `FROM`。如果只想計算簡單的算式或取得時間，必須從內建的 `DUAL` 虛擬表中查詢：
 ```sql
