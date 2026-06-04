@@ -11,6 +11,8 @@ builder.Services.AddSingleton<DotNetMvcWeb.Models.IProductRepository, DotNetMvcW
 builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleDemoConnection")));
 
+builder.Services.AddDbContext<DotNetMvcWeb.Data.MysqlDbContext>(options =>
+    options.UseMySQL(builder.Configuration.GetConnectionString("MysqlDemoConnection")!));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -25,6 +27,9 @@ using (IServiceScope scope = app.Services.CreateScope())
         DotNetMvcWeb.Data.AppDbContext context = services.GetRequiredService<DotNetMvcWeb.Data.AppDbContext>();
         // 執行外部獨立的 Seed 邏輯
         DotNetMvcWeb.Seeders.DbInitializer.Initialize(context);
+        
+        DotNetMvcWeb.Data.MysqlDbContext mysqlContext = services.GetRequiredService<DotNetMvcWeb.Data.MysqlDbContext>();
+        DotNetMvcWeb.Seeders.MysqlDbInitializer.Initialize(mysqlContext);
     }
     catch (Exception ex)
     {

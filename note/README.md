@@ -13,6 +13,8 @@
   - 包含 Entity, ViewModel, DTO 等 Models 的設計與驗證規範。
 - 🧩 **[C# 擴充方法教學與使用指南 (csharp-extensions-guide.md)](./csharp-extensions-guide.md)**
   - 介紹 C# 中 Extension Methods 的概念、撰寫規範以及與前端 TypeScript 原型鏈對應的寫法。
+- 💡 **[.NET 開發知識要點 (dotnet-knowledge-points.md)](./dotnet-knowledge-points.md)**
+  - 記錄開發 C# 與 ASP.NET Core 專案時常見的知識點，包含 XML 註解 (`<inheritdoc />`) 與 EF Core 資料庫建立機制解惑。
 
 ## ⚙️ 環境與部署 (Environment & Deployment)
 在不同的作業系統或容器環境中順利把專案跑起來的指南。
@@ -41,6 +43,8 @@
   - 提供給前端 (Vue, React, Nuxt) 串接的純 JSON RESTful API 使用說明與端點介紹。
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**
   - Oracle 常用的 SQL 指令、Docker 容器操作及常用語法速查。
+- 📂 **[EF Core 多資料庫與 Migration 管理指南 (ef-core-multiple-databases.md)](./ef-core-multiple-databases.md)**
+  - 介紹在單一專案中同時使用多個 DbContext (如 Oracle 與 MySQL) 時，如何透過 CLI 參數獨立管理與建立 Migration 檔案。
 
 ## 🌐 MVC 架構與前端互動 (MVC & Frontend Interaction)
 介紹 ASP.NET Core MVC 框架的底層機制，以及如何與現代前端技術（如 HTMX）進行無縫整合。
