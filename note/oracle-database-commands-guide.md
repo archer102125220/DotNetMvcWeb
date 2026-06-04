@@ -82,13 +82,13 @@ Oracle 的 SQL 語法與 MySQL 或 SQL Server 有些微不同，以下整理開�
 
 *   **INNER JOIN (內連接)**
     ```sql
-    SELECT i."Name", c."CategoryName"
+    SELECT i."Name", c."Name" AS "CategoryName"
     FROM "OracleDemoItems" i
     INNER JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id";
     ```
 *   **LEFT JOIN (左外連接)**
     ```sql
-    SELECT i."Name", c."CategoryName"
+    SELECT i."Name", c."Name" AS "CategoryName"
     FROM "OracleDemoItems" i
     LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id";
     ```
@@ -99,7 +99,7 @@ Oracle 的 SQL 語法與 MySQL 或 SQL Server 有些微不同，以下整理開�
     ```sql
     SELECT * FROM "OracleDemoItems"
     WHERE "CategoryId" IN (
-        SELECT "Id" FROM "OracleDemoCategories" WHERE "IsActive" = 1
+        SELECT "Id" FROM "OracleDemoCategories" WHERE "Name" = '測試分類'
     );
     ```
 *   **EXISTS 子查詢** (通常效能較好，用於檢查關聯記錄是否存在)
@@ -109,6 +109,9 @@ Oracle 的 SQL 語法與 MySQL 或 SQL Server 有些微不同，以下整理開�
         SELECT 1 FROM "OracleDemoItems" i WHERE i."CategoryId" = c."Id"
     );
     ```
+    > 💡 **語法解析：為什麼寫 `SELECT 1`？**
+    > 在 `EXISTS` 的括號內，資料庫只在乎「條件有沒有配對到任何一筆資料」，而**不在乎撈出什麼具體的欄位內容**。
+    > 因此業界慣例會寫 `SELECT 1`，告訴資料庫：「只要有配對到，隨便丟個常數 1 給我就好」。這能讓查詢語意更明確，也可能帶來微小的效能提升。
 
 ### DUAL 虛擬表
 Oracle 強制規定所有的 `SELECT` 語句都**必須**有 `FROM`。如果只想計算簡單的算式或取得時間，必須從內建的 `DUAL` 虛擬表中查詢：
