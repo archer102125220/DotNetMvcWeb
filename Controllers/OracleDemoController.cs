@@ -6,6 +6,7 @@ using DotNetMvcWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -238,6 +239,90 @@ namespace DotNetMvcWeb.Controllers
         {
             var categoriesQuery = _context.OracleDemoCategories.OrderBy(c => c.Name);
             ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
+        }
+
+        /// <summary>
+        /// GET: /OracleDemo/AdoNetDemo
+        /// 示範如何直接使用 Oracle.ManagedDataAccess.Client 原生 ADO.NET 方式連線與查詢
+        /// </summary>
+        public async Task<IActionResult> AdoNetDemo(string? keyword = null)
+        {
+            // [教學註解] 從 EF Core 上下文取得連接字串，這比讀取 IConfiguration 更簡潔。
+            string? connectionString = _context.Database.GetConnectionString();
+            
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return BadRequest("無法取得資料庫連接字串");
+            }
+
+            var resultList = new List<OracleDemoItem>();
+
+            // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (OracleConnection, OracleCommand, DbDataReader)
+            // 原生的 ADO.NET 操作需要開發者自行負責釋放連線。如果忘記 using，會造成 Connection Pool 被耗盡。
+            await using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                // [教學註解] Async First 政策：所有資料庫操作都必須使用 Async 版本。
+                await connection.OpenAsync();
+
+                await using (OracleCommand command = connection.CreateCommand())
+                {
+                    // [教學註解] 撰寫原生 SQL 查詢，這裡示範了如何做 JOIN。
+                    // ⚠️ 注意：Oracle 對於加了雙引號建立的欄位和表格會「強制區分大小寫」，所以這裡的 SQL 也要有雙引號。
+                    string sqlText = """
+                        SELECT 
+                            i."Id", 
+                            i."Name", 
+                            i."CreatedAt", 
+                            i."Description", 
+                            i."CategoryId", 
+                            c."Name" AS "CategoryName"
+                        FROM "OracleDemoItems" i
+                        LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id"
+                    """;
+
+                    // [教學註解] 動態加入搜尋條件 (WHERE)
+                    if (!string.IsNullOrWhiteSpace(keyword))
+                    {
+                        sqlText += " WHERE i.\"Name\" LIKE :keyword";
+                        // [教學註解] ⚠️ 絕對禁止字串拼接！必須使用 Parameter 參數化查詢，防止 SQL Injection (隱碼攻擊)
+                        command.Parameters.Add(new OracleParameter("keyword", $"%{keyword}%"));
+                    }
+
+                    sqlText += " ORDER BY i.\"CreatedAt\" DESC";
+                    command.CommandText = sqlText;
+
+                    // [教學註解] ExecuteReaderAsync 會開啟資料流讀取器
+                    await using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
+                        while (await reader.ReadAsync())
+                        {
+                            var item = new OracleDemoItem
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                CreatedAt = reader.GetDateTime(2),
+                                // [教學註解] 原生讀取資料時，針對可能為 NULL 的欄位，必須先呼叫 IsDBNull 進行檢查。
+                                // 否則呼叫 GetString 或 GetInt32 時會引發 SqlNullValueException！
+                                Description = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                CategoryId = reader.IsDBNull(4) ? null : reader.GetInt32(4)
+                            };
+
+                            // [教學註解] 如果有對應的 CategoryName，就手動建構關聯物件 (Navigation Property)
+                            if (!reader.IsDBNull(5))
+                            {
+                                item.Category = new OracleDemoCategory { Name = reader.GetString(5) };
+                            }
+
+                            resultList.Add(item);
+                        }
+                    }
+                }
+            }
+
+            ViewBag.Keyword = keyword;
+            // [教學註解] 回傳給具備 UI 畫面的 View，並將剛剛手動組裝好的 List 傳遞給 @model
+            return View(resultList);
         }
     }
 }

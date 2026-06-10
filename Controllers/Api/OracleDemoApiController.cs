@@ -6,6 +6,7 @@ using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Oracle.ManagedDataAccess.Client;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -150,6 +151,86 @@ namespace DotNetMvcWeb.Controllers
         private bool OracleDemoItemExists(int id)
         {
             return _context.OracleDemoItems.Any(e => e.Id == id);
+        }
+
+        /// <summary>
+        /// GET: api/oracle-demo/ado-net-demo
+        /// 示範如何直接使用 Oracle.ManagedDataAccess.Client 原生 ADO.NET 方式連線與查詢
+        /// </summary>
+        [HttpGet("ado-net-demo")]
+        public async Task<IActionResult> AdoNetDemo([FromQuery] string? keyword = null)
+        {
+            // [教學註解] 雖然我們示範的是原生 ADO.NET，但還是可以直接利用已經設定在 DbContext 內的連線字串
+            // 這讓我們不用去 appsettings.json 裡面手動剖析 (parse) IConfiguration。
+            string? connectionString = _context.Database.GetConnectionString();
+            
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                return BadRequest(new { message = "無法取得資料庫連接字串" });
+            }
+
+            var resultList = new List<object>();
+
+            // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (OracleConnection, OracleCommand, DbDataReader)
+            // 由於資料庫連線是非常昂貴的資源，務必要確保執行完畢或發生例外時，連線能被正確關閉與釋放 (Dispose)。
+            await using (OracleConnection connection = new OracleConnection(connectionString))
+            {
+                // [教學註解] Async First 政策：不要使用 connection.Open()，以免在流量大時阻塞執行緒 (Thread starvation)。
+                await connection.OpenAsync();
+
+                // [教學註解] 建立要送到 Oracle 執行的指令物件 (Command)
+                await using (OracleCommand command = connection.CreateCommand())
+                {
+                    // [教學註解] 撰寫原生 SQL 查詢，這裡同樣示範如何做 JOIN。
+                    // ⚠️ 注意：Oracle 資料庫中，如果資料表或欄位名稱被 EF Core 加上了雙引號 (強迫區分大小寫)，
+                    // 這裡的原生 SQL 也必須加上雙引號 (例如 \"Id\")，否則會發生 ORA-00904: invalid identifier 錯誤。
+                    string sqlText = """
+                        SELECT 
+                            i."Id", 
+                            i."Name", 
+                            i."CreatedAt", 
+                            i."Description", 
+                            i."CategoryId", 
+                            c."Name" AS "CategoryName"
+                        FROM "OracleDemoItems" i
+                        LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id"
+                    """;
+
+                    if (!string.IsNullOrWhiteSpace(keyword))
+                    {
+                        sqlText += " WHERE i.\"Name\" LIKE :keyword";
+                        // [教學註解] 防止 SQL Injection：必須使用參數化查詢
+                        command.Parameters.Add(new OracleParameter("keyword", $"%{keyword}%"));
+                    }
+
+                    sqlText += " ORDER BY i.\"CreatedAt\" DESC";
+                    command.CommandText = sqlText;
+
+                    // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式。
+                    // 它不會一次把幾百萬筆資料塞爆記憶體，而是透過 ReadAsync() 逐筆向資料庫要資料。
+                    await using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            resultList.Add(new 
+                            {
+                                // [教學註解] 透過索引值取出對應的欄位，這是最快的。
+                                // 如果要用欄位名稱取值，可以使用 reader.GetOrdinal("Id") 取得索引。
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                // Oracle DATE 或 TIMESTAMP 型別可以直接轉換為 C# 的 DateTime
+                                CreatedAt = reader.GetDateTime(2),
+                                // [教學註解] 原生讀取資料時，必須先呼叫 IsDBNull 檢查
+                                Description = reader.IsDBNull(3) ? null : reader.GetString(3),
+                                CategoryId = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
+                                CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5)
+                            });
+                        }
+                    }
+                }
+            }
+
+            return Ok(resultList);
         }
     }
 }
