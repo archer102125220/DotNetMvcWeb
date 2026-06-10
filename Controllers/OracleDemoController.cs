@@ -6,6 +6,7 @@ using DotNetMvcWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
 
 namespace DotNetMvcWeb.Controllers
@@ -17,11 +18,13 @@ namespace DotNetMvcWeb.Controllers
     public class OracleDemoController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        // 透過依賴注入 (Dependency Injection) 取得資料庫上下文
-        public OracleDemoController(AppDbContext context)
+        // 透過依賴注入 (Dependency Injection) 取得資料庫上下文與設定檔
+        public OracleDemoController(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -247,12 +250,16 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> AdoNetDemo(string? keyword = null)
         {
-            // [教學註解] 從 EF Core 上下文取得連接字串，這比讀取 IConfiguration 更簡潔。
-            string? connectionString = _context.Database.GetConnectionString();
+            // [教學註解] 直接利用已經設定在 DbContext 內的連線字串的情況，
+            // 可參考 Controllers/Api/OracleDemoApiController.cs，
+            // 這裡示範「手動剖析」設定檔：
+            // 透過依賴注入取得 IConfiguration，直接從 appsettings.json 中讀取連線字串。
+            // 這在沒有使用 Entity Framework (DbContext) 的純 ADO.NET 專案中是標準作法。
+            string? connectionString = _configuration.GetConnectionString("OracleDemoConnection");
             
             if (string.IsNullOrEmpty(connectionString))
             {
-                return BadRequest("無法取得資料庫連接字串");
+                return BadRequest("無法從 appsettings.json 取得 OracleDemoConnection 連接字串");
             }
 
             var resultList = new List<OracleDemoItem>();
