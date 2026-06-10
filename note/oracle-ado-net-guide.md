@@ -119,6 +119,14 @@ public async Task<List<OracleDemoItem>> GetItemsViaAdoNet()
 - **❌ 錯誤寫法**：`Description = reader.GetString(3)`
 - **✅ 正確寫法**：`Description = reader.IsDBNull(3) ? null : reader.GetString(3)`
 
+### 🚨 規則五：防止 SQL Injection (必須使用參數化查詢)
+當 SQL 語句中需要動態帶入使用者的輸入條件時，**絕對禁止使用字串拼接**。必須使用 `OracleParameter` 來進行參數化查詢，否則會面臨嚴重的 SQL Injection (隱碼攻擊) 風險。
+- **❌ 錯誤寫法**：`command.CommandText = $"SELECT * FROM \"Users\" WHERE \"Name\" = '{userName}'";`
+- **✅ 正確寫法**：
+  ```csharp
+  command.CommandText = "SELECT * FROM \"Users\" WHERE \"Name\" = :name";
+  command.Parameters.Add(new OracleParameter("name", userName));
+
 ---
 
 ## 6. 其他常用操作
