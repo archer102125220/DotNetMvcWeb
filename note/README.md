@@ -29,7 +29,7 @@
   - 在 .NET 中使用 appsettings.json 與 User Secrets 管理環境變數與機密的教學。
 
 ## 🗄️ 資料庫與 ORM (Database & ORM)
-記錄了各種資料庫系統（包含 Oracle）以及 Entity Framework Core 相關的教學與操作指令。
+記錄了各種資料庫系統（包含 Oracle 與 PostgreSQL）以及 Entity Framework Core 相關的教學與操作指令。
 
 - 🎭 **[Mock Database 實作指南 (mock_database_guide.md)](./mock_database_guide.md)**
   - 在不依賴實體資料庫的情況下，使用假資料進行開發的架構實作。
@@ -43,8 +43,18 @@
   - 提供給前端 (Vue, React, Nuxt) 串接的純 JSON RESTful API 使用說明與端點介紹。
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**
   - Oracle 常用的 SQL 指令、Docker 容器操作及常用語法速查。
+- 💻 **[原生 ADO.NET (Oracle) 操作指南 (oracle-ado-net-guide.md)](./oracle-ado-net-guide.md)**
+  - 使用原生的 Oracle.ManagedDataAccess.Client 直接操作 Oracle 的實踐指南與防護規範。
+- 🛢️ **[Postgres MVC 整合 Demo 指南 (postgres-mvc-demo-guide.md)](./postgres-mvc-demo-guide.md)**
+  - 介紹如何結合 EF Core、PostgreSQL 資料庫與前端 HTMX 實現無重整的 CRUD 操作。
+- 🔌 **[Postgres API 開發指南 (postgres-api-guide.md)](./postgres-api-guide.md)**
+  - 提供給前端串接的 Postgres 純 JSON RESTful API 使用說明與端點介紹。
+- ⌨️ **[Postgres 資料庫指令指南 (postgres-database-commands-guide.md)](./postgres-database-commands-guide.md)**
+  - PostgreSQL 常用的 SQL 指令、Docker 容器操作及常用語法速查。
+- 💻 **[原生 ADO.NET (Npgsql) 操作指南 (postgres-ado-net-guide.md)](./postgres-ado-net-guide.md)**
+  - 使用原生的 Npgsql 套件直接操作 PostgreSQL 的實踐指南與防護規範。
 - 📂 **[EF Core 多資料庫與 Migration 管理指南 (ef-core-multiple-databases.md)](./ef-core-multiple-databases.md)**
-  - 介紹在單一專案中同時使用多個 DbContext (如 Oracle 與 MySQL) 時，如何透過 CLI 參數獨立管理與建立 Migration 檔案。
+  - 介紹在單一專案中同時使用多個 DbContext (如 Oracle 與 Postgres) 時，如何透過 CLI 參數獨立管理與建立 Migration 檔案。
 
 ## 🌐 MVC 架構與前端互動 (MVC & Frontend Interaction)
 介紹 ASP.NET Core MVC 框架的底層機制，以及如何與現代前端技術（如 HTMX）進行無縫整合。

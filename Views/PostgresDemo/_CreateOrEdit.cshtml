@@ -1,0 +1,70 @@
+@model DotNetMvcWeb.Models.PostgresDemoItem
+
+<!--
+  表單 Partial View (共用於新增與編輯)：
+  這裡的表單送出是透過 HTMX 的 hx-post，而非傳統的整頁重整。
+-->
+<h4 class="mb-3">@(Model.Id == 0 ? "Create Item" : "Edit Item")</h4>
+
+<!--
+  【HTMX 流程解說：表單送出後如何更新畫面？】
+  1. 表單送出：因為使用了 hx-post，當使用者點擊 Submit 時，HTMX 會攔截預設的整頁重整，改為發送非同步的 POST 請求 (到 Create 或 Edit)。
+  2. 後端處理：Controller 儲存完資料後，會呼叫 `List()` 方法，並回傳 "_DemoList.cshtml" (也就是最新的表格 HTML 原始碼)。
+  3. 接收與替換：HTMX 收到新的表格 HTML 後，會尋找 hx-target 指定的目標 (也就是右側的 id="postgres-demo-list-container")。
+  4. 渲染方式：依照 hx-swap="innerHTML" 指示，把右側舊的表格直接替換成新的表格。
+  * 注意：如果後端驗證失敗 (例如沒填必填欄位)，Controller 會回傳狀態錯誤的 _CreateOrEdit 表單本身，並透過 HTTP Header (HX-Retarget) 指示 HTMX 改為替換左側的表單區塊，讓使用者看到錯誤訊息。
+-->
+<!--
+  根據 Model.Id 是否為 0 來決定送出的 Action 網址 (Create 或 Edit)。
+  送出後，預期 Controller 會回傳更新後的資料列表，因此 hx-target 設為 #postgres-demo-list-container
+-->
+<form hx-post="@(Model.Id == 0 ? Url.Action("Create", "PostgresDemo") : Url.Action("Edit", "PostgresDemo", new { id = Model.Id }))"
+      hx-target="#postgres-demo-list-container"
+      hx-swap="innerHTML"
+      class="postgres_demo_page-form">
+    
+    <!-- 必要的 CSRF 防護標記 -->
+    @Html.AntiForgeryToken()
+
+    @if (Model.Id != 0)
+    {
+        <!-- 如果是編輯模式，必須將 Id 與 CreatedAt 隱藏欄位帶上，以確保 Model Binding 正常 -->
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" />
+    }
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" required />
+        <!-- 顯示伺服器端的驗證錯誤訊息 -->
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories">
+            <option value="">-- Select Category (Optional) --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <!-- 
+          取消按鈕：
+          直接使用 JavaScript 將表單區塊還原為預設文字。
+          [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /PostgresDemo。
+        -->
+        <button type="button" 
+                class="btn btn-light" 
+                onclick="document.getElementById('postgres-demo-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select an item to edit or click \'Create New Item\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "PostgresDemo")');">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

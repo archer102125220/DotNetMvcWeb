@@ -1,0 +1,100 @@
+@model IEnumerable<DotNetMvcWeb.Models.PostgresDemoItem>
+@{
+    ViewData["Title"] = "Postgres DB Demo";
+}
+
+<!--
+  主頁面 (Index)：
+  這裡使用了 HTMX 來處理前端與後端的非同步互動，而不需要寫任何 JavaScript。
+  主要有兩個區塊：
+  1. #postgres-demo-form-container：用來顯示新增或編輯表單的區塊
+  2. #postgres-demo-list-container：用來顯示資料列表的區塊
+-->
+<div class="postgres_demo_page">
+    <div class="postgres_demo_page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="postgres_demo_page-title">Postgres Database Demonstration</h1>
+        
+        <div class="d-flex gap-2">
+            <!-- 
+              搜尋框 (示範 Raw SQL 查詢)：
+              透過 HTMX，當使用者輸入文字 (keyup) 並停頓 500ms 後，會發送 GET /PostgresDemo/List?keyword=xxx
+              並自動替換下方的列表 
+            -->
+            <!-- [教學註解] hx-push-url="true" 會讓 HTMX 在發出 GET 請求時，自動把請求的網址 (例如 /PostgresDemo?keyword=xxx) 推播到瀏覽器的網址列，實現網址同步 -->
+            <input type="text" 
+                   name="keyword" 
+                   class="form-control" 
+                   placeholder="搜尋名稱 (Raw SQL)..."
+                   value="@ViewBag.Keyword"
+                   hx-get="@Url.Action("Index", "PostgresDemo")"
+                   hx-push-url="true"
+                   hx-trigger="keyup changed delay:500ms, search"
+                   hx-target="#postgres-demo-list-container" />
+
+            <!--
+              【HTMX 流程解說：如何顯示新增表單】
+              1. 觸發條件：使用者點擊這顆按鈕。
+              2. 發送請求：hx-get 告訴 HTMX 發送一個 HTTP GET 請求到 /PostgresDemo/Create (這是由 Url.Action 產生的路徑)。
+              3. 後端處理：Controller 收到請求後，執行 Create() 方法，並回傳 "_CreateOrEdit.cshtml" 這個 Partial View (HTML 原始碼)。
+              4. 接收與替換：HTMX 收到 HTML 原始碼後，會找到畫面上的 hx-target (也就是 id="postgres-demo-form-container" 的元素)。
+              5. 渲染方式：依照 hx-swap="innerHTML" 的指示，把該元素的「內部內容」替換成後端回傳的表單 HTML。
+                 (也就是說，下方預設的那段 <p>Select an item...</p> 就會被 _CreateOrEdit 的內容給蓋掉！)
+              透過 HTMX 發送 GET 請求到 /PostgresDemo/Create 取得新增表單 (Partial View)
+              並將結果放入 (hx-target) id 為 postgres-demo-form-container 的元素中
+              [教學註解] 同樣加上 hx-push-url="true"，點擊時網址會變成 /PostgresDemo/Create，確保狀態可被分享或重整。
+            -->
+            <button class="postgres_demo_page-create_btn btn btn-primary text-nowrap"
+                    hx-get="@Url.Action("Create", "PostgresDemo")"
+                    hx-push-url="true"
+                    hx-target="#postgres-demo-form-container"
+                    hx-swap="innerHTML">
+                Create New Item
+            </button>
+
+            <!-- 前往原生 ADO.NET 示範頁面的入口 -->
+            <a href="@Url.Action("AdoNetDemo", "PostgresDemo")" class="btn btn-outline-info text-nowrap" title="前往觀看使用純 ADO.NET 撈取資料的示範畫面">
+                ADO.NET Demo
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 表單顯示區塊 (Form Container) -->
+        <div class="col-md-4">
+            <!--
+              這就是上面 Create 按鈕 (以及列表中的 Edit 按鈕) 的目標容器 (hx-target="#postgres-demo-form-container")。
+              這是一個非常重要的 HTMX 概念：我們不需要寫 JS 操作 DOM，只要指定目標 ID，
+              HTMX 就會自動把後端回傳的 Partial View (_CreateOrEdit.cshtml) 塞進這裡！
+            -->
+            <div id="postgres-demo-form-container" class="postgres_demo_page-form_container card p-3 shadow-sm">
+                <!-- 
+                  [教學註解] Progressive Enhancement (漸進式增強) 的 View 實作：
+                  當使用者直接重整 /PostgresDemo/Edit/5 或 /PostgresDemo/Create 時，
+                  Controller 會把資料塞入 ViewBag.ActiveItem 並回傳整頁。
+                  我們在這裡判斷如果 ActiveItem 有值，就直接在畫面初始載入時把表單畫出來，達到「重整不破版、狀態不遺失」。
+                -->
+                @if (ViewBag.ActiveItem != null)
+                {
+                    @await Html.PartialAsync("_CreateOrEdit", (DotNetMvcWeb.Models.PostgresDemoItem)ViewBag.ActiveItem)
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Select an item to edit or click 'Create New Item'.</p>
+                }
+            </div>
+        </div>
+
+        <!-- 資料列表區塊 (List Container) -->
+        <div class="col-md-8">
+            <div id="postgres-demo-list-container" class="postgres_demo_page-list_container">
+                <!-- 初始載入時，直接透過 Razor 渲染部分視圖 (_DemoList) -->
+                @await Html.PartialAsync("_DemoList", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- 引入 HTMX 腳本庫，讓上述的 hx-* 屬性生效 -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+}

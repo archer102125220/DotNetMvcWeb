@@ -1,0 +1,66 @@
+@model IEnumerable<DotNetMvcWeb.Models.PostgresDemoCategory>
+@{
+    ViewData["Title"] = "Postgres Category Demo";
+}
+
+<!--
+  主頁面 (Index)：
+  這裡同樣使用 HTMX 來處理前端與後端的非同步互動。
+  主要有兩個區塊：
+  1. #postgres-demo-category-form-container：用來顯示新增或編輯分類表單的區塊
+  2. #postgres-demo-category-list-container：用來顯示分類列表的區塊
+-->
+<div class="postgres_demo_page">
+    <div class="postgres_demo_page-header d-flex justify-content-between align-items-center mb-4">
+        <h1 class="postgres_demo_page-title">Postgres Categories</h1>
+        
+        <div class="d-flex gap-2">
+            <!--
+              透過 HTMX 發送 GET 請求到 /PostgresDemoCategory/Create 取得新增表單 (Partial View)
+              並將結果放入 (hx-target) id 為 postgres-demo-category-form-container 的元素中
+              [教學註解] 加入 hx-push-url="true" 將網址同步改為 /Create，保持使用者體驗一致性。
+            -->
+            <button class="postgres_demo_page-create_btn btn btn-primary text-nowrap"
+                    hx-get="@Url.Action("Create", "PostgresDemoCategory")"
+                    hx-push-url="true"
+                    hx-target="#postgres-demo-category-form-container"
+                    hx-swap="innerHTML">
+                Create New Category
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 表單顯示區塊 (Form Container) -->
+        <div class="col-md-4">
+            <div id="postgres-demo-category-form-container" class="postgres_demo_page-form_container card p-3 shadow-sm">
+                <!-- 
+                  [教學註解] 漸進式增強 (Progressive Enhancement)：
+                  配合 Controller 傳來的 ViewBag.ActiveItem，如果是重新整理帶有 Id 的網址，
+                  直接在此處渲染表單，避免畫面空白或跑回初始狀態。
+                -->
+                @if (ViewBag.ActiveItem != null)
+                {
+                    @await Html.PartialAsync("_CreateOrEdit", (DotNetMvcWeb.Models.PostgresDemoCategory)ViewBag.ActiveItem)
+                }
+                else
+                {
+                    <p class="text-muted mb-0">Select a category to edit or click 'Create New Category'.</p>
+                }
+            </div>
+        </div>
+
+        <!-- 資料列表區塊 (List Container) -->
+        <div class="col-md-8">
+            <div id="postgres-demo-category-list-container" class="postgres_demo_page-list_container">
+                <!-- 初始載入時，直接透過 Razor 渲染部分視圖 (_CategoryList) -->
+                @await Html.PartialAsync("_CategoryList", Model)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- 引入 HTMX 腳本庫，讓上述的 hx-* 屬性生效 -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+}
