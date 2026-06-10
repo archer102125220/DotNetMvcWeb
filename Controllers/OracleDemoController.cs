@@ -270,25 +270,25 @@ namespace DotNetMvcWeb.Controllers
                     // ⚠️ 注意：Oracle 對於加了雙引號建立的欄位和表格會「強制區分大小寫」，所以這裡的 SQL 也要有雙引號。
                     string sqlText = """
                         SELECT 
-                            i."Id", 
-                            i."Name", 
-                            i."CreatedAt", 
-                            i."Description", 
-                            i."CategoryId", 
-                            c."Name" AS "CategoryName"
-                        FROM "OracleDemoItems" i
-                        LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id"
+                            item."Id", 
+                            item."Name", 
+                            item."CreatedAt", 
+                            item."Description", 
+                            item."CategoryId", 
+                            category."Name" AS "CategoryName"
+                        FROM "OracleDemoItems" item
+                        LEFT JOIN "OracleDemoCategories" category ON item."CategoryId" = category."Id"
                     """;
 
                     // [教學註解] 動態加入搜尋條件 (WHERE)
                     if (!string.IsNullOrWhiteSpace(keyword))
                     {
-                        sqlText += " WHERE i.\"Name\" LIKE :keyword";
+                        sqlText += " WHERE item.\"Name\" LIKE :keyword";
                         // [教學註解] ⚠️ 絕對禁止字串拼接！必須使用 Parameter 參數化查詢，防止 SQL Injection (隱碼攻擊)
                         command.Parameters.Add(new OracleParameter("keyword", $"%{keyword}%"));
                     }
 
-                    sqlText += " ORDER BY i.\"CreatedAt\" DESC";
+                    sqlText += " ORDER BY item.\"CreatedAt\" DESC";
                     command.CommandText = sqlText;
 
                     // [教學註解] ExecuteReaderAsync 會開啟資料流讀取器

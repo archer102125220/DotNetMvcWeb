@@ -186,24 +186,24 @@ namespace DotNetMvcWeb.Controllers
                     // 這裡的原生 SQL 也必須加上雙引號 (例如 \"Id\")，否則會發生 ORA-00904: invalid identifier 錯誤。
                     string sqlText = """
                         SELECT 
-                            i."Id", 
-                            i."Name", 
-                            i."CreatedAt", 
-                            i."Description", 
-                            i."CategoryId", 
-                            c."Name" AS "CategoryName"
-                        FROM "OracleDemoItems" i
-                        LEFT JOIN "OracleDemoCategories" c ON i."CategoryId" = c."Id"
+                            item."Id", 
+                            item."Name", 
+                            item."CreatedAt", 
+                            item."Description", 
+                            item."CategoryId", 
+                            category."Name" AS "CategoryName"
+                        FROM "OracleDemoItems" item
+                        LEFT JOIN "OracleDemoCategories" category ON item."CategoryId" = category."Id"
                     """;
 
                     if (!string.IsNullOrWhiteSpace(keyword))
                     {
-                        sqlText += " WHERE i.\"Name\" LIKE :keyword";
+                        sqlText += " WHERE item.\"Name\" LIKE :keyword";
                         // [教學註解] 防止 SQL Injection：必須使用參數化查詢
                         command.Parameters.Add(new OracleParameter("keyword", $"%{keyword}%"));
                     }
 
-                    sqlText += " ORDER BY i.\"CreatedAt\" DESC";
+                    sqlText += " ORDER BY item.\"CreatedAt\" DESC";
                     command.CommandText = sqlText;
 
                     // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式。
