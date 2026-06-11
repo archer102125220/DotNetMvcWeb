@@ -61,6 +61,8 @@
 
 - 🗺️ **[ASP.NET Core MVC 路由與視圖渲染機制教學 (mvc-routing-partial-view-guide.md)](./mvc-routing-partial-view-guide.md)**
   - 解析從前端網址請求、Controller 路由對應，到回傳 PartialView 與模型綁定的完整底層運作機制。
+- 🔌 **[OpenAPI 與 TypeScript 型別產生指南 (openapi-typescript-generation-guide.md)](./openapi-typescript-generation-guide.md)**
+  - 介紹如何從 .NET 的 Scalar (OpenAPI) 介面中，匯出並產生前端所需的 TypeScript 型別與 API Client。
 
 ## 🔐 核心功能與實作 (Core Features)
 針對特定核心功能的深入說明與實作教學。
