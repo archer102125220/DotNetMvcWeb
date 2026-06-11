@@ -62,7 +62,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> Create()
         {
             PopulateCategoriesDropDownList();
-            var model = new PostgresDemoItem();
+            PostgresDemoItem model = new PostgresDemoItem();
 
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -165,7 +165,7 @@ namespace DotNetMvcWeb.Controllers
 
         private void PopulateCategoriesDropDownList(object? selectedCategory = null)
         {
-            var categoriesQuery = _context.PostgresDemoCategories.OrderBy(c => c.Name);
+            IOrderedQueryable<PostgresDemoCategory> categoriesQuery = _context.PostgresDemoCategories.OrderBy(c => c.Name);
             ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
         }
 
@@ -183,7 +183,7 @@ namespace DotNetMvcWeb.Controllers
                 return BadRequest("無法從 appsettings.json 取得 PostgresDemoConnection 連接字串");
             }
 
-            var resultList = new List<PostgresDemoItem>();
+            List<PostgresDemoItem> resultList = new List<PostgresDemoItem>();
 
             // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件
             await using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
@@ -218,11 +218,11 @@ namespace DotNetMvcWeb.Controllers
                     command.CommandText = sqlText;
 
                     // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式
-                    await using (var reader = await command.ExecuteReaderAsync())
+                    await using (NpgsqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            var item = new PostgresDemoItem
+                            PostgresDemoItem item = new PostgresDemoItem
                             {
                                 // [教學註解] 透過索引值取出對應的欄位，這是最快的
                                 Id = reader.GetInt32(0),

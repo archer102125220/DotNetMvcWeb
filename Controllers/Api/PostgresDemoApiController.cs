@@ -169,7 +169,7 @@ namespace DotNetMvcWeb.Controllers
                 return BadRequest(new { message = "無法取得資料庫連接字串" });
             }
 
-            var resultList = new List<object>();
+            List<object> resultList = new List<object>();
 
             // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (NpgsqlConnection, NpgsqlCommand, DbDataReader)
             // 由於資料庫連線是非常昂貴的資源，務必要確保執行完畢或發生例外時，連線能被正確關閉與釋放 (Dispose)。
@@ -208,7 +208,7 @@ namespace DotNetMvcWeb.Controllers
 
                     // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式。
                     // 它不會一次把幾百萬筆資料塞爆記憶體，而是透過 ReadAsync() 逐筆向資料庫要資料。
-                    await using (var reader = await command.ExecuteReaderAsync())
+                    await using (NpgsqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {

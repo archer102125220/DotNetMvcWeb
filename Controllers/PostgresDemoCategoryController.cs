@@ -23,7 +23,7 @@ namespace DotNetMvcWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var items = await GetItemsAsync();
+            List<PostgresDemoCategory> items = await GetItemsAsync();
 
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -43,7 +43,7 @@ namespace DotNetMvcWeb.Controllers
 
         public async Task<IActionResult> Create()
         {
-            var model = new PostgresDemoCategory();
+            PostgresDemoCategory model = new PostgresDemoCategory();
 
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -78,7 +78,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            var item = await _context.PostgresDemoCategories.FindAsync(id);
+            PostgresDemoCategory? item = await _context.PostgresDemoCategories.FindAsync(id);
             if (item == null) return NotFound();
             
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -124,7 +124,7 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.PostgresDemoCategories.FindAsync(id);
+            PostgresDemoCategory? item = await _context.PostgresDemoCategories.FindAsync(id);
             if (item != null)
             {
                 _context.PostgresDemoCategories.Remove(item);
