@@ -7,6 +7,7 @@ using DotNetMvcWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using System.Data.Common;
 
 namespace DotNetMvcWeb.Controllers.Api
 {
@@ -183,7 +184,7 @@ namespace DotNetMvcWeb.Controllers.Api
 
                     // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式。
                     // 它不會一次把幾百萬筆資料塞爆記憶體，而是透過 ReadAsync() 逐筆向資料庫要資料。
-                    await using (var reader = await command.ExecuteReaderAsync())
+                    await using (DbDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {

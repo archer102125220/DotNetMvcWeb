@@ -23,7 +23,7 @@ namespace DotNetMvcWeb.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var items = await GetItemsAsync();
+            List<MssqlDemoCategory> items = await GetItemsAsync();
 
             // [教學註解] 漸進式增強 (Progressive Enhancement)：若為 HTMX 請求，僅回傳 PartialView 節省頻寬。
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -83,7 +83,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            var item = await _context.MssqlDemoCategories.FindAsync(id);
+            MssqlDemoCategory? item = await _context.MssqlDemoCategories.FindAsync(id);
             if (item == null) return NotFound();
             
             // [教學註解] 若是透過 HTMX 點擊 Edit，只回傳編輯表單的部分 HTML
@@ -133,7 +133,7 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.MssqlDemoCategories.FindAsync(id);
+            MssqlDemoCategory? item = await _context.MssqlDemoCategories.FindAsync(id);
             if (item != null)
             {
                 _context.MssqlDemoCategories.Remove(item);

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Oracle.ManagedDataAccess.Client;
+using System.Data.Common;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -240,7 +241,7 @@ namespace DotNetMvcWeb.Controllers
 
         private void PopulateCategoriesDropDownList(object? selectedCategory = null)
         {
-            var categoriesQuery = _context.OracleDemoCategories.OrderBy(c => c.Name);
+            IQueryable<OracleDemoCategory> categoriesQuery = _context.OracleDemoCategories.OrderBy(c => c.Name);
             ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
         }
 
@@ -299,7 +300,7 @@ namespace DotNetMvcWeb.Controllers
                     command.CommandText = sqlText;
 
                     // [教學註解] ExecuteReaderAsync 會開啟資料流讀取器
-                    await using (var reader = await command.ExecuteReaderAsync())
+                    await using (DbDataReader reader = await command.ExecuteReaderAsync())
                     {
                         // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
                         while (await reader.ReadAsync())

@@ -28,7 +28,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Index()
         {
-            var items = await GetItemsAsync();
+            List<OracleDemoCategory> items = await GetItemsAsync();
 
             // [教學註解] 檢查是否為 HTMX (AJAX) 請求，是的話只回傳部分視圖
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -121,7 +121,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            var item = await _context.OracleDemoCategories.FindAsync(id);
+            OracleDemoCategory? item = await _context.OracleDemoCategories.FindAsync(id);
             if (item == null) return NotFound();
             
             // [教學註解] 若是 HTMX 請求，只回傳表單
@@ -179,7 +179,7 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var item = await _context.OracleDemoCategories.FindAsync(id);
+            OracleDemoCategory? item = await _context.OracleDemoCategories.FindAsync(id);
             if (item != null)
             {
                 _context.OracleDemoCategories.Remove(item);
