@@ -1,0 +1,48 @@
+@model DotNetMvcWeb.Models.MssqlDemoCategory
+
+<!--
+  分類表單 Partial View (共用於新增與編輯)：
+  這裡的表單送出是透過 HTMX 的 hx-post，而非傳統的整頁重整。
+-->
+<h4 class="mb-3">@(Model.Id == 0 ? "Create Category" : "Edit Category")</h4>
+
+<!--
+  根據 Model.Id 是否為 0 來決定送出的 Action 網址 (Create 或 Edit)。
+  送出後，預期 Controller 會回傳更新後的資料列表，因此 hx-target 設為 #mssql-demo-category-list-container
+-->
+<form hx-post="@(Model.Id == 0 ? Url.Action("Create", "MssqlDemoCategory") : Url.Action("Edit", "MssqlDemoCategory", new { id = Model.Id }))"
+      hx-target="#mssql-demo-category-list-container"
+      hx-swap="innerHTML"
+      class="mssql_demo_page-form">
+    
+    <!-- 必要的 CSRF 防護標記 -->
+    @Html.AntiForgeryToken()
+
+    @if (Model.Id != 0)
+    {
+        <!-- 如果是編輯模式，必須將 Id 與 CreatedAt 隱藏欄位帶上，以確保 Model Binding 正常 -->
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" />
+    }
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Name</label>
+        <input asp-for="Name" class="form-control" required />
+        <!-- 顯示伺服器端的驗證錯誤訊息 -->
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-4">
+        <!-- 
+          取消按鈕：
+          直接使用 JavaScript 將表單區塊還原為預設文字。
+          [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /MssqlDemoCategory。
+        -->
+        <button type="button" 
+                class="btn btn-light" 
+                onclick="document.getElementById('mssql-demo-category-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select a category to edit or click \'Create New Category\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "MssqlDemoCategory")');">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+</form>

@@ -16,6 +16,9 @@ builder.Services.AddDbContext<DotNetMvcWeb.Data.MysqlDbContext>(options =>
 
 builder.Services.AddDbContext<DotNetMvcWeb.Data.PostgresDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDemoConnection")!));
+
+builder.Services.AddDbContext<DotNetMvcWeb.Data.MssqlDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MssqlDemoConnection")!));
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -36,6 +39,9 @@ using (IServiceScope scope = app.Services.CreateScope())
         
         DotNetMvcWeb.Data.PostgresDbContext postgresContext = services.GetRequiredService<DotNetMvcWeb.Data.PostgresDbContext>();
         DotNetMvcWeb.Seeders.PostgresDbInitializer.Initialize(postgresContext);
+
+        DotNetMvcWeb.Data.MssqlDbContext mssqlContext = services.GetRequiredService<DotNetMvcWeb.Data.MssqlDbContext>();
+        DotNetMvcWeb.Seeders.MssqlDbInitializer.Initialize(mssqlContext);
     }
     catch (Exception ex)
     {

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/oracle-demo.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mssql-demo.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DotNetMvcWeb.styles.css" asp-append-version="true" />
 </head>
 <body hx-indicator="#global-loading-bar">
@@ -58,6 +59,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @GetActiveStyle("PostgresDemoCategory")" asp-area="" asp-controller="PostgresDemoCategory" asp-action="Index">Postgres Demo (Categories)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @GetActiveStyle("MssqlDemo")" asp-area="" asp-controller="MssqlDemo" asp-action="Index">MSSQL Demo (Items)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @GetActiveStyle("MssqlDemoCategory")" asp-area="" asp-controller="MssqlDemoCategory" asp-action="Index">MSSQL Demo (Categories)</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @GetActiveStyle("ExtensionsDemo")" asp-area="" asp-controller="ExtensionsDemo" asp-action="Index">Extensions 示範</a>
