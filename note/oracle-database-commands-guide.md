@@ -120,6 +120,34 @@ SELECT SYSDATE FROM DUAL;
 SELECT 1 + 1 FROM DUAL;
 ```
 
+### MERGE 語句 (合併 / Upsert)
+在 Oracle 中，如果想要實現「若資料存在則更新，不存在則新增」的邏輯（即 Upsert），會使用 `MERGE INTO` 語句。這在批次處理同步資料或避免重複寫入時非常實用。
+
+```sql
+MERGE INTO "OracleDemoItems" target
+USING (
+    -- 準備要 Upsert 的來源資料 (可以是從另一張表撈取，或用 DUAL 構造單筆)
+    SELECT 100 AS "Id", '新測試商品' AS "Name", '新描述內容' AS "Description" FROM DUAL
+) source
+ON (target."Id" = source."Id")
+WHEN MATCHED THEN
+    -- 當 ON 條件成立 (資料已存在)，執行 UPDATE
+    UPDATE SET 
+        target."Name" = source."Name",
+        target."Description" = source."Description"
+WHEN NOT MATCHED THEN
+    -- 當 ON 條件不成立 (資料不存在)，執行 INSERT
+    INSERT ("Id", "Name", "Description", "CreatedAt")
+    VALUES (source."Id", source."Name", source."Description", SYSDATE);
+```
+
+> 💡 **語法解析：**
+> *   `MERGE INTO target`: 指定要操作的目標資料表。
+> *   `USING source`: 提供資料來源。
+> *   `ON (條件)`: 用來判斷資料是否已經存在的條件（通常是對應的 Primary Key 或 Unique Key）。
+> *   `WHEN MATCHED THEN`: 指定條件符合時要做的 `UPDATE` 操作。**注意：不可以去更新 `ON` 條件裡面用到的欄位。**
+> *   `WHEN NOT MATCHED THEN`: 指定條件不符合時要做的 `INSERT` 操作。
+
 ---
 
 ## 4. 常見問題與踩坑 (Gotchas)
