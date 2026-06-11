@@ -21,6 +21,8 @@
 
 - 🍏 **[Mac 下使用 asdf 安裝 .NET 環境指南 (ASDF_DOTNET_INSTALL_MAC.md)](./ASDF_DOTNET_INSTALL_MAC.md)**
   - 在 macOS 上使用 `asdf` 版本控制工具安裝 .NET SDK 的步驟。
+- 🚀 **[使用 mise 安裝與管理 .NET 環境指南 (mise-dotnet-install-guide.md)](./mise-dotnet-install-guide.md)**
+  - 在 macOS/Linux 等環境中使用更快速的 `mise` 工具管理 .NET SDK 與專案版本的教學。
 - 🐳 **[Docker 環境設置 (DOCKER_ENVIRONMENT.md)](./DOCKER_ENVIRONMENT.md)**
   - 如何使用 Docker 運行本專案與周邊服務。
 - 🚀 **[部署指南 (DEPLOYMENT.md)](./DEPLOYMENT.md)**
