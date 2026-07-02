@@ -16,6 +16,9 @@ builder.Services.AddSingleton<DotNetMvcWeb.Models.IProductRepository, DotNetMvcW
 builder.Services.AddScoped<IMssqlDemoItemService, MssqlDemoItemService>();
 builder.Services.AddScoped<IMssqlDemoCategoryService, MssqlDemoCategoryService>();
 
+builder.Services.AddScoped<IOracleDemoItemService, OracleDemoItemService>();
+builder.Services.AddScoped<IOracleDemoCategoryService, OracleDemoCategoryService>();
+
 builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleDemoConnection")));
 

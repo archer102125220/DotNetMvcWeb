@@ -9,12 +9,12 @@ namespace DotNetMvcWeb.Services.Interfaces
     /// 透過介面定義功能，能讓 Controller 與具體的實作解耦 (Decoupling)。
     /// 未來在撰寫單元測試時，可以很輕易地 Mock 這個介面，而不需要真的連線到資料庫。
     /// </summary>
-    public interface IMssqlDemoCategoryService
+    public interface IOracleDemoCategoryService
     {
-        Task<List<MssqlDemoCategory>> GetCategoriesAsync();
-        Task<MssqlDemoCategory?> GetCategoryByIdAsync(int id);
-        Task CreateCategoryAsync(MssqlDemoCategory category);
-        Task UpdateCategoryAsync(MssqlDemoCategory category);
+        Task<List<OracleDemoCategory>> GetCategoriesAsync();
+        Task<OracleDemoCategory?> GetCategoryByIdAsync(int id);
+        Task CreateCategoryAsync(OracleDemoCategory category);
+        Task UpdateCategoryAsync(OracleDemoCategory category);
         Task DeleteCategoryAsync(int id);
         bool CategoryExists(int id);
     }
