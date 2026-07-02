@@ -182,6 +182,8 @@ namespace DotNetMvcWeb.Controllers
                 // [教學註解] 建立要送到 Oracle 執行的指令物件 (Command)
                 await using (OracleCommand command = connection.CreateCommand())
                 {
+                    command.BindByName = true;
+
                     // [教學註解] 撰寫原生 SQL 查詢，這裡同樣示範如何做 JOIN。
                     // ⚠️ 注意：Oracle 資料庫中，如果資料表或欄位名稱被 EF Core 加上了雙引號 (強迫區分大小寫)，
                     // 這裡的原生 SQL 也必須加上雙引號 (例如 \"Id\")，否則會發生 ORA-00904: invalid identifier 錯誤。
