@@ -1,14 +1,12 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Data.SqlClient;
-using System.Data.Common;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -18,13 +16,17 @@ namespace DotNetMvcWeb.Controllers
     /// </summary>
     public class MssqlDemoController : Controller
     {
-        private readonly MssqlDbContext _context;
+        private readonly IMssqlDemoItemService _itemService;
+        private readonly IMssqlDemoCategoryService _categoryService;
         private readonly IConfiguration _configuration;
 
-        // 透過依賴注入 (Dependency Injection) 取得資料庫上下文與設定檔
-        public MssqlDemoController(MssqlDbContext context, IConfiguration configuration)
+        // [教學註解] 依賴注入 (Dependency Injection, DI)
+        // 這裡不直接注入 DbContext，而是注入我們定義好的 Service 介面。
+        // 這樣可以達到「關注點分離」，讓 Controller 只負責接收請求與回傳結果，商業邏輯交給 Service 處理。
+        public MssqlDemoController(IMssqlDemoItemService itemService, IMssqlDemoCategoryService categoryService, IConfiguration configuration)
         {
-            _context = context;
+            _itemService = itemService;
+            _categoryService = categoryService;
             _configuration = configuration;
         }
 
@@ -34,7 +36,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Index(string? keyword = null)
         {
-            List<MssqlDemoItem> items = await GetItemsAsync(keyword);
+            List<MssqlDemoItem> items = await _itemService.GetItemsAsync(keyword);
 
             // [教學註解] 漸進式增強 (Progressive Enhancement) 的核心：
             // 透過檢查 Request Header 是否包含 "HX-Request"，我們可以知道這個請求是由 HTMX (AJAX) 發出的，
@@ -51,33 +53,6 @@ namespace DotNetMvcWeb.Controllers
         }
 
         /// <summary>
-        /// 取得資料列表 (支援 Raw SQL 關鍵字搜尋)
-        /// </summary>
-        private async Task<List<MssqlDemoItem>> GetItemsAsync(string? keyword)
-        {
-            // 如果有輸入關鍵字，就使用原生 SQL 進行查詢
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                string searchPattern = $"%{keyword}%";
-                // ⚠️ 深度檢查注意：使用 FromSqlInterpolated 會自動進行參數化，安全防止 SQL Injection。
-                // 另外，查詢後仍必須加上 .AsNoTracking() 來進行唯讀優化。
-                return await _context.MssqlDemoItems
-                    .FromSqlInterpolated($"SELECT * FROM [MssqlDemoItems] WHERE [Name] LIKE {searchPattern}")
-                    .Include(i => i.Category)
-                    .AsNoTracking()
-                    .OrderByDescending(i => i.CreatedAt)
-                    .ToListAsync();
-            }
-
-            // 如果沒有關鍵字，就使用一般的 LINQ 查詢全部
-            return await _context.MssqlDemoItems
-                .Include(i => i.Category)
-                .AsNoTracking()
-                .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync();
-        }
-
-        /// <summary>
         /// GET: /MssqlDemo/Create
         /// 回傳「新增項目」的表單 Partial View，供 HTMX 載入到畫面上。
         /// 
@@ -91,7 +66,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Create()
         {
-            PopulateCategoriesDropDownList();
+            await PopulateCategoriesDropDownListAsync();
             var model = new MssqlDemoItem();
 
             // [教學註解] 若是透過 HTMX 點擊「Create」按鈕進來，只回傳表單的部分 HTML
@@ -107,7 +82,7 @@ namespace DotNetMvcWeb.Controllers
             // 這樣使用者重新整理時，就會看到完整的列表頁面，且左側自動開啟新增表單！
             ViewBag.ActiveItem = model;
             ViewBag.IsCreate = true;
-            return View("Index", await GetItemsAsync(null));
+            return View("Index", await _itemService.GetItemsAsync(null));
         }
 
         /// <summary>
@@ -120,9 +95,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (ModelState.IsValid) // 檢查資料驗證是否通過
             {
-                item.CreatedAt = DateTime.UtcNow;
-                _context.Add(item);
-                await _context.SaveChangesAsync(); // 非同步寫入資料庫
+                await _itemService.CreateItemAsync(item);
                 
                 // [教學註解] 狀態網址化 (URL State Sync) - 送出後的還原：
                 // 當成功新增後，我們利用 Response Header 告訴 HTMX 去推播 (Push) 一個新網址。
@@ -136,7 +109,7 @@ namespace DotNetMvcWeb.Controllers
             
             Response.Headers.Append("HX-Retarget", "#mssql-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -155,10 +128,10 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            MssqlDemoItem? item = await _context.MssqlDemoItems.FindAsync(id);
+            MssqlDemoItem? item = await _itemService.GetItemByIdAsync(id.Value);
             if (item == null) return NotFound();
             
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
 
             // [教學註解] 若是點擊列表的 Edit 按鈕 (HTMX 請求)，回傳表單的部分視圖
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -171,7 +144,7 @@ namespace DotNetMvcWeb.Controllers
             // 把讀取到的 item 塞入 ViewBag，由 Index 視圖做整頁渲染，實現「無縫狀態接軌」。
             ViewBag.ActiveItem = item;
             ViewBag.IsEdit = true;
-            return View("Index", await GetItemsAsync(null));
+            return View("Index", await _itemService.GetItemsAsync(null));
         }
 
         /// <summary>
@@ -188,12 +161,11 @@ namespace DotNetMvcWeb.Controllers
             {
                 try
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    await _itemService.UpdateItemAsync(item);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MssqlDemoItemExists(item.Id))
+                    if (!_itemService.ItemExists(item.Id))
                         return NotFound();
                     else
                         throw;
@@ -205,7 +177,7 @@ namespace DotNetMvcWeb.Controllers
             
             Response.Headers.Append("HX-Retarget", "#mssql-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -217,27 +189,21 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            MssqlDemoItem? item = await _context.MssqlDemoItems.FindAsync(id);
-            if (item != null)
-            {
-                _context.MssqlDemoItems.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            await _itemService.DeleteItemAsync(id);
             
             // 刪除成功後，回傳更新後的列表，並確保網址維持在根目錄
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MssqlDemo"));
             return await Index();
         }
 
-        private bool MssqlDemoItemExists(int id)
+        private async Task PopulateCategoriesDropDownListAsync(object? selectedCategory = null)
         {
-            return _context.MssqlDemoItems.Any(e => e.Id == id);
-        }
-
-        private void PopulateCategoriesDropDownList(object? selectedCategory = null)
-        {
-            IQueryable<MssqlDemoCategory> categoriesQuery = _context.MssqlDemoCategories.OrderBy(c => c.Name);
-            ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
+            var categories = await _categoryService.GetCategoriesAsync();
+            // 注意：Service 已經幫忙 OrderByDescending(CreatedAt) 或可自訂排序
+            // 若要有特定排序，可直接在呼叫後作 LINQ 處理：categories.OrderBy(c => c.Name)
+            // 為了保持和之前一樣依名稱排序：
+            categories.Sort((x, y) => string.Compare(x.Name, y.Name, StringComparison.Ordinal));
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedCategory);
         }
 
         /// <summary>
@@ -246,86 +212,8 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> AdoNetDemo(string? keyword = null)
         {
-            // [教學註解] 直接利用已經設定在 DbContext 內的連線字串的情況，
-            // 可參考 Controllers/Api/MssqlDemoApiController.cs，
-            // 這裡示範「手動剖析」設定檔：
-            // 透過依賴注入取得 IConfiguration，直接從 appsettings.json 中讀取連線字串。
-            // 這在沒有使用 Entity Framework (DbContext) 的純 ADO.NET 專案中是標準作法。
-            string? connectionString = _configuration.GetConnectionString("MssqlDemoConnection");
-            
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return BadRequest("無法從 appsettings.json 取得 MssqlDemoConnection 連接字串");
-            }
-
-            var resultList = new List<MssqlDemoItem>();
-
-            // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (SqlConnection, SqlCommand, SqlDataReader)
-            // 原生的 ADO.NET 操作需要開發者自行負責釋放連線。如果忘記 using，會造成 Connection Pool 被耗盡。
-            await using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                // [教學註解] Async First 政策：所有資料庫操作都必須使用 Async 版本。
-                await connection.OpenAsync();
-
-                // [教學註解] 建立要送到 MSSQL 執行的指令物件 (Command)
-                await using (SqlCommand command = connection.CreateCommand())
-                {
-                    // [教學註解] 撰寫原生 SQL 查詢，這裡示範了如何做 JOIN。
-                    // ⚠️ 注意：MSSQL 中，使用中括號 [] 可以避免與保留字衝突，並明確指定物件名稱。
-                    string sqlText = """
-                        SELECT 
-                            item.[Id], 
-                            item.[Name], 
-                            item.[CreatedAt], 
-                            item.[Description], 
-                            item.[CategoryId], 
-                            category.[Name] AS [CategoryName]
-                        FROM [MssqlDemoItems] item
-                        LEFT JOIN [MssqlDemoCategories] category ON item.[CategoryId] = category.[Id]
-                    """;
-
-                    // [教學註解] 動態加入搜尋條件 (WHERE)
-                    if (!string.IsNullOrWhiteSpace(keyword))
-                    {
-                        sqlText += " WHERE item.[Name] LIKE @keyword";
-                        // [教學註解] ⚠️ 絕對禁止字串拼接！必須使用 Parameter 參數化查詢，防止 SQL Injection (隱碼攻擊)
-                        command.Parameters.Add(new SqlParameter("@keyword", $"%{keyword}%"));
-                    }
-
-                    sqlText += " ORDER BY item.[CreatedAt] DESC";
-                    command.CommandText = sqlText;
-
-                    // [教學註解] ExecuteReaderAsync 會開啟資料流讀取器
-                    await using (DbDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
-                        while (await reader.ReadAsync())
-                        {
-                            var item = new MssqlDemoItem
-                            {
-                                // [教學註解] 透過索引值取出對應的欄位，這是最快的。
-                                // 如果要用欄位名稱取值，可以使用 reader.GetOrdinal("Id") 取得索引。
-                                Id = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                // MSSQL DATETIME 或 DATETIME2 型別可以直接轉換為 C# 的 DateTime
-                                CreatedAt = reader.GetDateTime(2),
-                                // [教學註解] 原生讀取資料時，針對可能為 NULL 的欄位，必須先呼叫 IsDBNull 進行檢查。
-                                // 否則呼叫 GetString 或 GetInt32 時會引發 SqlNullValueException！
-                                Description = reader.IsDBNull(3) ? null : reader.GetString(3),
-                                CategoryId = reader.IsDBNull(4) ? null : reader.GetInt32(4)
-                            };
-
-                            // [教學註解] 如果有對應的 CategoryName，就手動建構關聯物件 (Navigation Property)
-                            if (!reader.IsDBNull(5))
-                            {
-                                item.Category = new MssqlDemoCategory { Name = reader.GetString(5) };
-                            }
-
-                            resultList.Add(item);
-                        }
-                    }
-                }
-            }
+            // 將 ADO.NET 查詢邏輯也封裝進 Service 內
+            var resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
 
             ViewBag.Keyword = keyword;
             // [教學註解] 回傳給具備 UI 畫面的 View，並將剛剛手動組裝好的 List 傳遞給 @model

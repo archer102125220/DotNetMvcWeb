@@ -1,8 +1,8 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,16 +14,16 @@ namespace DotNetMvcWeb.Controllers
     /// </summary>
     public class MssqlDemoCategoryController : Controller
     {
-        private readonly MssqlDbContext _context;
+        private readonly IMssqlDemoCategoryService _categoryService;
 
-        public MssqlDemoCategoryController(MssqlDbContext context)
+        public MssqlDemoCategoryController(IMssqlDemoCategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
         public async Task<IActionResult> Index()
         {
-            List<MssqlDemoCategory> items = await GetItemsAsync();
+            List<MssqlDemoCategory> items = await _categoryService.GetCategoriesAsync();
 
             // [教學註解] 漸進式增強 (Progressive Enhancement)：若為 HTMX 請求，僅回傳 PartialView 節省頻寬。
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -32,14 +32,6 @@ namespace DotNetMvcWeb.Controllers
             }
 
             return View(items);
-        }
-
-        private async Task<List<MssqlDemoCategory>> GetItemsAsync()
-        {
-            return await _context.MssqlDemoCategories
-                .AsNoTracking()
-                .OrderByDescending(c => c.CreatedAt)
-                .ToListAsync();
         }
 
         public async Task<IActionResult> Create()
@@ -55,7 +47,7 @@ namespace DotNetMvcWeb.Controllers
             // [教學註解] 漸進式增強：若使用者直接存取 /MssqlDemoCategory/Create，將渲染整頁 Index 並自動帶入新增狀態。
             ViewBag.ActiveItem = model;
             ViewBag.IsCreate = true;
-            return View("Index", await GetItemsAsync());
+            return View("Index", await _categoryService.GetCategoriesAsync());
         }
 
         [HttpPost]
@@ -64,9 +56,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                item.CreatedAt = DateTime.UtcNow;
-                _context.Add(item);
-                await _context.SaveChangesAsync();
+                await _categoryService.CreateCategoryAsync(item);
                 
                 // [教學註解] 成功新增後，推播新網址以還原狀態，並回傳更新後的列表。
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MssqlDemoCategory"));
@@ -83,7 +73,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            MssqlDemoCategory? item = await _context.MssqlDemoCategories.FindAsync(id);
+            MssqlDemoCategory? item = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (item == null) return NotFound();
             
             // [教學註解] 若是透過 HTMX 點擊 Edit，只回傳編輯表單的部分 HTML
@@ -95,7 +85,7 @@ namespace DotNetMvcWeb.Controllers
             // [教學註解] 漸進式增強：直接重整 Edit 網頁時，將渲染整頁 Index 並自動帶入編輯狀態。
             ViewBag.ActiveItem = item;
             ViewBag.IsEdit = true;
-            return View("Index", await GetItemsAsync());
+            return View("Index", await _categoryService.GetCategoriesAsync());
         }
 
         [HttpPost]
@@ -108,12 +98,11 @@ namespace DotNetMvcWeb.Controllers
             {
                 try
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    await _categoryService.UpdateCategoryAsync(item);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MssqlDemoCategoryExists(item.Id))
+                    if (!_categoryService.CategoryExists(item.Id))
                         return NotFound();
                     else
                         throw;
@@ -133,21 +122,11 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            MssqlDemoCategory? item = await _context.MssqlDemoCategories.FindAsync(id);
-            if (item != null)
-            {
-                _context.MssqlDemoCategories.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            await _categoryService.DeleteCategoryAsync(id);
             
             // [教學註解] 刪除成功後，確保網址維持在根目錄
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MssqlDemoCategory"));
             return await Index();
-        }
-
-        private bool MssqlDemoCategoryExists(int id)
-        {
-            return _context.MssqlDemoCategories.Any(e => e.Id == id);
         }
     }
 }

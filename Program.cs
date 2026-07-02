@@ -1,12 +1,20 @@
 using Scalar.AspNetCore;
 
 using Microsoft.EntityFrameworkCore;
+using DotNetMvcWeb.Services.Interfaces;
+using DotNetMvcWeb.Services.Implements;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DotNetMvcWeb.Models.IProductRepository, DotNetMvcWeb.Models.ProductRepository>();
+
+// [教學註解] 註冊自訂的 Services
+// AddScoped 表示「每一個 HTTP 請求 (Request)」都會產生一個新的 Service 實例。
+// 這樣可以確保同一個 Request 中的資料庫連線與狀態是共用且安全的。
+builder.Services.AddScoped<IMssqlDemoItemService, MssqlDemoItemService>();
+builder.Services.AddScoped<IMssqlDemoCategoryService, MssqlDemoCategoryService>();
 
 builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleDemoConnection")));
