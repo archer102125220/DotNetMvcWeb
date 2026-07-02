@@ -1,8 +1,8 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +14,13 @@ namespace DotNetMvcWeb.Controllers
     /// </summary>
     public class MysqlDemoCategoryController : Controller
     {
-        private readonly MysqlDbContext _context;
+        private readonly IMysqlDemoCategoryService _categoryService;
 
-        // 透過依賴注入 (Dependency Injection) 取得資料庫上下文
-        public MysqlDemoCategoryController(MysqlDbContext context)
+        // [教學註解] 依賴注入 (Dependency Injection, DI)
+        // 這裡不直接注入 DbContext，而是注入定義好的 Service 介面。
+        public MysqlDemoCategoryController(IMysqlDemoCategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Index()
         {
-            List<MysqlDemoCategory> items = await GetItemsAsync();
+            List<MysqlDemoCategory> items = await _categoryService.GetCategoriesAsync();
 
             // [教學註解] 檢查是否為 HTMX (AJAX) 請求，是的話只回傳部分視圖
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -38,18 +39,6 @@ namespace DotNetMvcWeb.Controllers
 
             // [教學註解] 一般瀏覽器請求，回傳完整視圖
             return View(items);
-        }
-
-        /// <summary>
-        /// 取得分類列表，預設依建立時間反向排序
-        /// </summary>
-        private async Task<List<MysqlDemoCategory>> GetItemsAsync()
-        {
-            // ⚠️ 深度檢查注意：唯讀查詢必須加上 .AsNoTracking() 以節省記憶體並提升效能
-            return await _context.MysqlDemoCategories
-                .AsNoTracking()
-                .OrderByDescending(c => c.CreatedAt)
-                .ToListAsync();
         }
 
         /// <summary>
@@ -70,7 +59,7 @@ namespace DotNetMvcWeb.Controllers
             // 並且把 ActiveItem 透過 ViewBag 帶過去，讓 Index 在載入時自己把表單畫出來。
             ViewBag.ActiveItem = model;
             ViewBag.IsCreate = true;
-            return View("Index", await GetItemsAsync());
+            return View("Index", await _categoryService.GetCategoriesAsync());
         }
 
         /// <summary>
@@ -83,9 +72,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (ModelState.IsValid) // 檢查資料驗證是否通過
             {
-                item.CreatedAt = DateTime.UtcNow;
-                _context.Add(item);
-                await _context.SaveChangesAsync(); // 非同步寫入資料庫
+                await _categoryService.CreateCategoryAsync(item); // 非同步寫入資料庫
                 
                 // [教學註解] 透過 Response Header 指示 HTMX 更新瀏覽器的網址列，避免網址停留在 /Create
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemoCategory"));
@@ -106,7 +93,7 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            MysqlDemoCategory? item = await _context.MysqlDemoCategories.FindAsync(id);
+            MysqlDemoCategory? item = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (item == null) return NotFound();
             
             // [教學註解] 若是 HTMX 請求，只回傳表單
@@ -117,8 +104,9 @@ namespace DotNetMvcWeb.Controllers
 
             // [教學註解] 若是直接輸入網址或重新整理，回傳完整的 Index 頁面，並自動帶入表單內容
             ViewBag.ActiveItem = item;
+            ViewBag.IsCreate = false;
             ViewBag.IsEdit = true;
-            return View("Index", await GetItemsAsync());
+            return View("Index", await _categoryService.GetCategoriesAsync());
         }
 
         /// <summary>
@@ -135,12 +123,11 @@ namespace DotNetMvcWeb.Controllers
             {
                 try
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    await _categoryService.UpdateCategoryAsync(item);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MysqlDemoCategoryExists(item.Id))
+                    if (!_categoryService.CategoryExists(item.Id))
                         return NotFound();
                     else
                         throw;
@@ -149,7 +136,7 @@ namespace DotNetMvcWeb.Controllers
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemoCategory"));
                 return await Index();
             }
-            
+
             // 驗證失敗，將錯誤表單重新渲染
             Response.Headers.Append("HX-Retarget", "#mysql-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
@@ -164,21 +151,11 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            MysqlDemoCategory? item = await _context.MysqlDemoCategories.FindAsync(id);
-            if (item != null)
-            {
-                _context.MysqlDemoCategories.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            await _categoryService.DeleteCategoryAsync(id);
             
             // 刪除成功後，回傳更新後的列表
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemoCategory"));
             return await Index();
-        }
-
-        private bool MysqlDemoCategoryExists(int id)
-        {
-            return _context.MysqlDemoCategories.Any(e => e.Id == id);
         }
     }
 }

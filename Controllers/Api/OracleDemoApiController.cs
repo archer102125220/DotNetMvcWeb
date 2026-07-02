@@ -116,10 +116,10 @@ namespace DotNetMvcWeb.Controllers
         }
 
         /// <summary>
-        /// GET: api/oracle-demo/adonet
+        /// GET: api/oracle-demo/ado-net-demo
         /// 透過原生 ADO.NET 方式取得資料
         /// </summary>
-        [HttpGet("adonet")]
+        [HttpGet("ado-net-demo")]
         public async Task<ActionResult<IEnumerable<OracleDemoItem>>> GetItemsViaAdoNet([FromQuery] string? keyword = null)
         {
             try

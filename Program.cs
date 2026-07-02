@@ -10,14 +10,6 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<DotNetMvcWeb.Models.IProductRepository, DotNetMvcWeb.Models.ProductRepository>();
 
-// [教學註解] 註冊自訂的 Services
-// AddScoped 表示「每一個 HTTP 請求 (Request)」都會產生一個新的 Service 實例。
-// 這樣可以確保同一個 Request 中的資料庫連線與狀態是共用且安全的。
-builder.Services.AddScoped<IMssqlDemoItemService, MssqlDemoItemService>();
-builder.Services.AddScoped<IMssqlDemoCategoryService, MssqlDemoCategoryService>();
-
-builder.Services.AddScoped<IOracleDemoItemService, OracleDemoItemService>();
-builder.Services.AddScoped<IOracleDemoCategoryService, OracleDemoCategoryService>();
 
 builder.Services.AddDbContext<DotNetMvcWeb.Data.AppDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleDemoConnection")));
@@ -30,6 +22,22 @@ builder.Services.AddDbContext<DotNetMvcWeb.Data.PostgresDbContext>(options =>
 
 builder.Services.AddDbContext<DotNetMvcWeb.Data.MssqlDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MssqlDemoConnection")!));
+
+// [教學註解] 註冊自訂的 Services
+// AddScoped 表示「每一個 HTTP 請求 (Request)」都會產生一個新的 Service 實例。
+// 這樣可以確保同一個 Request 中的資料庫連線與狀態是共用且安全的。
+builder.Services.AddScoped<IMssqlDemoItemService, MssqlDemoItemService>();
+builder.Services.AddScoped<IMssqlDemoCategoryService, MssqlDemoCategoryService>();
+
+builder.Services.AddScoped<IOracleDemoItemService, OracleDemoItemService>();
+builder.Services.AddScoped<IOracleDemoCategoryService, OracleDemoCategoryService>();
+
+builder.Services.AddScoped<IMysqlDemoItemService, MysqlDemoItemService>();
+builder.Services.AddScoped<IMysqlDemoCategoryService, MysqlDemoCategoryService>();
+
+builder.Services.AddScoped<IPostgresDemoItemService, PostgresDemoItemService>();
+builder.Services.AddScoped<IPostgresDemoCategoryService, PostgresDemoCategoryService>();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 

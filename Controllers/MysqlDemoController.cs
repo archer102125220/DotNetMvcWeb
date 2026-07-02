@@ -1,14 +1,13 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MySql.Data.MySqlClient;
-using System.Data.Common;
+
 namespace DotNetMvcWeb.Controllers
 {
     /// <summary>
@@ -17,13 +16,17 @@ namespace DotNetMvcWeb.Controllers
     /// </summary>
     public class MysqlDemoController : Controller
     {
-        private readonly MysqlDbContext _context;
+        private readonly IMysqlDemoItemService _itemService;
+        private readonly IMysqlDemoCategoryService _categoryService;
         private readonly IConfiguration _configuration;
 
-        // 透過依賴注入 (Dependency Injection) 取得資料庫上下文與設定檔
-        public MysqlDemoController(MysqlDbContext context, IConfiguration configuration)
+        // [教學註解] 依賴注入 (Dependency Injection, DI)
+        // 這裡不直接注入 DbContext，而是注入定義好的 Service 介面。
+        // 這樣可以達到「關注點分離」，讓 Controller 只負責接收請求與回傳結果，商業邏輯交給 Service 處理。
+        public MysqlDemoController(IMysqlDemoItemService itemService, IMysqlDemoCategoryService categoryService, IConfiguration configuration)
         {
-            _context = context;
+            _itemService = itemService;
+            _categoryService = categoryService;
             _configuration = configuration;
         }
 
@@ -33,40 +36,17 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Index(string? keyword = null)
         {
-            List<MysqlDemoItem> items = await GetItemsAsync(keyword);
+            List<MysqlDemoItem> items = await _itemService.GetItemsAsync(keyword);
 
+            // [教學註解] 檢查是否為 HTMX (AJAX) 請求，是的話只回傳部分視圖
             if (Request.Headers.ContainsKey("HX-Request"))
             {
                 return PartialView("_DemoList", items);
             }
 
             ViewBag.Keyword = keyword;
+            // [教學註解] 一般瀏覽器請求，回傳完整視圖
             return View(items);
-        }
-
-        /// <summary>
-        /// 取得資料列表 (支援 Raw SQL 關鍵字搜尋)
-        /// </summary>
-        private async Task<List<MysqlDemoItem>> GetItemsAsync(string? keyword)
-        {
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                string searchPattern = $"%{keyword}%";
-                // ⚠️ 深度檢查注意：使用 FromSqlInterpolated 會自動進行參數化，安全防止 SQL Injection。
-                // 注意 MySQL 表名不一定需要加上雙引號，但為了安全與習慣我們使用反引號 ` 或交由 EF Core
-                return await _context.MysqlDemoItems
-                    .FromSqlInterpolated($"SELECT * FROM `MysqlDemoItems` WHERE `Name` LIKE {searchPattern}")
-                    .Include(i => i.Category)
-                    .AsNoTracking()
-                    .OrderByDescending(i => i.CreatedAt)
-                    .ToListAsync();
-            }
-
-            return await _context.MysqlDemoItems
-                .Include(i => i.Category)
-                .AsNoTracking()
-                .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync();
         }
 
         /// <summary>
@@ -75,17 +55,19 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Create()
         {
-            PopulateCategoriesDropDownList();
+            await PopulateCategoriesDropDownListAsync();
             var model = new MysqlDemoItem();
 
+            // [教學註解] 若是 HTMX 點擊進來，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))
             {
                 return PartialView("_CreateOrEdit", model);
             }
 
+            // [教學註解] 解決重新整理重置版：如果是重整，我們回傳完整的 Index 頁面，
             ViewBag.ActiveItem = model;
             ViewBag.IsCreate = true;
-            return View("Index", await GetItemsAsync(null));
+            return View("Index", await _itemService.GetItemsAsync(null));
         }
 
         /// <summary>
@@ -98,17 +80,16 @@ namespace DotNetMvcWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                item.CreatedAt = DateTime.UtcNow;
-                _context.Add(item);
-                await _context.SaveChangesAsync();
+                await _itemService.CreateItemAsync(item);
                 
+                // [教學註解] 透過 Response Header 指示 HTMX 更新瀏覽器的網址列，避免網址停留在 /Create
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemo"));
                 return await Index();
             }
             
             Response.Headers.Append("HX-Retarget", "#mysql-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -120,19 +101,22 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id == null) return NotFound();
 
-            MysqlDemoItem? item = await _context.MysqlDemoItems.FindAsync(id);
+            MysqlDemoItem? item = await _itemService.GetItemByIdAsync(id.Value);
             if (item == null) return NotFound();
             
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
 
+            // [教學註解] 若是 HTMX 請求，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))
             {
                 return PartialView("_CreateOrEdit", item);
             }
 
+            // [教學註解] 若是直接輸入網址或重新整理，回傳完整的 Index 頁面，並自動帶入表單內容
             ViewBag.ActiveItem = item;
+            ViewBag.IsCreate = false;
             ViewBag.IsEdit = true;
-            return View("Index", await GetItemsAsync(null));
+            return View("Index", await _itemService.GetItemsAsync(null));
         }
 
         /// <summary>
@@ -149,12 +133,11 @@ namespace DotNetMvcWeb.Controllers
             {
                 try
                 {
-                    _context.Update(item);
-                    await _context.SaveChangesAsync();
+                    await _itemService.UpdateItemAsync(item);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!MysqlDemoItemExists(item.Id))
+                    if (!_itemService.ItemExists(item.Id))
                         return NotFound();
                     else
                         throw;
@@ -165,7 +148,7 @@ namespace DotNetMvcWeb.Controllers
             
             Response.Headers.Append("HX-Retarget", "#mysql-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
-            PopulateCategoriesDropDownList(item.CategoryId);
+            await PopulateCategoriesDropDownListAsync(item.CategoryId);
             return PartialView("_CreateOrEdit", item);
         }
 
@@ -177,26 +160,16 @@ namespace DotNetMvcWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            MysqlDemoItem? item = await _context.MysqlDemoItems.FindAsync(id);
-            if (item != null)
-            {
-                _context.MysqlDemoItems.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            await _itemService.DeleteItemAsync(id);
             
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemo"));
             return await Index();
         }
 
-        private bool MysqlDemoItemExists(int id)
+        private async Task PopulateCategoriesDropDownListAsync(object? selectedCategory = null)
         {
-            return _context.MysqlDemoItems.Any(e => e.Id == id);
-        }
-
-        private void PopulateCategoriesDropDownList(object? selectedCategory = null)
-        {
-            IQueryable<MysqlDemoCategory> categoriesQuery = _context.MysqlDemoCategories.OrderBy(c => c.Name);
-            ViewBag.Categories = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
+            List<MysqlDemoCategory> categories = await _categoryService.GetCategoriesAsync();
+            ViewBag.Categories = new SelectList(categories, "Id", "Name", selectedCategory);
         }
 
         /// <summary>
@@ -205,86 +178,11 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> AdoNetDemo(string? keyword = null)
         {
-            // [教學註解] 直接利用已經設定在 DbContext 內的連線字串的情況，
-            // 可參考 Controllers/Api/MysqlDemoApiController.cs，
-            // 這裡示範「手動剖析」設定檔：
-            // 透過依賴注入取得 IConfiguration，直接從 appsettings.json 中讀取連線字串。
-            // 這在沒有使用 Entity Framework (DbContext) 的純 ADO.NET 專案中是標準作法。
-            string? connectionString = _configuration.GetConnectionString("MysqlDemoConnection");
-            
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                return BadRequest("無法從 appsettings.json 取得 MysqlDemoConnection 連接字串");
-            }
-
-            var resultList = new List<MysqlDemoItem>();
-
-            // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (MySqlConnection, MySqlCommand, DbDataReader)
-            // 原生的 ADO.NET 操作需要開發者自行負責釋放連線。如果忘記 using，會造成 Connection Pool 被耗盡。
-            await using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                // [教學註解] Async First 政策：所有資料庫操作都必須使用 Async 版本。
-                await connection.OpenAsync();
-
-                await using (MySqlCommand command = connection.CreateCommand())
-                {
-                    // [教學註解] 撰寫原生 SQL 查詢，這裡示範了如何做 JOIN。
-                    // ⚠️ 注意：MySQL 對於保留字和欄位名稱會習慣使用反引號 ` 包起來。
-                    string sqlText = """
-                        SELECT 
-                            item.`Id`, 
-                            item.`Name`, 
-                            item.`CreatedAt`, 
-                            item.`Description`, 
-                            item.`CategoryId`, 
-                            category.`Name` AS `CategoryName`
-                        FROM `MysqlDemoItems` item
-                        LEFT JOIN `MysqlDemoCategories` category ON item.`CategoryId` = category.`Id`
-                    """;
-
-                    // [教學註解] 動態加入搜尋條件 (WHERE)
-                    if (!string.IsNullOrWhiteSpace(keyword))
-                    {
-                        sqlText += " WHERE item.`Name` LIKE @keyword";
-                        // [教學註解] ⚠️ 絕對禁止字串拼接！必須使用 Parameter 參數化查詢，防止 SQL Injection (隱碼攻擊)
-                        command.Parameters.Add(new MySqlParameter("@keyword", $"%{keyword}%"));
-                    }
-
-                    sqlText += " ORDER BY item.`CreatedAt` DESC";
-                    command.CommandText = sqlText;
-
-                    // [教學註解] ExecuteReaderAsync 會開啟資料流讀取器
-                    await using (DbDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
-                        while (await reader.ReadAsync())
-                        {
-                            var item = new MysqlDemoItem
-                            {
-                                Id = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                CreatedAt = reader.GetDateTime(2),
-                                // [教學註解] 原生讀取資料時，針對可能為 NULL 的欄位，必須先呼叫 IsDBNull 進行檢查。
-                                // 否則呼叫 GetString 或 GetInt32 時會引發 SqlNullValueException！
-                                Description = reader.IsDBNull(3) ? null : reader.GetString(3),
-                                CategoryId = reader.IsDBNull(4) ? null : reader.GetInt32(4)
-                            };
-
-                            // [教學註解] 如果有對應的 CategoryName，就手動建構關聯物件 (Navigation Property)
-                            if (!reader.IsDBNull(5))
-                            {
-                                item.Category = new MysqlDemoCategory { Name = reader.GetString(5) };
-                            }
-
-                            resultList.Add(item);
-                        }
-                    }
-                }
-            }
+            List<MysqlDemoItem> items = await _itemService.GetItemsViaAdoNetAsync(keyword);
 
             ViewBag.Keyword = keyword;
             // [教學註解] 回傳給具備 UI 畫面的 View，並將剛剛手動組裝好的 List 傳遞給 @model
-            return View(resultList);
+            return View(items);
         }
     }
 }

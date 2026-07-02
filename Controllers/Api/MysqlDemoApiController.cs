@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
-using System.Data.Common;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -19,11 +16,14 @@ namespace DotNetMvcWeb.Controllers
     [ApiController]
     public class MysqlDemoApiController : ControllerBase
     {
-        private readonly MysqlDbContext _context;
+        private readonly IMysqlDemoItemService _itemService;
 
-        public MysqlDemoApiController(MysqlDbContext context)
+        // [教學註解] 這裡利用依賴注入 (DI) 來取得 Service。
+        // WebAPI 和一般的 MVC Controller 可以共用同一個 Service 的商業邏輯，
+        // 這樣就不會因為不同的接入點而把相同的資料庫操作寫兩遍！
+        public MysqlDemoApiController(IMysqlDemoItemService itemService)
         {
-            _context = context;
+            _itemService = itemService;
         }
 
         /// <summary>
@@ -33,26 +33,7 @@ namespace DotNetMvcWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MysqlDemoItem>>> GetItems([FromQuery] string? keyword = null)
         {
-            // ⚠️ 深度檢查: 讀取資料必須使用 AsNoTracking() 進行優化
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                string searchPattern = $"%{keyword}%";
-                List<MysqlDemoItem> searchResult = await _context.MysqlDemoItems
-                    .FromSqlInterpolated($"SELECT * FROM `MysqlDemoItems` WHERE `Name` LIKE {searchPattern}")
-                    .Include(i => i.Category)
-                    .AsNoTracking()
-                    .OrderByDescending(i => i.CreatedAt)
-                    .ToListAsync();
-                
-                return Ok(searchResult);
-            }
-
-            List<MysqlDemoItem> items = await _context.MysqlDemoItems
-                .Include(i => i.Category)
-                .AsNoTracking()
-                .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync();
-
+            List<MysqlDemoItem> items = await _itemService.GetItemsAsync(keyword);
             return Ok(items);
         }
 
@@ -63,10 +44,7 @@ namespace DotNetMvcWeb.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MysqlDemoItem>> GetItem(int id)
         {
-            MysqlDemoItem? item = await _context.MysqlDemoItems
-                .Include(i => i.Category)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(i => i.Id == id);
+            MysqlDemoItem? item = await _itemService.GetItemByIdAsync(id, includeCategory: true);
 
             if (item == null)
             {
@@ -83,11 +61,7 @@ namespace DotNetMvcWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<MysqlDemoItem>> CreateItem([FromBody] MysqlDemoItem item)
         {
-            item.CreatedAt = DateTime.UtcNow;
-            
-            _context.MysqlDemoItems.Add(item);
-            await _context.SaveChangesAsync();
-
+            await _itemService.CreateItemAsync(item);
             return CreatedAtAction(nameof(GetItem), new { id = item.Id }, item);
         }
 
@@ -100,20 +74,18 @@ namespace DotNetMvcWeb.Controllers
         {
             if (id != item.Id)
             {
-                return BadRequest(new { message = "路徑中的 ID 與資料本身的 ID 不相符" });
+                return BadRequest(new { message = "路徑中的 ID 與內容中的 ID 不相符" });
             }
-
-            _context.Entry(item).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _itemService.UpdateItemAsync(item);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MysqlDemoItemExists(id))
+                if (!_itemService.ItemExists(id))
                 {
-                    return NotFound(new { message = "找不到指定的項目，可能已被刪除" });
+                    return NotFound(new { message = "找不到指定的項目" });
                 }
                 else
                 {
@@ -131,21 +103,13 @@ namespace DotNetMvcWeb.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteItem(int id)
         {
-            MysqlDemoItem? item = await _context.MysqlDemoItems.FindAsync(id);
-            if (item == null)
+            if (!_itemService.ItemExists(id))
             {
-                return NotFound(new { message = "找不到指定的項目，可能已被刪除" });
+                return NotFound(new { message = "找不到指定的項目" });
             }
 
-            _context.MysqlDemoItems.Remove(item);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "刪除成功" });
-        }
-
-        private bool MysqlDemoItemExists(int id)
-        {
-            return _context.MysqlDemoItems.Any(e => e.Id == id);
+            await _itemService.DeleteItemAsync(id);
+            return NoContent();
         }
 
         /// <summary>
@@ -153,78 +117,17 @@ namespace DotNetMvcWeb.Controllers
         /// 示範如何直接使用 MySql.Data.MySqlClient 原生 ADO.NET 方式連線與查詢
         /// </summary>
         [HttpGet("ado-net-demo")]
-        public async Task<IActionResult> AdoNetDemo([FromQuery] string? keyword = null)
+        public async Task<ActionResult<IEnumerable<MysqlDemoItem>>> GetItemsViaAdoNet([FromQuery] string? keyword = null)
         {
-            // [教學註解] 雖然我們示範的是原生 ADO.NET，但還是可以直接利用已經設定在 DbContext 內的連線字串
-            // 這讓我們不用去 appsettings.json 裡面手動剖析 (parse) IConfiguration。
-            string? connectionString = _context.Database.GetConnectionString();
-            
-            if (string.IsNullOrEmpty(connectionString))
+            try
             {
-                return BadRequest(new { message = "無法取得資料庫連接字串" });
+                List<MysqlDemoItem> resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
+                return Ok(resultList);
             }
-
-            var resultList = new List<object>();
-
-            // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (MySqlConnection, MySqlCommand, DbDataReader)
-            // 由於資料庫連線是非常昂貴的資源，務必要確保執行完畢或發生例外時，連線能被正確關閉與釋放 (Dispose)。
-            await using (MySqlConnection connection = new MySqlConnection(connectionString))
+            catch (Exception ex)
             {
-                // [教學註解] Async First 政策：不要使用 connection.Open()，以免在流量大時阻塞執行緒 (Thread starvation)。
-                await connection.OpenAsync();
-
-                // [教學註解] 建立要送到 MySQL 執行的指令物件 (Command)
-                await using (MySqlCommand command = connection.CreateCommand())
-                {
-                    // [教學註解] 撰寫原生 SQL 查詢，這裡同樣示範如何做 JOIN。
-                    // ⚠️ 注意：MySQL 習慣上會使用反引號 ` 來包覆資料表或欄位名稱。
-                    string sqlText = """
-                        SELECT 
-                            item.`Id`, 
-                            item.`Name`, 
-                            item.`CreatedAt`, 
-                            item.`Description`, 
-                            item.`CategoryId`, 
-                            category.`Name` AS `CategoryName`
-                        FROM `MysqlDemoItems` item
-                        LEFT JOIN `MysqlDemoCategories` category ON item.`CategoryId` = category.`Id`
-                    """;
-
-                    if (!string.IsNullOrWhiteSpace(keyword))
-                    {
-                        sqlText += " WHERE item.`Name` LIKE @keyword";
-                        // [教學註解] 防止 SQL Injection：必須使用參數化查詢
-                        command.Parameters.Add(new MySqlParameter("@keyword", $"%{keyword}%"));
-                    }
-
-                    sqlText += " ORDER BY item.`CreatedAt` DESC";
-                    command.CommandText = sqlText;
-
-                    // [教學註解] ExecuteReaderAsync 會回傳一個 DataReader，這是一種流式 (Streaming) 讀取方式。
-                    // 它不會一次把幾百萬筆資料塞爆記憶體，而是透過 ReadAsync() 逐筆向資料庫要資料。
-                    await using (DbDataReader reader = await command.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            resultList.Add(new 
-                            {
-                                // [教學註解] 透過索引值取出對應的欄位，這是最快的。
-                                // 如果要用欄位名稱取值，可以使用 reader.GetOrdinal("Id") 取得索引。
-                                Id = reader.GetInt32(0),
-                                Name = reader.GetString(1),
-                                // MySQL DATETIME 或 TIMESTAMP 型別可以直接轉換為 C# 的 DateTime
-                                CreatedAt = reader.GetDateTime(2),
-                                // [教學註解] 原生讀取資料時，必須先呼叫 IsDBNull 檢查
-                                Description = reader.IsDBNull(3) ? null : reader.GetString(3),
-                                CategoryId = reader.IsDBNull(4) ? (int?)null : reader.GetInt32(4),
-                                CategoryName = reader.IsDBNull(5) ? null : reader.GetString(5)
-                            });
-                        }
-                    }
-                }
+                return StatusCode(500, new { message = "執行原生 SQL 發生錯誤", details = ex.Message });
             }
-
-            return Ok(resultList);
         }
     }
 }
