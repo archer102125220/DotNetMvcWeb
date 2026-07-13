@@ -12,6 +12,7 @@
 6. [實務 Docker 開發與部署流程總覽](06-workflow-and-deployment-tutorial.md)
 7. [本地端測試 Docker 設定檔指南](07-local-testing-tutorial.md)
 8. [忽略檔 (.gitignore 與 .dockerignore) 設定指南](08-ignore-files-tutorial.md)
+9. [CI/CD 平台中的環境變數與機密管理](09-cicd-environment-variables-tutorial.md)
 
 ## 範例專案結構
 
