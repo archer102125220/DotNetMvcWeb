@@ -71,11 +71,13 @@
    - Runner 自動抓取最新原始碼。
    - Runner 自動編譯並執行單元測試 (Unit Test)。
    - **(Docker 出場)** 測試通過後，Runner 執行 `docker build` 將程式碼包成 Image。
+     > 📄 **用到哪些設定檔**：`Dockerfile` (告訴 Runner 怎麼打包程式碼)、`.dockerignore` (過濾不需要打包的垃圾檔案)。
    - Runner 執行 `docker push` 將 Image 推送到 Registry。
 3. **CD Pipeline 觸發 (持續部署)**：
    - Runner 透過 SSH 金鑰（或 Webhook Agent）連線進你的「正式機伺服器」。
    - Runner 在正式機上透過腳本自動替換掉舊的 Image 版本號。
    - Runner 在正式機上自動執行 `docker compose pull` 與 `docker compose up -d`。
+     > 📄 **用到哪些設定檔**：正式機上只需要純淨的 `docker-compose.yml` (服務編排) 與 `.env` (正式機的環境變數)。**絕對不會**用到 `docker-compose.override.yml`。
 4. **完成上線**：整個過程無人為介入，工程師只要推完 Code，喝杯咖啡，幾分鐘內系統就自動上線了。
 
 ### CI/CD 中的 Docker 核心優勢
