@@ -6,24 +6,31 @@
 
 請參考 `sample-app/docker-compose.yml` 來搭配以下說明。
 
+## 💡 關於新舊版指令的小知識 (V1 vs V2)
+
+您可能會在網路上看到 `docker-compose` (有連字號) 和 `docker compose` (有空格) 兩種寫法：
+- **`docker-compose`** (V1)：較舊的版本，通常是用 Python 寫的獨立套件。
+- **`docker compose`** (V2)：現在的**官方新標準**，由 Go 語言重寫並直接整合進了 Docker CLI 中。
+
+**所有**原本的指令都可以無縫改用有空格的新版寫法，以下教學皆以新版 (V2) 為標準。
+
 ## 常用指令
 
 - **啟動所有服務 (並在背景執行)**
   ```bash
-  docker-compose up -d
-  # 或較新版的指令： docker compose up -d
+  docker compose up -d
   ```
 
 - **停止並移除所有服務 (包含容器與網路)**
   ```bash
-  docker-compose down
+  docker compose down
   ```
-  > 若要連同 Volume 裡的資料一起刪除，可加上 `-v` 參數：`docker-compose down -v`
+  > 若要連同 Volume 裡的資料一起刪除，可加上 `-v` 參數：`docker compose down -v`
 
 - **查看服務日誌**
   ```bash
-  docker-compose logs -f
-  # 也可以看特定服務的： docker-compose logs -f web
+  docker compose logs -f
+  # 也可以看特定服務的： docker compose logs -f web
   ```
 
 ## docker-compose.yml 結構解析

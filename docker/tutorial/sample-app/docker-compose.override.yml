@@ -1,0 +1,19 @@
+version: '3.8'
+
+# 這份 override 檔案會自動合併並覆寫 docker-compose.yml 的設定
+# 通常用於「本機開發環境」，在實務上可以考慮將此檔案加入 .gitignore 避免互相干擾
+
+services:
+  webapp:
+    environment:
+      # 強制將環境設為開發模式，開啟詳細錯誤畫面 (會覆寫原有的設定或新增)
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_DETAILEDERRORS=true
+    # 進階技巧示範：
+    # 在本機開發時，可以把本機的專案原始碼目錄直接掛載到容器內
+    # 搭配 dotnet watch 就可以實現改程式碼不用重 build image 的熱重載 (Hot Reload)
+    volumes:
+      - ./:/src
+    # 假設你需要為開發環境多開一個 Debug Port 也可以寫在這裡
+    ports:
+      - "8081:8081"
