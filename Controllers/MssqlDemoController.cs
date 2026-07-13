@@ -196,6 +196,22 @@ namespace DotNetMvcWeb.Controllers
             return await Index();
         }
 
+        /// <summary>
+        /// POST: /MssqlDemo/UpdateDescriptionViaProcedure/5
+        /// 處理更新敘述的請求 (直接透過 HTMX 發送 POST)
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDescriptionViaProcedure(int id, string newDescription)
+        {
+            if (!string.IsNullOrWhiteSpace(newDescription))
+            {
+                await _itemService.UpdateItemDescriptionViaProcAsync(id, newDescription);
+            }
+            
+            return await Index();
+        }
+
         private async Task PopulateCategoriesDropDownListAsync(object? selectedCategory = null)
         {
             List<MssqlDemoCategory> categories = await _categoryService.GetCategoriesAsync();
