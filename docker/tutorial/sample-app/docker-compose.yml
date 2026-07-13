@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sample_webapp
+    ports:
+      - "8080:8080"
+    environment:
+      # .NET 的 Configuration 在 Linux 環境下使用雙底線 '__' 來表示階層
+      # 這裡我們使用 ${DB_PASSWORD} 從 .env 檔案中讀取密碼
+      - ConnectionStrings__DefaultConnection=Host=db;Database=${DB_NAME};Username=${DB_USER};Password=${DB_PASSWORD};
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - db
+    networks:
+      - app_network
+
+  db:
+    image: postgres:15-alpine
+    container_name: sample_postgres
+    restart: always
+    environment:
+      # 密碼與帳號不寫死，從 .env 檔案讀取
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # 將 init.sql 掛載進去，資料庫第一次啟動時會自動執行建表與插入假資料
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app_network
+
+volumes:
+  pgdata: # 宣告具名 volume，讓資料庫可以持久化
+
+networks:
+  app_network:
+    driver: bridge
