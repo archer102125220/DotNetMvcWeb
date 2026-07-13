@@ -23,7 +23,7 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     @{
-                        string GetActiveStyle(string c, string? a = null)
+                        string GetActiveStyle(string c, string? a = null, bool isDropdown = false)
                         {
                             string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
                             string? currentAction = ViewContext.RouteData.Values["action"]?.ToString();
@@ -32,7 +32,18 @@
                             {
                                 isMatch = isMatch && string.Equals(currentAction, a, StringComparison.OrdinalIgnoreCase);
                             }
-                            return isMatch ? "active text-primary fw-bold" : "text-dark";
+                            return isMatch ? (isDropdown ? "active text-light fw-bold" : "active text-primary fw-bold") : "text-dark";
+                        }
+
+                        bool IsDatabaseActive()
+                        {
+                            string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                            if (string.IsNullOrEmpty(currentController)) return false;
+                            
+                            return currentController.StartsWith("OracleDemo", StringComparison.OrdinalIgnoreCase) ||
+                                   currentController.StartsWith("MysqlDemo", StringComparison.OrdinalIgnoreCase) ||
+                                   currentController.StartsWith("PostgresDemo", StringComparison.OrdinalIgnoreCase) ||
+                                   currentController.StartsWith("MssqlDemo", StringComparison.OrdinalIgnoreCase);
                         }
                     }
                     <ul class="navbar-nav flex-grow-1">
@@ -42,29 +53,30 @@
                         <li class="nav-item">
                             <a class="nav-link @GetActiveStyle("Products")" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("OracleDemo")" asp-area="" asp-controller="OracleDemo" asp-action="Index">Oracle Demo (Items)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("OracleDemoCategory")" asp-area="" asp-controller="OracleDemoCategory" asp-action="Index">Oracle Demo (Categories)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("MysqlDemo")" asp-area="" asp-controller="MysqlDemo" asp-action="Index">MySQL Demo (Items)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("MysqlDemoCategory")" asp-area="" asp-controller="MysqlDemoCategory" asp-action="Index">MySQL Demo (Categories)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("PostgresDemo")" asp-area="" asp-controller="PostgresDemo" asp-action="Index">Postgres Demo (Items)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("PostgresDemoCategory")" asp-area="" asp-controller="PostgresDemoCategory" asp-action="Index">Postgres Demo (Categories)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("MssqlDemo")" asp-area="" asp-controller="MssqlDemo" asp-action="Index">MSSQL Demo (Items)</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("MssqlDemoCategory")" asp-area="" asp-controller="MssqlDemoCategory" asp-action="Index">MSSQL Demo (Categories)</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle @(IsDatabaseActive() ? "active text-primary fw-bold" : "text-dark")" href="#" id="navbarDropdownDB" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Databases
+                            </a>
+                            <ul class="dropdown-menu shadow-sm" aria-labelledby="navbarDropdownDB">
+                                <li><h6 class="dropdown-header">Oracle</h6></li>
+                                <li><a class="dropdown-item @GetActiveStyle("OracleDemo", null, true)" asp-controller="OracleDemo" asp-action="Index">Items</a></li>
+                                <li><a class="dropdown-item @GetActiveStyle("OracleDemoCategory", null, true)" asp-controller="OracleDemoCategory" asp-action="Index">Categories</a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">MySQL</h6></li>
+                                <li><a class="dropdown-item @GetActiveStyle("MysqlDemo", null, true)" asp-controller="MysqlDemo" asp-action="Index">Items</a></li>
+                                <li><a class="dropdown-item @GetActiveStyle("MysqlDemoCategory", null, true)" asp-controller="MysqlDemoCategory" asp-action="Index">Categories</a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">PostgreSQL</h6></li>
+                                <li><a class="dropdown-item @GetActiveStyle("PostgresDemo", null, true)" asp-controller="PostgresDemo" asp-action="Index">Items</a></li>
+                                <li><a class="dropdown-item @GetActiveStyle("PostgresDemoCategory", null, true)" asp-controller="PostgresDemoCategory" asp-action="Index">Categories</a></li>
+                                
+                                <li><hr class="dropdown-divider"></li>
+                                <li><h6 class="dropdown-header">MSSQL</h6></li>
+                                <li><a class="dropdown-item @GetActiveStyle("MssqlDemo", null, true)" asp-controller="MssqlDemo" asp-action="Index">Items</a></li>
+                                <li><a class="dropdown-item @GetActiveStyle("MssqlDemoCategory", null, true)" asp-controller="MssqlDemoCategory" asp-action="Index">Categories</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @GetActiveStyle("ExtensionsDemo")" asp-area="" asp-controller="ExtensionsDemo" asp-action="Index">Extensions 示範</a>
