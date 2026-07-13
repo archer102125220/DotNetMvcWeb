@@ -30,7 +30,15 @@
 - **查看服務日誌**
   ```bash
   docker compose logs -f
-  # 也可以看特定服務的： docker compose logs -f web
+  # 也可以看特定服務的： docker compose logs -f webapp
+  ```
+
+- **進入執行中的 Container (進入終端機)**
+  ```bash
+  # 格式：docker compose exec <服務名稱> <Shell名稱>
+  docker compose exec webapp /bin/bash
+  # 如果是 alpine 版本的 image，通常沒有 bash，請改用 sh：
+  # docker compose exec db /bin/sh
   ```
 
 ## docker-compose.yml 結構解析
