@@ -126,3 +126,52 @@ public async Task UpdateItemDescriptionViaProcAsync(int id, string newDescriptio
 
 無論底層是使用 EF Core 的標準物件追蹤 (Tracking) 來更新資料，還是直接呼叫預存程序，前端控制器 (Controller) 與 UI 的實作都可以保持不變。
 在本專案中，我們利用 **HTMX** 以非同步方式 (`hx-post`) 呼叫 Controller 端點，讓預存程序的執行過程對使用者完全透明，並搭配了「雙擊編輯 (Double-click to edit)」的互動體驗，展現了現代化架構的低耦合優勢。
+
+---
+
+### 5. 各資料庫預存程序 (Stored Procedures) 語法與呼叫差異比較
+
+在相同的業務需求下，不同的關聯式資料庫 (RDBMS) 在「建立」與「呼叫」預存程序時，會有些微的語法差異。以下是本專案支援的四種資料庫之差異總結：
+
+#### 1. SQL 建立語法 (DDL) 差異
+
+*   **Oracle**
+    *   **建立**: 支援 `CREATE OR REPLACE PROCEDURE`。
+    *   **參數**: 使用 `IN`、`OUT` 修飾詞，型別如 `NUMBER`、`NVARCHAR2`。
+    *   **主體**: 使用 `AS BEGIN ... END;`。
+*   **MSSQL (SQL Server)**
+    *   **建立**: 支援 `CREATE OR ALTER PROCEDURE`。
+    *   **參數**: 變數名稱必須加上 `@` 前綴（如 `@p_Id`），型別如 `INT`、`NVARCHAR(MAX)`。
+    *   **主體**: 使用 `AS BEGIN ... END`。
+*   **PostgreSQL**
+    *   **建立**: 支援 `CREATE OR REPLACE PROCEDURE`。
+    *   **參數**: 型別如 `integer`、`character varying`。
+    *   **主體**: 必須指定語言 `LANGUAGE plpgsql`，並將主體包在 `AS $$ BEGIN ... END; $$;` 區塊中。
+*   **MySQL**
+    *   **建立**: **不支援** `OR REPLACE`，通常在 Migration 中需先執行 `DROP PROCEDURE IF EXISTS`，再執行 `CREATE PROCEDURE`。
+    *   **參數**: 使用 `IN` 修飾詞，型別如 `INT`、`TEXT`。
+    *   **主體**: 使用 `BEGIN ... END`。
+
+#### 2. C# EF Core 呼叫語法差異
+
+透過 EF Core 的 `ExecuteSqlRawAsync` 或是 `ExecuteSqlInterpolatedAsync` 呼叫時，各家資料庫所接受的 SQL 命令也不同：
+
+*   **Oracle**: 必須包裝在 PL/SQL 匿名區塊中。
+    ```csharp
+    await _context.Database.ExecuteSqlRawAsync("BEGIN SP_UPDATE_ITEM_DESCRIPTION(:p0, :p1); END;", id, newDescription);
+    ```
+*   **MSSQL (SQL Server)**: 使用 `EXEC` 指令。
+    ```csharp
+    await _context.Database.ExecuteSqlInterpolatedAsync($"EXEC SP_UPDATE_ITEM_DESCRIPTION {id}, {newDescription}");
+    ```
+*   **PostgreSQL**: (PostgreSQL 11 之後引入的 Procedure) 使用 `CALL` 指令。
+    ```csharp
+    await _context.Database.ExecuteSqlInterpolatedAsync($"CALL SP_UPDATE_ITEM_DESCRIPTION({id}, {newDescription})");
+    ```
+*   **MySQL**: 同樣使用 `CALL` 指令。
+    ```csharp
+    await _context.Database.ExecuteSqlInterpolatedAsync($"CALL SP_UPDATE_ITEM_DESCRIPTION({id}, {newDescription})");
+    ```
+
+> [!TIP]
+> 建議在 C# 端呼叫時，優先使用 `ExecuteSqlInterpolatedAsync($"...")` 的字串插值語法。EF Core 會自動將大括號 `{}` 內的變數轉換為對應資料庫的安全參數 (Parameterized Query)，能有效防範 SQL Injection 攻擊，並且不用手動處理 `:p0` 或是 `@p0` 的差異。
