@@ -101,11 +101,11 @@ namespace DotNetMvcWeb.Controllers.Api
         {
             try
             {
-                var resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
+                List<MssqlDemoItem> resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
                 
                 // 為了與之前的 API 回傳格式相同，將 MssqlDemoItem 轉為包含 CategoryName 的匿名物件
-                var responseList = new List<object>();
-                foreach(var item in resultList)
+                List<object> responseList = new List<object>();
+                foreach(MssqlDemoItem item in resultList)
                 {
                     responseList.Add(new {
                         Id = item.Id,

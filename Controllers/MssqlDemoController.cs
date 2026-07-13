@@ -67,7 +67,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesDropDownListAsync();
-            var model = new MssqlDemoItem();
+            MssqlDemoItem model = new MssqlDemoItem();
 
             // [教學註解] 若是透過 HTMX 點擊「Create」按鈕進來，只回傳表單的部分 HTML
             if (Request.Headers.ContainsKey("HX-Request"))
@@ -198,7 +198,7 @@ namespace DotNetMvcWeb.Controllers
 
         private async Task PopulateCategoriesDropDownListAsync(object? selectedCategory = null)
         {
-            var categories = await _categoryService.GetCategoriesAsync();
+            List<MssqlDemoCategory> categories = await _categoryService.GetCategoriesAsync();
             // 注意：Service 已經幫忙 OrderByDescending(CreatedAt) 或可自訂排序
             // 若要有特定排序，可直接在呼叫後作 LINQ 處理：categories.OrderBy(c => c.Name)
             // 為了保持和之前一樣依名稱排序：
@@ -213,7 +213,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> AdoNetDemo(string? keyword = null)
         {
             // 將 ADO.NET 查詢邏輯也封裝進 Service 內
-            var resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
+            List<MssqlDemoItem> resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
 
             ViewBag.Keyword = keyword;
             // [教學註解] 回傳給具備 UI 畫面的 View，並將剛剛手動組裝好的 List 傳遞給 @model

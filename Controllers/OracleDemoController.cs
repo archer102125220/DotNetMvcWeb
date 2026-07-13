@@ -67,7 +67,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesDropDownListAsync();
-            var model = new OracleDemoItem();
+            OracleDemoItem model = new OracleDemoItem();
 
             // [教學註解] 若是透過 HTMX 點擊「Create」按鈕進來，只回傳表單的部分 HTML
             if (Request.Headers.ContainsKey("HX-Request"))

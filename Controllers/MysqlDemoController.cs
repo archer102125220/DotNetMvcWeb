@@ -56,7 +56,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateCategoriesDropDownListAsync();
-            var model = new MysqlDemoItem();
+            MysqlDemoItem model = new MysqlDemoItem();
 
             // [教學註解] 若是 HTMX 點擊進來，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))

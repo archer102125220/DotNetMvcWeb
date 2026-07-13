@@ -100,7 +100,7 @@ namespace DotNetMvcWeb.Services.Implements
                 throw new InvalidOperationException("無法取得資料庫連接字串");
             }
 
-            var resultList = new List<OracleDemoItem>();
+            List<OracleDemoItem> resultList = new List<OracleDemoItem>();
 
             // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (OracleConnection, OracleCommand, DbDataReader)
             // 由於資料庫連線是非常昂貴的資源，務必要確保執行完畢或發生例外時，連線能被正確關閉與釋放 (Dispose)。
@@ -147,7 +147,7 @@ namespace DotNetMvcWeb.Services.Implements
                         // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
                         while (await reader.ReadAsync())
                         {
-                            var item = new OracleDemoItem
+                            OracleDemoItem item = new OracleDemoItem
                             {
                                 // [教學註解] 透過索引值取出對應的欄位，這是最快的。
                                 // 如果要用欄位名稱取值，可以使用 reader.GetOrdinal("Id") 取得索引。

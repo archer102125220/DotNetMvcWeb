@@ -101,7 +101,7 @@ namespace DotNetMvcWeb.Services.Implements
                 throw new InvalidOperationException("無法從 DbContext 取得連接字串");
             }
 
-            var resultList = new List<MysqlDemoItem>();
+            List<MysqlDemoItem> resultList = new List<MysqlDemoItem>();
 
             // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件 (MySqlConnection, MySqlCommand, DbDataReader)
             // 原生的 ADO.NET 操作需要開發者自行負責釋放連線。如果忘記 using，會造成 Connection Pool 被耗盡。
@@ -145,7 +145,7 @@ namespace DotNetMvcWeb.Services.Implements
                         // [教學註解] ReadAsync() 會逐筆將資料拉到應用程式記憶體中。
                         while (await reader.ReadAsync())
                         {
-                            var item = new MysqlDemoItem
+                            MysqlDemoItem item = new MysqlDemoItem
                             {
                                 // [教學註解] 透過索引值取出對應的欄位，這是最快的。
                                 // 如果要用欄位名稱取值，可以使用 reader.GetOrdinal("Id") 取得索引。

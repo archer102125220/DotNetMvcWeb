@@ -45,7 +45,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Create()
         {
-            var model = new PostgresDemoCategory();
+            PostgresDemoCategory model = new PostgresDemoCategory();
 
             // [教學註解] 若是 HTMX 點擊進來，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))

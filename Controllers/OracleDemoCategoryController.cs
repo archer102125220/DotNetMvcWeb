@@ -44,7 +44,7 @@ namespace DotNetMvcWeb.Controllers
         /// </summary>
         public async Task<IActionResult> Create()
         {
-            var model = new OracleDemoCategory();
+            OracleDemoCategory model = new OracleDemoCategory();
 
             // [教學註解] 若是透過 HTMX 點擊「Create」按鈕進來，只回傳表單的部分 HTML
             if (Request.Headers.ContainsKey("HX-Request"))

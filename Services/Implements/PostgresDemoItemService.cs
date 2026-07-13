@@ -99,7 +99,7 @@ namespace DotNetMvcWeb.Services.Implements
                 throw new InvalidOperationException("無法從 DbContext 取得連接字串");
             }
 
-            var resultList = new List<PostgresDemoItem>();
+            List<PostgresDemoItem> resultList = new List<PostgresDemoItem>();
 
             // ⚠️ 深度檢查注意：必須使用 await using 包覆 IDisposable 物件
             await using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
