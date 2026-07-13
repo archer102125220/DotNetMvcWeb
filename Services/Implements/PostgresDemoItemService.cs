@@ -163,5 +163,12 @@ namespace DotNetMvcWeb.Services.Implements
 
             return resultList;
         }
+
+        public async Task UpdateItemDescriptionViaProcAsync(int id, string newDescription)
+        {
+            // ⚠️ 深度檢查注意：使用 ExecuteSqlInterpolatedAsync 會自動處理參數化，防止 SQL Injection
+            // 在 Postgres 中呼叫 Procedure 通常使用 CALL
+            await _context.Database.ExecuteSqlInterpolatedAsync($"CALL SP_UPDATE_ITEM_DESCRIPTION({id}, {newDescription})");
+        }
     }
 }
