@@ -10,6 +10,8 @@
 4. [Database Seeding (建立預設資料) 教學](04-database-seeding-tutorial.md)
 5. [覆寫設定 (Override) 教學](05-docker-compose-override-tutorial.md)
 6. [實務 Docker 開發與部署流程總覽](06-workflow-and-deployment-tutorial.md)
+7. [本地端測試 Docker 設定檔指南](07-local-testing-tutorial.md)
+8. [忽略檔 (.gitignore 與 .dockerignore) 設定指南](08-ignore-files-tutorial.md)
 
 ## 範例專案結構
 
