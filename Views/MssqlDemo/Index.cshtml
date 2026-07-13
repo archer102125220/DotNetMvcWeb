@@ -11,11 +11,8 @@
   2. #mssql-demo-list-container：用來顯示資料列表的區塊
 -->
 <div class="mssql_demo_page">
-    <div class="mssql_demo_page-header d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mssql_demo_page-title">MSSQL Database Demonstration</h1>
-        
-        <div class="d-flex gap-2">
-            <!-- 
+    <page-header title="MSSQL Database Demonstration">
+        <!-- 
               搜尋框 (示範 Raw SQL 查詢)：
               透過 HTMX，當使用者輸入文字 (keyup) 並停頓 500ms 後，會發送 GET /MssqlDemo/List?keyword=xxx
               並自動替換下方的列表 
@@ -55,8 +52,7 @@
             <a href="@Url.Action("AdoNetDemo", "MssqlDemo")" class="btn btn-outline-info text-nowrap" title="前往觀看使用純 ADO.NET 撈取資料的示範畫面">
                 ADO.NET Demo
             </a>
-        </div>
-    </div>
+    </page-header>
 
     <div class="row">
         <!-- 表單顯示區塊 (Form Container) -->

@@ -11,11 +11,8 @@
   2. #oracle-demo-category-list-container：用來顯示分類列表的區塊
 -->
 <div class="oracle_demo_page">
-    <div class="oracle_demo_page-header d-flex justify-content-between align-items-center mb-4">
-        <h1 class="oracle_demo_page-title">Oracle Categories</h1>
-        
-        <div class="d-flex gap-2">
-            <!--
+    <page-header title="Oracle Categories">
+        <!--
               透過 HTMX 發送 GET 請求到 /OracleDemoCategory/Create 取得新增表單 (Partial View)
               並將結果放入 (hx-target) id 為 oracle-demo-category-form-container 的元素中
               [教學註解] 加入 hx-push-url="true" 將網址同步改為 /Create，保持使用者體驗一致性。
@@ -27,8 +24,7 @@
                     hx-swap="innerHTML">
                 Create New Category
             </button>
-        </div>
-    </div>
+    </page-header>
 
     <div class="row">
         <!-- 表單顯示區塊 (Form Container) -->
