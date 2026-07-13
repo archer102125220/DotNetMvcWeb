@@ -18,5 +18,6 @@ namespace DotNetMvcWeb.Services.Interfaces
         Task DeleteItemAsync(int id);
         bool ItemExists(int id);
         Task<List<MysqlDemoItem>> GetItemsViaAdoNetAsync(string? keyword = null);
+        Task UpdateItemDescriptionViaProcAsync(int id, string newDescription);
     }
 }

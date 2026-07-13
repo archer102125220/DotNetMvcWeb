@@ -166,6 +166,21 @@ namespace DotNetMvcWeb.Controllers
             return await Index();
         }
 
+        /// <summary>
+        /// POST: /MysqlDemo/UpdateDescriptionViaProcedure/5
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDescriptionViaProcedure(int id, string newDescription)
+        {
+            if (!string.IsNullOrWhiteSpace(newDescription))
+            {
+                await _itemService.UpdateItemDescriptionViaProcAsync(id, newDescription);
+            }
+            
+            return await Index();
+        }
+
         private async Task PopulateCategoriesDropDownListAsync(object? selectedCategory = null)
         {
             List<MysqlDemoCategory> categories = await _categoryService.GetCategoriesAsync();

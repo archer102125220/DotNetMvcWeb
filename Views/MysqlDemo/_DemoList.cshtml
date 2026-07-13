@@ -26,7 +26,21 @@
                         <td>@item.Id</td>
                         <td>@item.Name</td>
                         <td>@(item.Category?.Name ?? "-")</td>
-                        <td>@item.Description</td>
+                        <td ondblclick="this.querySelector('.desc-text').classList.add('d-none'); this.querySelector('form').classList.remove('d-none'); this.querySelector('input').focus();">
+                            <!-- 顯示狀態的文字 -->
+                            <span class="desc-text text-primary" style="cursor: pointer;" title="雙擊以修改">@item.Description</span>
+                            
+                            <!-- 雙擊後顯示的編輯表單 (預設隱藏: d-none) -->
+                            <form hx-post="@Url.Action("UpdateDescriptionViaProcedure", "MysqlDemo", new { id = item.Id })"
+                                  hx-target="#mysql-demo-list-container"
+                                  hx-swap="innerHTML"
+                                  class="d-none d-flex align-items-center mb-0">
+                                @Html.AntiForgeryToken()
+                                <input type="text" name="newDescription" value="@item.Description" class="form-control form-control-sm me-2" style="min-width: 120px;" required>
+                                <button type="submit" class="btn btn-sm btn-primary text-nowrap me-1">儲存</button>
+                                <button type="button" class="btn btn-sm btn-secondary text-nowrap" onclick="event.stopPropagation(); var td = this.closest('td'); td.querySelector('form').classList.add('d-none'); td.querySelector('.desc-text').classList.remove('d-none');">取消</button>
+                            </form>
+                        </td>
                         <!-- 將 UTC 時間轉換為本地時間顯示 -->
                         <td>@item.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</td>
                         <td>
