@@ -15,6 +15,9 @@
   - 介紹 C# 中 Extension Methods 的概念、撰寫規範以及與前端 TypeScript 原型鏈對應的寫法。
 - 💡 **[.NET 開發知識要點 (dotnet-knowledge-points.md)](./dotnet-knowledge-points.md)**
   - 記錄開發 C# 與 ASP.NET Core 專案時常見的知識點，包含 XML 註解 (`<inheritdoc />`) 與 EF Core 資料庫建立機制解惑。
+- 🗄️ **[預存程序與 EF Core 整合指南 (ef-core-sql-procedures-guide.md)](./ef-core-sql-procedures-guide.md)**
+  - 記錄為何現代開發較少使用 SQL Procedures，以及如何在 EF Core Migrations 中管理並呼叫預存程序。
+
 
 ## ⚙️ 環境與部署 (Environment & Deployment)
 在不同的作業系統或容器環境中順利把專案跑起來的指南。

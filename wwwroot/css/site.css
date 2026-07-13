@@ -55,3 +55,8 @@ body {
     0% { background-position: 100% 0; }
     100% { background-position: -100% 0; }
 }
+
+/* Page Header Responsive Wrapping */
+[class*="_page-header"] {
+    flex-wrap: wrap;
+}
