@@ -175,5 +175,12 @@ namespace DotNetMvcWeb.Services.Implements
 
             return resultList;
         }
+
+        public async Task UpdateItemDescriptionViaProcAsync(int id, string newDescription)
+        {
+            // ⚠️ 深度檢查注意：使用 ExecuteSqlInterpolatedAsync 會自動處理參數化，防止 SQL Injection
+            // 在 Oracle 中呼叫 Procedure 習慣使用 BEGIN ... END; 包住
+            await _context.Database.ExecuteSqlInterpolatedAsync($"BEGIN SP_UPDATE_ITEM_DESCRIPTION({id}, {newDescription}); END;");
+        }
     }
 }

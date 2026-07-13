@@ -132,5 +132,21 @@ namespace DotNetMvcWeb.Controllers
                 return StatusCode(500, new { message = "執行原生 SQL 發生錯誤", details = ex.Message });
             }
         }
+
+        /// <summary>
+        /// [示範] 透過 Oracle 預存程序更新 Description
+        /// PATCH: api/oracle-demo/5/description
+        /// </summary>
+        [HttpPatch("{id}/description")]
+        public async Task<IActionResult> UpdateDescriptionViaProcedure(int id, [FromBody] string newDescription)
+        {
+            if (string.IsNullOrWhiteSpace(newDescription))
+            {
+                return BadRequest("Description 不可為空");
+            }
+
+            await _itemService.UpdateItemDescriptionViaProcAsync(id, newDescription);
+            return NoContent();
+        }
     }
 }
