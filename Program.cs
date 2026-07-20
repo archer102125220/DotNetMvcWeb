@@ -85,6 +85,10 @@ else
 app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 
 app.UseHttpsRedirection();
+
+// 🟢 在這裡註冊我們自訂的 Middleware 
+app.UseRequestTiming(); 
+
 app.UseRouting();
 
 app.UseAuthorization();
