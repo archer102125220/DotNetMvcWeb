@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/oracle-demo.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/mssql-demo.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DotNetMvcWeb.styles.css" asp-append-version="true" />
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body hx-indicator="#global-loading-bar">
     <div id="global-loading-bar" class="htmx-indicator"></div>
@@ -80,6 +81,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link @GetActiveStyle("ExtensionsDemo")" asp-area="" asp-controller="ExtensionsDemo" asp-action="Index">Extensions 示範</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @GetActiveStyle("RedirectDemo")" asp-area="" asp-controller="RedirectDemo" asp-action="DemoList">Redirect 示範</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="/scalar/v1" target="_blank">API 文件</a>

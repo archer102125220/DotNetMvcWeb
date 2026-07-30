@@ -3,6 +3,7 @@ using Scalar.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using DotNetMvcWeb.Services.Interfaces;
 using DotNetMvcWeb.Services.Implements;
+using DotNetMvcWeb.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

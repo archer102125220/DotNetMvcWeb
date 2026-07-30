@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Redirect Target";
+}
+
+<div class="redirect_demo_page redirect_demo_page--target">
+    <div class="container mt-5">
+        <h1>重新導向成功！</h1>
+        
+        <div class="alert alert-success mt-4">
+            <p><strong>接收到的 ID:</strong> @ViewBag.Id</p>
+            <p><strong>接收到的訊息:</strong> @ViewBag.Message</p>
+        </div>
+
+        <div class="mt-4">
+            <a href="/RedirectDemo/Index" class="btn btn-primary">返回範例列表</a>
+        </div>
+    </div>
+</div>
