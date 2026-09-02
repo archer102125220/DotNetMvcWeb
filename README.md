@@ -94,18 +94,41 @@ dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
 ```
 
 ### 3. 產生並查看 HTML 視覺化報表 (ReportGenerator)
-可使用 `dotnet-reportgenerator-globaltool` 將覆蓋率數據轉換為互動式 HTML 網頁：
+
+你可以選擇以下任一種方式來產出視覺化 HTML 報表：
+
+#### 🌟 方式 A：使用專案本機工具 (Local Tool - 推薦，免設定 PATH)
+專案已內建 `dotnet-tools.json` 工具資訊清單，直接使用 `dotnet reportgenerator` 即可：
 ```bash
-# 全域安裝 ReportGenerator 工具 (僅需安裝一次)
+# 1. 還原本機工具 (首次或在 CI/CD 執行)
+dotnet tool restore
+
+# 2. 產出 HTML 互動式網站報表
+dotnet reportgenerator \
+  -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
+  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -reporttypes:"Html;TextSummary;Badges"
+
+# 3. 開啟報表 (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
+```
+
+#### 🌐 方式 B：使用全域工具 (Global Tool, `-g`)
+若習慣安裝在系統全域環境中使用：
+```bash
+# 1. 全域安裝 ReportGenerator 工具 (僅需安裝一次)
 dotnet tool install -g dotnet-reportgenerator-globaltool
 
-# 產出 HTML 互動式網站報表
+# 2. 產出 HTML 互動式網站報表
+# (若 PATH 尚未包含 ~/.dotnet/tools，macOS/Linux 可使用 ~/.dotnet/tools/reportgenerator)
 reportgenerator \
   -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
   -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
   -reporttypes:"Html;TextSummary;Badges"
 
-# 開啟報表 (macOS)
+# 3. 開啟報表 (macOS)
 open DotNetMvcWeb.Tests/CoverageReport/index.html
 ```
+
+
 

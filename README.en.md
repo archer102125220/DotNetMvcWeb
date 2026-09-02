@@ -94,18 +94,41 @@ dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
 ```
 
 ### 3. Generate and View Visual HTML Reports (ReportGenerator)
-Use `dotnet-reportgenerator-globaltool` to convert coverage data into an interactive HTML dashboard:
+
+You can choose either of the following approaches to generate visual HTML reports:
+
+#### 🌟 Option A: Using Local Tool (Recommended, No PATH setup required)
+The project includes a `dotnet-tools.json` local tool manifest. Run `dotnet reportgenerator` directly:
 ```bash
-# Install ReportGenerator globally (once)
+# 1. Restore local tools (once on new environment or CI/CD)
+dotnet tool restore
+
+# 2. Generate interactive HTML report
+dotnet reportgenerator \
+  -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
+  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -reporttypes:"Html;TextSummary;Badges"
+
+# 3. Open report (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
+```
+
+#### 🌐 Option B: Using Global Tool (`-g`)
+If you prefer installing tools globally across your entire system:
+```bash
+# 1. Install ReportGenerator globally (once)
 dotnet tool install -g dotnet-reportgenerator-globaltool
 
-# Generate interactive HTML report
+# 2. Generate interactive HTML report
+# (If PATH does not include ~/.dotnet/tools yet, use ~/.dotnet/tools/reportgenerator on macOS/Linux)
 reportgenerator \
   -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
   -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
   -reporttypes:"Html;TextSummary;Badges"
 
-# Open report (macOS)
+# 3. Open report (macOS)
 open DotNetMvcWeb.Tests/CoverageReport/index.html
 ```
+
+
 

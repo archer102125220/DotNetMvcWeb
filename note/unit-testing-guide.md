@@ -399,36 +399,88 @@ public decimal CalculateDiscount(decimal price, bool isVip)
 
 透過 `ReportGenerator`，可以把 Coverlet 產出的原始 XML 轉換成美觀的 HTML 互動式儀表板。
 
-### 步驟 1：安裝全域工具 (只需安裝一次)
+在 .NET 生態系中，管理 CLI 工具有兩種標準方式：**本機工具清單 (Local Tool, `dotnet-tools.json`)** 與 **全域工具 (Global Tool, `-g`)**。
+
+---
+
+### 🌟 方案 A：使用專案本機工具 (Local Tool / `dotnet-tools.json` - 團隊推薦)
+
+這是在企業團隊協作與 CI/CD 自動化建置中最推薦的現代標準做法（類似 Node.js 的 `package.json`）：
+- **版本鎖定**：將工具版本記錄在專案目錄下的 `dotnet-tools.json`。
+- **團隊一鍵還原**：其他成員 clone 專案後，只要執行 `dotnet tool restore` 即可自動安裝。
+- **免設定 PATH**：安裝後可以直接使用 `dotnet reportgenerator` 呼叫，完全不受環境變數影響！
+
+#### 1. 初始化與安裝（本專案已完成設定）：
 ```bash
-dotnet tool install -g dotnet-reportgenerator-globaltool
+# 建立工具清單 (若專案尚未建立過)
+dotnet new tool-manifest
+
+# 安裝 reportgenerator 為專案本機工具
+dotnet tool install dotnet-reportgenerator-globaltool
 ```
 
-### 步驟 2：執行測試並產出 Cobertura 格式覆蓋率檔
+#### 2. 日常執行與產出報表：
 ```bash
+# 步驟 1: 還原本機工具 (首次使用或 CI/CD 環境需執行一次)
+dotnet tool restore
+
+# 步驟 2: 執行測試並收集覆蓋率
 dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
   /p:CollectCoverage=true \
   /p:CoverletOutputFormat=cobertura \
   /p:CoverletOutput=./TestResults/ \
   /p:Exclude="[DotNetMvcWeb]AspNetCoreGeneratedDocument.*%2c[DotNetMvcWeb]Program%2c[DotNetMvcWeb]*.Migrations.*%2c[DotNetMvcWeb]Microsoft.AspNetCore.OpenApi.*%2c[DotNetMvcWeb]System.Runtime.CompilerServices.*"
+
+# 步驟 3: 產出 HTML 網站報表 (直接使用 dotnet reportgenerator，免設 PATH)
+dotnet reportgenerator \
+  -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
+  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -reporttypes:"Html;TextSummary;Badges"
+
+# 步驟 4: 在瀏覽器中開啟報表 (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
 ```
 
-### 步驟 3：產出 HTML 網站報表
+---
+
+### 🌐 方案 B：使用全域工具 (Global Tool, `-g` - 個人電腦通用)
+
+如果你希望在電腦上的任何目錄都能隨時使用該工具，不需要依賴專案目錄下的清單：
+
+#### 1. 全域安裝工具 (僅需安裝一次)：
 ```bash
+dotnet tool install -g dotnet-reportgenerator-globaltool
+```
+
+> **⚠️ 全域工具注意事項 (macOS / Linux)**：  
+> 全域工具會安裝在 `~/.dotnet/tools`。如果終端機出現 `zsh: command not found`，請將工具路徑加入 `~/.zshrc`：
+> ```bash
+> echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.zshrc
+> source ~/.zshrc
+> ```
+> 或直接使用完整路徑呼叫：`~/.dotnet/tools/reportgenerator ...`。
+
+#### 2. 日常執行與產出報表：
+```bash
+# 步驟 1: 執行測試並收集覆蓋率
+dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput=./TestResults/ \
+  /p:Exclude="[DotNetMvcWeb]AspNetCoreGeneratedDocument.*%2c[DotNetMvcWeb]Program%2c[DotNetMvcWeb]*.Migrations.*%2c[DotNetMvcWeb]Microsoft.AspNetCore.OpenApi.*%2c[DotNetMvcWeb]System.Runtime.CompilerServices.*"
+
+# 步驟 2: 產出 HTML 網站報表
 reportgenerator \
   -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
   -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
   -reporttypes:"Html;TextSummary;Badges"
+
+# 步驟 3: 在瀏覽器中開啟報表 (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
 ```
 
-### 步驟 4：在瀏覽器中開啟報表
-- **macOS**:
-  ```bash
-  open DotNetMvcWeb.Tests/CoverageReport/index.html
-  ```
-- **Windows**:
-  ```cmd
-  start DotNetMvcWeb.Tests\CoverageReport\index.html
-  ```
+---
 
-開啟後即可逐行檢視每一支 C# 檔案中被綠色標記（已覆蓋）與紅色標記（未覆蓋）的程式碼與分支狀態！
+開啟 `index.html` 報表後，即可逐行檢視每一支 C# 檔案中被綠色標記（已覆蓋）與紅色標記（未覆蓋）的程式碼與分支狀態！
+
+
