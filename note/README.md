@@ -17,6 +17,9 @@
   - 記錄開發 C# 與 ASP.NET Core 專案時常見的知識點，包含 XML 註解 (`<inheritdoc />`) 與 EF Core 資料庫建立機制解惑。
 - 🗄️ **[預存程序與 EF Core 整合指南 (ef-core-sql-procedures-guide.md)](./ef-core-sql-procedures-guide.md)**
   - 記錄為何現代開發較少使用 SQL Procedures，以及如何在 EF Core Migrations 中管理並呼叫預存程序。
+- 🧪 **[.NET 單元測試與覆蓋率實戰教學指南 (unit-testing-guide.md)](./unit-testing-guide.md)**
+  - 介紹 xUnit、Moq、InMemory 資料庫、測試三大維度（正向、反向、邊界測試），以及 Coverlet 與 ReportGenerator 視覺化報表產出。
+
 
 
 ## ⚙️ 環境與部署 (Environment & Deployment)
