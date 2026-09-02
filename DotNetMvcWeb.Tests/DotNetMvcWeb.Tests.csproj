@@ -1,0 +1,76 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ========================================================================= -->
+  <!-- 1. 專案基本設定 (Project Properties)                                       -->
+  <!-- ========================================================================= -->
+  <PropertyGroup>
+    <!-- 指定目標架構為 .NET 10.0，必須與被測試的主專案 (DotNetMvcWeb) 保持一致 -->
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- 啟用可為 Null 的參考型別 (Nullable Reference Types) 靜態檢查，提升型別安全性 -->
+    <Nullable>enable</Nullable>
+
+    <!-- 啟用隱式命名空間引用 (Implicit Usings)，常用命名空間 (如 System, System.Collections.Generic) 會自動引用 -->
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- 標記此專案為測試專案，讓 IDE (如 Visual Studio / VS Code) 與 dotnet test 能夠自動識別 -->
+    <IsTestProject>true</IsTestProject>
+
+    <!-- 測試專案不需要被打包成 NuGet 套件發布，因此設為 false -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- ========================================================================= -->
+  <!-- 2. 專案參考 (Project References)                                          -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <!-- 引用主專案 DotNetMvcWeb，使測試專案可以存取主專案的所有 Controller、Service、Model 與 Extension -->
+    <ProjectReference Include="..\DotNetMvcWeb.csproj" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- 3. 單元測試與測試執行引擎套件 (Testing Framework & Runners)                -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <!-- Microsoft.NET.Test.Sdk: 微軟測試執行環境核心，提供 dotnet test 與 VSTest 執行測試所需的基礎介面 -->
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+
+    <!-- xunit: .NET 社群最廣泛使用的主流單元測試框架，提供 [Fact]、[Theory]、[InlineData] 與 Assert 斷言 -->
+    <PackageReference Include="xunit" Version="2.9.3" />
+
+    <!-- xunit.runner.visualstudio: xUnit 測試適配器，讓 Visual Studio、VS Code 及 dotnet test 可以探索並執行 xUnit 測試 -->
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- 4. 模擬物件與記憶體資料庫套件 (Mocking & In-Memory Database)               -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <!-- Moq: 強大的 Mocking 框架，用於模擬 Controller 依賴的 Service 介面，隔離外部相依以進行純粹的單元測試 -->
+    <PackageReference Include="Moq" Version="4.20.72" />
+
+    <!-- Microsoft.EntityFrameworkCore.InMemory: 微軟官方 EF Core 記憶體資料庫提供者，可在 RAM 中快速測試 DbContext 與 Service，無須安裝實體資料庫 -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.8" />
+  </ItemGroup>
+
+  <!-- ========================================================================= -->
+  <!-- 5. 程式碼覆蓋率收集套件 (Code Coverage Tools)                             -->
+  <!-- ========================================================================= -->
+  <ItemGroup>
+    <!-- coverlet.collector: 跨平台程式碼覆蓋率收集器 (Data Collector 模式)，支援 dotnet test dash-dash-collect:"XPlat Code Coverage" -->
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <!-- coverlet.msbuild: 跨平台覆蓋率 MSBuild 整合套件，可直接透過 /p:CollectCoverage=true 執行，並在終端機輸出 ASCII 覆蓋率報表與設定門檻值 -->
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

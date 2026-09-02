@@ -73,3 +73,39 @@ dotnet new gitignore
     1. **大型且複雜的應用程式**：當專案規模龐大，需要嚴謹的架構來劃分各組件時。
     2. **高度客製化或複雜的路由需求**：MVC 支援非常彈性的路由設計。
     3. **已有明確分工的開發團隊**：前端與後端開發者可以各自專注於 View 與 Controller/Model 的開發，互不干擾。
+
+## 單元測試與程式碼覆蓋率 (Unit Testing & Code Coverage)
+
+專案包含完整的單元測試套件 `DotNetMvcWeb.Tests`，全面涵蓋**正向測試 (Positive Tests)**、**反向/例外測試 (Negative Tests)** 與**邊界值測試 (Boundary Tests)**。
+
+### 1. 執行單元測試
+```bash
+dotnet test
+```
+
+### 2. 執行測試並收集覆蓋率 (Coverlet)
+透過 Coverlet 收集覆蓋率數據（行覆蓋率與分支覆蓋率均達 85% 以上）：
+```bash
+dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput=./TestResults/ \
+  /p:Exclude="[DotNetMvcWeb]AspNetCoreGeneratedDocument.*%2c[DotNetMvcWeb]Program%2c[DotNetMvcWeb]*.Migrations.*%2c[DotNetMvcWeb]Microsoft.AspNetCore.OpenApi.*%2c[DotNetMvcWeb]System.Runtime.CompilerServices.*"
+```
+
+### 3. 產生並查看 HTML 視覺化報表 (ReportGenerator)
+可使用 `dotnet-reportgenerator-globaltool` 將覆蓋率數據轉換為互動式 HTML 網頁：
+```bash
+# 全域安裝 ReportGenerator 工具 (僅需安裝一次)
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# 產出 HTML 互動式網站報表
+reportgenerator \
+  -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
+  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -reporttypes:"Html;TextSummary;Badges"
+
+# 開啟報表 (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
+```
+

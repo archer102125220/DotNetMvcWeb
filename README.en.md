@@ -73,3 +73,39 @@ In .NET web development, two common architectural patterns are **MVC (Model-View
     1. **Large and complex applications**: When the project scale requires a strict architectural pattern to maintain order and structure.
     2. **Complex routing requirements**: MVC provides extensive and highly customizable routing capabilities.
     3. **Divided team roles**: Front-end developers can focus on Views, while back-end developers can focus on Controllers and Models without interfering with each other.
+
+## Unit Testing & Code Coverage
+
+The project includes a comprehensive unit testing suite `DotNetMvcWeb.Tests`, covering **Positive Tests**, **Negative/Exception Tests**, and **Boundary Tests**.
+
+### 1. Run Unit Tests
+```bash
+dotnet test
+```
+
+### 2. Run Tests with Code Coverage (Coverlet)
+Collect coverage metrics using Coverlet (both line and branch coverage exceed 85%):
+```bash
+dotnet test DotNetMvcWeb.Tests/DotNetMvcWeb.Tests.csproj \
+  /p:CollectCoverage=true \
+  /p:CoverletOutputFormat=cobertura \
+  /p:CoverletOutput=./TestResults/ \
+  /p:Exclude="[DotNetMvcWeb]AspNetCoreGeneratedDocument.*%2c[DotNetMvcWeb]Program%2c[DotNetMvcWeb]*.Migrations.*%2c[DotNetMvcWeb]Microsoft.AspNetCore.OpenApi.*%2c[DotNetMvcWeb]System.Runtime.CompilerServices.*"
+```
+
+### 3. Generate and View Visual HTML Reports (ReportGenerator)
+Use `dotnet-reportgenerator-globaltool` to convert coverage data into an interactive HTML dashboard:
+```bash
+# Install ReportGenerator globally (once)
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+# Generate interactive HTML report
+reportgenerator \
+  -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
+  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -reporttypes:"Html;TextSummary;Badges"
+
+# Open report (macOS)
+open DotNetMvcWeb.Tests/CoverageReport/index.html
+```
+

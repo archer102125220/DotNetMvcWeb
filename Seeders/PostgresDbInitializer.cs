@@ -10,8 +10,11 @@ namespace DotNetMvcWeb.Seeders
     {
         public static void Initialize(PostgresDbContext context)
         {
-            // 自動執行未套用的 Migration
-            context.Database.Migrate();
+            // 自動執行未套用的 Migration (僅在關聯式資料庫連線下執行)
+            if (context.Database.IsRelational())
+            {
+                context.Database.Migrate();
+            }
 
             // 檢查是否已經存在我們即將動態寫入的資料
             if (context.PostgresDemoItems.Any(i => i.Name == "動態種子資料 1 (PG)"))

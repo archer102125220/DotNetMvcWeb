@@ -493,3 +493,11 @@ docker/*/pg_data
 docker/*/pg_data/*
 
 !docker/tutorial/sample-app/*
+
+# Test and Coverage Results
+TestResults/
+[Tt]est[Rr]esult*/
+CoverageReport/
+[Cc]overage[Rr]eport*/
+*.cobertura.xml
+coverage.json
