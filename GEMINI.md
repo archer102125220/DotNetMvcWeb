@@ -22,7 +22,7 @@ This ensures users make informed decisions about potentially risky actions.
 - **Nullable Reference Types**: `<Nullable>enable</Nullable>` is enabled. ALWAYS handle nulls properly.
 - NEVER use `dynamic` or `object` unless absolutely necessary (e.g., reflection or dealing with untyped JSON).
 - Use strict typing. Prefer generic collections over untyped ones (e.g., `List<T>` instead of `ArrayList`).
-- Avoid implicit typing `var` unless the right side makes the type blatantly obvious (e.g., `var list = new List<string>()`).
+- Avoid implicit typing `var` for built-in primitive types (e.g., use `int`, `string`, `bool`). Prefer `var` for other local variables (e.g., `var user = await _userService.GetUserAsync(id);`, `var list = new List<string>();`) or use target-typed `new()` (`List<string> list = new();`).
 
 ### Runtime Data Validation & Null Checking
 - **Strings**: Use `string.IsNullOrEmpty(str)` or `string.IsNullOrWhiteSpace(str)`.

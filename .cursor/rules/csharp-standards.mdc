@@ -10,7 +10,8 @@ alwaysApply: true
 
 - **Nullable Reference Types**: `<Nullable>enable</Nullable>` is enabled by default. ALWAYS handle nulls properly. Avoid using `!` (null-forgiving operator) unless the compiler simply cannot infer a value is non-null.
 - **NEVER use `dynamic` or `object`** unless absolutely necessary (e.g., when dealing with untyped JSON or Reflection). Use precise typing.
-- **Limit `var` usage**: Only use implicit typing `var` when the type is blatantly obvious from the right side of the assignment (e.g., `var list = new List<string>();`). If it's not obvious, use the explicit type (e.g., `User user = await _userService.GetUserAsync();`).
+- **Limit `var` for built-in types**: Always explicitly declare built-in primitive types (e.g., `int count = 0;`, `string name = "text";`, `bool isActive = true;`).
+- **Prefer `var` for other types**: Prefer `var` for non-primitive types, method return values, object instantiations, and LINQ queries (e.g., `var user = await _userService.GetUserAsync(id);`, `var list = new List<string>();`), or use target-typed `new()` where appropriate (`List<string> list = new();`).
 - **Generic Collections**: Prefer generic collections `List<T>`, `Dictionary<TKey, TValue>` over untyped arrays or `ArrayList`.
 
 ## Pattern Matching
@@ -20,12 +21,17 @@ alwaysApply: true
 ## Examples
 
 ```csharp
-// ❌ FORBIDDEN
+// ❌ FORBIDDEN / ANTI-PATTERNS
 dynamic data = GetData();
-var result = ProcessSomething(); // Type is unclear from context
+var count = 0; // Built-in types should be explicitly declared: int count = 0;
+var name = "text"; // Built-in types should be explicitly declared: string name = "text";
 
-// ✅ REQUIRED
-MyDataClass data = GetData();
-var userList = new List<User>(); // Obvious type
-User? user = await _userService.GetUserAsync(id); // Explicit when method return type is not obvious
+// ✅ RECOMMENDED (.NET Idiomatic Standard)
+int count = 0;
+string name = "text";
+bool isReady = true;
+
+var user = await _userService.GetUserAsync(id);
+var userList = new List<User>(); // or List<User> userList = new();
+var orderDetails = ProcessOrder(order);
 ```

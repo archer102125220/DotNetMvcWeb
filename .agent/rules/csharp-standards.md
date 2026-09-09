@@ -5,9 +5,10 @@
 - **Rule**: Always handle nulls appropriately. Avoid using `!` (null-forgiving operator) unless you are absolutely certain the value cannot be null and the compiler simply cannot infer it.
 - **Rule**: Use `ArgumentNullException.ThrowIfNull(param)` at the start of methods to guard against null arguments.
 
-## 2. Strong Typing
+## 2. Strong Typing & Variable Declarations (`var`)
 - **Rule**: NEVER use `dynamic` or `object` when a specific type can be used (e.g., reflection or untyped JSON are the rare exceptions).
-- **Rule**: When using `var`, it should only be used when the type is blatantly obvious from the right side of the assignment (e.g. `var user = new User();` or `var list = new List<string>();`). If it's the result of a method call where the type isn't obvious, specify the explicit type.
+- **Rule**: **Built-in types**: Always explicitly declare built-in primitive types (e.g., `int count = 0;`, `string name = "text";`, `bool isActive = true;`).
+- **Rule**: **Non-built-in types (`var`)**: Prefer `var` for non-primitive types, method return values, object instantiations, and LINQ queries (e.g., `var user = await _userService.GetUserAsync(id);`, `var list = new List<string>();`), or use target-typed `new()` where appropriate (`List<string> list = new();`).
 - **Rule**: Prefer generic collections `List<T>`, `Dictionary<TKey, TValue>` over untyped arrays or `ArrayList`.
 
 ## 3. Pattern Matching
@@ -17,12 +18,17 @@
 ## Examples
 
 ```csharp
-// ❌ FORBIDDEN
+// ❌ FORBIDDEN / ANTI-PATTERNS
 dynamic data = GetData();
-var result = ProcessSomething(); // Type is unclear from context
+var count = 0; // Built-in types should be explicitly declared: int count = 0;
+var name = "text"; // Built-in types should be explicitly declared: string name = "text";
 
-// ✅ REQUIRED
-MyDataClass data = GetData();
-var userList = new List<User>(); // Obvious type
-User? user = await _userService.GetUserAsync(id); // Explicit when method return type is not obvious
+// ✅ RECOMMENDED (.NET Idiomatic Standard)
+int count = 0;
+string name = "text";
+bool isReady = true;
+
+var user = await _userService.GetUserAsync(id);
+var userList = new List<User>(); // or List<User> userList = new();
+var orderDetails = ProcessOrder(order);
 ```

@@ -22,7 +22,7 @@
 
 * **可 Null 參考型別 (Nullable Reference Types)**：專案已啟用 `<Nullable>enable</Nullable>`。**必須**妥善處理所有可能的 null 情況。
 * **嚴格型別 (Strict Typing)**：絕對**禁止**使用 `dynamic` 或 `object`，除非在反射 (Reflection) 或處理無型別 JSON 等絕對必要的情況下。應優先使用強型別的泛型集合 (如 `List<T>`) 而非 `ArrayList`。
-* **隱式型別 (Implicit Typing)**：避免使用 `var`，除非等號右側的型別已非常明顯 (例如：`var list = new List<string>();`)。
+* **隱式型別與宣告 (Implicit Typing / `var`)**：基礎型別 (如 `int`, `string`, `bool`) 應明確宣告型態；其餘型別、方法回傳值、LINQ 與物件建立優先使用 `var` (例如：`var user = await _userService.GetUserAsync(id);`、`var list = new List<string>();`)，或使用 Target-typed `new()` (`List<string> list = new();`)。
 
 ### 🛡️ 執行期資料驗證與 Null 檢查 (Runtime Validation)
 * **字串檢查**：使用 `string.IsNullOrEmpty(str)` 或 `string.IsNullOrWhiteSpace(str)`。
