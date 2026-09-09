@@ -91,6 +91,7 @@ When reviewing or refactoring backend code (C# Controllers, Services, Data Acces
 ### Build & Dev Tooling (dotnet CLI)
 - **Run**: `dotnet run` or `dotnet watch` for hot reload.
 - **Build**: `dotnet build`
+- **Format**: `dotnet format DotNetMvcWeb.sln` (formats code according to `.editorconfig`).
 - **EF Core CLI**: Use `dotnet ef` tools for migrations (e.g. `dotnet ef migrations add`, `dotnet ef database update`).
 - **Environment**: Always check `appsettings.json` and `appsettings.Development.json` for proper configuration before running.
 

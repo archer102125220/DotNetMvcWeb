@@ -1,0 +1,147 @@
+# =============================================================================
+# DotNetMvcWeb - EditorConfig
+# =============================================================================
+# https://learn.microsoft.com/visualstudio/ide/editorconfig-code-style-settings-reference
+
+root = true
+
+# -----------------------------------------------------------------------------
+# 1. 通用檔案格式設定 (General File Settings)
+# -----------------------------------------------------------------------------
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.{json,yml,yaml,md}]
+indent_size = 2
+
+[*.{css,scss,js,ts,html,cshtml}]
+indent_size = 2
+# indent_size = 4
+
+# -----------------------------------------------------------------------------
+# 2. C# 語言與型別偏好 (C# Language & Type Preferences)
+# -----------------------------------------------------------------------------
+[*.cs]
+
+# --- var 宣告偏好 (專案主流規範) ---
+# 基礎型別 (int, string, bool, double 等)：明確宣告型態
+csharp_style_var_for_built_in_types = false:warning
+# 等號右側型別明顯時：優先使用 var
+csharp_style_var_when_type_is_apparent = true:suggestion
+# 其他情況 (方法回傳值、LINQ 查詢、複雜泛型)：優先使用 var
+csharp_style_var_elsewhere = true:suggestion
+
+# --- 物件與集合建立 (C# 9+) ---
+# 偏好 Target-typed new: List<string> list = new();
+csharp_style_implicit_object_creation_when_type_is_apparent = true:suggestion
+
+# --- 模式匹配 (Pattern Matching - 專案規範強制) ---
+# 偏好使用模式匹配取代 as + null 檢查 (例如 if (obj is MyType myObj))
+csharp_style_pattern_matching_over_as_with_null_check = true:warning
+# 偏好使用模式匹配取代 is + 型別強制轉換
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+# 偏好 switch 運算式 (switch expression)
+csharp_style_prefer_switch_expression = true:suggestion
+# 偏好 not 模式比對 (if (obj is not null))
+csharp_style_prefer_not_pattern = true:suggestion
+# 偏好延伸屬性模式 (Extended property patterns)
+csharp_style_prefer_extended_property_pattern = true:suggestion
+
+# --- Null 安全與簡潔語法 ---
+# 偏好 Null 傳播運算子 (obj?.Property)
+dotnet_style_null_propagation = true:suggestion
+# 偏好 Null 聯合運算子 (obj ?? fallback)
+dotnet_style_coalesce_expression = true:suggestion
+# 偏好 throw 運算式 (ArgumentNullException.ThrowIfNull 或 a ?? throw)
+csharp_style_throw_expression = true:suggestion
+# 偏好條件式委派呼叫 (Action?.Invoke())
+csharp_style_conditional_delegate_call = true:suggestion
+
+# --- 命名空間宣告 (C# 10+) ---
+# 偏好檔案範圍命名空間 (File-scoped namespace)
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# --- Using 引用管理 ---
+# System 命名空間置頂排序
+dotnet_sort_system_directives_first = true
+# 偏好不區隔 using 群組
+dotnet_separate_import_directive_groups = false
+
+# --- 運算式主體成員 (Expression-bodied members) ---
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_properties = true:suggestion
+csharp_style_expression_bodied_accessors = true:suggestion
+
+# --- 廢棄未使用的回傳值 ---
+csharp_style_unused_value_assignment = true:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
+
+# -----------------------------------------------------------------------------
+# 3. C# 程式碼排版與格式化 (Formatting & Spacing)
+# -----------------------------------------------------------------------------
+# 大括號換行規則 (Allman 風格)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# 空格規則
+csharp_space_after_cast = false
+csharp_space_around_binary_operators = before_and_after
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+
+# 縮排規則
+csharp_indent_braces = false
+csharp_indent_switch_labels = true
+csharp_indent_case_contents = true
+
+# -----------------------------------------------------------------------------
+# 4. C# 命名規範 (Naming Conventions)
+# -----------------------------------------------------------------------------
+# 介面必須以 'I' 開頭 (例如 IUserService)
+dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface_symbols
+dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
+dotnet_naming_rule.interface_should_be_begins_with_i.severity = warning
+
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_symbols.interface_symbols.applicable_accessibilities = *
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+
+# 類別、結構、列舉使用 PascalCase
+dotnet_naming_rule.types_should_be_pascal_case.symbols = type_symbols
+dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
+
+dotnet_naming_symbols.type_symbols.applicable_kinds = class, struct, enum, record
+dotnet_naming_symbols.type_symbols.applicable_accessibilities = *
+dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+
+# 非同步方法建議以 'Async' 結尾
+dotnet_naming_rule.async_methods_should_end_with_async.symbols = async_method_symbols
+dotnet_naming_rule.async_methods_should_end_with_async.style = ends_with_async
+dotnet_naming_rule.async_methods_should_end_with_async.severity = suggestion
+
+dotnet_naming_symbols.async_method_symbols.applicable_kinds = method
+dotnet_naming_symbols.async_method_symbols.required_modifiers = async
+dotnet_naming_symbols.async_method_symbols.applicable_accessibilities = *
+dotnet_naming_style.ends_with_async.required_suffix = Async
+dotnet_naming_style.ends_with_async.capitalization = pascal_case
+
+# 私有欄位使用 _camelCase
+dotnet_naming_rule.private_fields_should_be_prefixed.symbols = private_field_symbols
+dotnet_naming_rule.private_fields_should_be_prefixed.style = prefix_underscore_camel_case
+dotnet_naming_rule.private_fields_should_be_prefixed.severity = suggestion
+
+dotnet_naming_symbols.private_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_field_symbols.applicable_accessibilities = private, private_protected
+dotnet_naming_style.prefix_underscore_camel_case.required_prefix = _
+dotnet_naming_style.prefix_underscore_camel_case.capitalization = camel_case

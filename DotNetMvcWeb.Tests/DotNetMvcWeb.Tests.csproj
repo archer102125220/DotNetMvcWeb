@@ -13,6 +13,9 @@
     <!-- 啟用隱式命名空間引用 (Implicit Usings)，常用命名空間 (如 System, System.Collections.Generic) 會自動引用 -->
     <ImplicitUsings>enable</ImplicitUsings>
 
+    <!-- 在建置時強制檢查 Code Style 規則 -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
     <!-- 標記此專案為測試專案，讓 IDE (如 Visual Studio / VS Code) 與 dotnet test 能夠自動識別 -->
     <IsTestProject>true</IsTestProject>
 

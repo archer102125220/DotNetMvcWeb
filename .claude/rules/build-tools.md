@@ -11,6 +11,7 @@ This project uses the standard .NET CLI (`dotnet`) for all build, development, a
 ### Build & Clean
 - **Build**: `dotnet build`
 - **Clean**: `dotnet clean`
+- **Format Code**: `dotnet format DotNetMvcWeb.sln` (Applies formatting based on `.editorconfig`)
 
 ### Package Management
 - **Add Package**: `dotnet add package <PackageName>`

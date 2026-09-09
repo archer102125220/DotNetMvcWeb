@@ -11,7 +11,8 @@ When asked to run, build, or manage dependencies for this project, you MUST use 
 1. **Run Application**: `dotnet run` or `dotnet watch run` (for hot reload).
 2. **Build Application**: `dotnet build`
 3. **Clean Application**: `dotnet clean`
-4. **Manage Packages**: `dotnet add package <PackageName>` or `dotnet remove package <PackageName>`
+4. **Format Code**: `dotnet format DotNetMvcWeb.sln` (formats code according to `.editorconfig`)
+5. **Manage Packages**: `dotnet add package <PackageName>` or `dotnet remove package <PackageName>`
 
 ## Environment Variables
 If you need to run the application in a specific environment, set `ASPNETCORE_ENVIRONMENT`.

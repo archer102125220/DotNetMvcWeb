@@ -44,7 +44,7 @@ This ensures users make informed decisions about potentially risky actions.
 
 - **Nullable Reference Types**: `<Nullable>enable</Nullable>` is enabled. ALWAYS handle nulls properly.
 - **Strict Typing**: NEVER use `dynamic` or `object` unless absolutely necessary (e.g., reflection). Use generic collections like `List<T>`.
-- **Implicit Typing**: Avoid `var` unless the right side makes the type blatantly obvious.
+- **`var` Usage**: Explicit types for built-in primitive types (e.g., `int`, `string`, `bool`). Prefer `var` for other local variables (e.g., `var user = await _userService.GetUserAsync(id);`, `var list = new List<string>();`) or use target-typed `new()` (`List<string> list = new();`).
 - **Runtime Validation**: Use `string.IsNullOrEmpty`, `ArgumentNullException.ThrowIfNull`, and pattern matching.
 
 ### CSS/SCSS Naming (Modified BEM)

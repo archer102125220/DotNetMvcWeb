@@ -95,8 +95,10 @@
 
 ## 🛠️ 7. 開發工具、設定與其他規範
 
-* **開發環境 (dotnet CLI)**：
+* **開發環境與格式化 (dotnet CLI & .editorconfig)**：
   * 使用 `dotnet run` 或 `dotnet watch` 進行熱重載開發。
+  * 程式碼約束採用 `.editorconfig`，可使用 `dotnet format DotNetMvcWeb.sln` 進行格式化與自動修復。
+  * 專案建置已開啟 `<EnforceCodeStyleInBuild>`，`dotnet build` 會自動檢查程式碼風格。
   * 執行前務必確認 `appsettings.json` 與 `appsettings.Development.json` 設定正確。
 * **國際化 (i18n)**：
   * 採用標準的 `Microsoft.AspNetCore.Mvc.Localization`。
