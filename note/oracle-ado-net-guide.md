@@ -78,8 +78,9 @@ public async Task<List<OracleDemoItem>> GetItemsViaAdoNet()
                         Id = reader.GetInt32(0),
                         Name = reader.GetString(1),
                         CreatedAt = reader.GetDateTime(2),
-                        
+
                         // 處理可能為 NULL 的欄位，必須先呼叫 IsDBNull 檢查
+
                         Description = reader.IsDBNull(3) ? null : reader.GetString(3)
                     });
                 }

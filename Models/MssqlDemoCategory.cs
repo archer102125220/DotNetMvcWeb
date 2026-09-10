@@ -10,12 +10,12 @@ namespace DotNetMvcWeb.Models
         /// 唯一識別碼 (Primary Key)
         /// </summary>
         public int Id { get; set; }
-        
+
         /// <summary>
         /// 分類名稱 (必填)
         /// </summary>
         public string Name { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// 建立時間
         /// </summary>

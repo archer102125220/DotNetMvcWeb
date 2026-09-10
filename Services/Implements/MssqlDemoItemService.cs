@@ -96,7 +96,7 @@ namespace DotNetMvcWeb.Services.Implements
         {
             // [教學註解] 這裡直接利用已經設定在 DbContext 內的連線字串
             string? connectionString = _context.Database.GetConnectionString();
-            
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("無法取得資料庫連接字串");
@@ -117,12 +117,12 @@ namespace DotNetMvcWeb.Services.Implements
                     // [教學註解] 撰寫原生 SQL 查詢，這裡示範了如何做 JOIN。
                     // ⚠️ 注意：MSSQL 中，使用中括號 [] 可以避免與保留字衝突，並明確指定物件名稱。
                     string sqlText = """
-                        SELECT 
-                            item.[Id], 
-                            item.[Name], 
-                            item.[CreatedAt], 
-                            item.[Description], 
-                            item.[CategoryId], 
+                        SELECT
+                            item.[Id],
+                            item.[Name],
+                            item.[CreatedAt],
+                            item.[Description],
+                            item.[CategoryId],
                             category.[Name] AS [CategoryName]
                         FROM [MssqlDemoItems] item
                         LEFT JOIN [MssqlDemoCategories] category ON item.[CategoryId] = category.[Id]

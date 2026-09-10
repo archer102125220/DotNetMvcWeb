@@ -54,11 +54,11 @@ Only when the class name has **clear semantic meaning** (not just describing app
 ```scss
 .demo_box {
   background: #f5f5f5;
-  
+
   &[css-color='red'] {
     background: #ffcdd2;
   }
-  
+
   &[css-is-disabled='true'] {
     opacity: 0.5;
     cursor: not-allowed;
@@ -70,7 +70,7 @@ Only when the class name has **clear semantic meaning** (not just describing app
 
 ```html
 <!-- ✅ CORRECT: Single class + HTML attributes -->
-<div class="demo_box" 
+<div class="demo_box"
      css-color="red"
      css-is-disabled="@(Model.IsDisabled ? "true" : null)">
   Demo content

@@ -15,7 +15,7 @@ namespace DotNetMvcWeb.Extensions
         // 3. 第一個參數必須加上 `this` 關鍵字，代表你要「擴充」哪一個型別
         public static string Truncate(this string? value, int maxLength)
         {
-            if (string.IsNullOrEmpty(value)) 
+            if (string.IsNullOrEmpty(value))
             {
                 return string.Empty;
             }

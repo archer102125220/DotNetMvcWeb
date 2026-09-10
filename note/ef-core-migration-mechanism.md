@@ -47,17 +47,17 @@
 
            // 在這裡宣告 Seed Data (種子資料)
            modelBuilder.Entity<OracleDemoItem>().HasData(
-               new OracleDemoItem 
-               { 
+               new OracleDemoItem
+               {
                    Id = 1, // ⚠️ 注意：Seed Data 通常必須明確指定主鍵 Id
-                   Name = "測試項目 1", 
+                   Name = "測試項目 1",
                    Description = "這是第一筆預設資料",
                    CreatedAt = new DateTime(2026, 6, 2, 8, 0, 0, DateTimeKind.Utc)
                },
-               new OracleDemoItem 
-               { 
-                   Id = 2, 
-                   Name = "測試項目 2", 
+               new OracleDemoItem
+               {
+                   Id = 2,
+                   Name = "測試項目 2",
                    Description = "這是第二筆資料",
                    CreatedAt = new DateTime(2026, 6, 2, 8, 5, 0, DateTimeKind.Utc)
                }

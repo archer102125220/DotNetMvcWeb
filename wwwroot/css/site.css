@@ -32,26 +32,25 @@ body {
 
 /* HTMX Global Loading Bar */
 #global-loading-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    z-index: 9999;
-    background: linear-gradient(90deg, transparent, #0d6efd, transparent);
-    background-size: 200% 100%;
-    animation: loadingBarAnim 1.2s infinite linear;
-    
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  z-index: 9999;
+  background: linear-gradient(90deg, transparent, #0d6efd, transparent);
+  background-size: 200% 100%;
+  animation: loadingBarAnim 1.2s infinite linear;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
 }
 
 #global-loading-bar.htmx-request {
-    opacity: 1;
+  opacity: 1;
 }
 
 @keyframes loadingBarAnim {
-    0% { background-position: 100% 0; }
-    100% { background-position: -100% 0; }
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
 }

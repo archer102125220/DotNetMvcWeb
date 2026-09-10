@@ -68,12 +68,12 @@ namespace DotNetMvcWeb.Controllers
             if (ModelState.IsValid)
             {
                 await _categoryService.CreateCategoryAsync(item);
-                
+
                 // [教學註解] 成功新增後，推播新網址以還原狀態，並回傳更新後的列表。
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemoCategory"));
                 return await Index();
             }
-            
+
             // [教學註解] 若驗證失敗，指示 HTMX 將錯誤表單重新渲染回表單區塊中
             Response.Headers.Append("HX-Retarget", "#oracle-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
@@ -89,7 +89,7 @@ namespace DotNetMvcWeb.Controllers
 
             OracleDemoCategory? item = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (item == null) return NotFound();
-            
+
             // [教學註解] 若是透過 HTMX 點擊 Edit，只回傳編輯表單的部分 HTML
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -128,7 +128,7 @@ namespace DotNetMvcWeb.Controllers
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemoCategory"));
                 return await Index();
             }
-            
+
             // [教學註解] 若驗證失敗，指示 HTMX 將錯誤表單重新渲染回表單區塊中
             Response.Headers.Append("HX-Retarget", "#oracle-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
@@ -143,7 +143,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategoryAsync(id);
-            
+
             // [教學註解] 刪除成功後，確保網址維持在根目錄
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "OracleDemoCategory"));
             return await Index();

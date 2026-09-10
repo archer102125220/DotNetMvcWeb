@@ -122,9 +122,10 @@ SELECT 1 + 1;
     ```sql
     -- ❌ 錯誤 (因為沒加引號，會被 Postgres 轉成 postgresdemoitems 去找，結果報錯 relation does not exist)
     SELECT * FROM PostgresDemoItems;
-    
+
     -- ✅ 正確
     SELECT * FROM "PostgresDemoItems";
+
     ```
 
 2.  **IDENTITY 欄位與序列 (Sequences)**

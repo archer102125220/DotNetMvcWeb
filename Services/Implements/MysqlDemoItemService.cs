@@ -95,7 +95,7 @@ namespace DotNetMvcWeb.Services.Implements
             // [教學註解] 雖然我們示範的是原生 ADO.NET，但還是可以直接利用已經設定在 DbContext 內的連線字串
             // 這讓我們不用去 appsettings.json 裡面手動剖析 (parse) IConfiguration。
             string? connectionString = _context.Database.GetConnectionString();
-            
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("無法從 DbContext 取得連接字串");
@@ -116,12 +116,12 @@ namespace DotNetMvcWeb.Services.Implements
                     // [教學註解] 撰寫原生 SQL 查詢，這裡示範了如何做 JOIN。
                     // ⚠️ 注意：MySQL 對於保留字和欄位名稱會習慣使用反引號 ` 包起來。
                     string sqlText = """
-                        SELECT 
-                            item.`Id`, 
-                            item.`Name`, 
-                            item.`CreatedAt`, 
-                            item.`Description`, 
-                            item.`CategoryId`, 
+                        SELECT
+                            item.`Id`,
+                            item.`Name`,
+                            item.`CreatedAt`,
+                            item.`Description`,
+                            item.`CategoryId`,
                             category.`Name` AS `CategoryName`
                         FROM `MysqlDemoItems` item
                         LEFT JOIN `MysqlDemoCategories` category ON item.`CategoryId` = category.`Id`

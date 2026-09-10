@@ -1,115 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DotNetMvcWeb</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/oracle-demo.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/mssql-demo.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DotNetMvcWeb.styles.css" asp-append-version="true" />
-    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - DotNetMvcWeb</title>
+  <script type="importmap"></script>
+  <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/oracle-demo.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/css/mssql-demo.css" asp-append-version="true" />
+  <link rel="stylesheet" href="~/DotNetMvcWeb.styles.css" asp-append-version="true" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 <body hx-indicator="#global-loading-bar">
-    <div id="global-loading-bar" class="htmx-indicator"></div>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DotNetMvcWeb</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @{
-                        string GetActiveStyle(string c, string? a = null, bool isDropdown = false)
-                        {
-                            string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-                            string? currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-                            bool isMatch = string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase);
-                            if (a != null)
-                            {
-                                isMatch = isMatch && string.Equals(currentAction, a, StringComparison.OrdinalIgnoreCase);
-                            }
-                            return isMatch ? (isDropdown ? "active text-light fw-bold" : "active text-primary fw-bold") : "text-dark";
-                        }
+  <div id="global-loading-bar" class="htmx-indicator"></div>
+  <header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+      <div class="container-fluid">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DotNetMvcWeb</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+          @{
+            string GetActiveStyle(string c, string? a = null, bool isDropdown = false)
+            {
+              string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+              string? currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+              bool isMatch = string.Equals(currentController, c, StringComparison.OrdinalIgnoreCase);
+              if (a != null)
+              {
+                isMatch = isMatch && string.Equals(currentAction, a, StringComparison.OrdinalIgnoreCase);
+              }
+              return isMatch ? (isDropdown ? "active text-light fw-bold" : "active text-primary fw-bold") : "text-dark";
+            }
 
-                        bool IsDatabaseActive()
-                        {
-                            string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-                            if (string.IsNullOrEmpty(currentController)) return false;
-                            
-                            return currentController.StartsWith("OracleDemo", StringComparison.OrdinalIgnoreCase) ||
-                                   currentController.StartsWith("MysqlDemo", StringComparison.OrdinalIgnoreCase) ||
-                                   currentController.StartsWith("PostgresDemo", StringComparison.OrdinalIgnoreCase) ||
-                                   currentController.StartsWith("MssqlDemo", StringComparison.OrdinalIgnoreCase);
-                        }
-                    }
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("Products")" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle @(IsDatabaseActive() ? "active text-primary fw-bold" : "text-dark")" href="#" id="navbarDropdownDB" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Databases
-                            </a>
-                            <ul class="dropdown-menu shadow-sm" aria-labelledby="navbarDropdownDB">
-                                <li><h6 class="dropdown-header">Oracle</h6></li>
-                                <li><a class="dropdown-item @GetActiveStyle("OracleDemo", null, true)" asp-controller="OracleDemo" asp-action="Index">Items</a></li>
-                                <li><a class="dropdown-item @GetActiveStyle("OracleDemoCategory", null, true)" asp-controller="OracleDemoCategory" asp-action="Index">Categories</a></li>
-                                
-                                <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">MySQL</h6></li>
-                                <li><a class="dropdown-item @GetActiveStyle("MysqlDemo", null, true)" asp-controller="MysqlDemo" asp-action="Index">Items</a></li>
-                                <li><a class="dropdown-item @GetActiveStyle("MysqlDemoCategory", null, true)" asp-controller="MysqlDemoCategory" asp-action="Index">Categories</a></li>
-                                
-                                <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">PostgreSQL</h6></li>
-                                <li><a class="dropdown-item @GetActiveStyle("PostgresDemo", null, true)" asp-controller="PostgresDemo" asp-action="Index">Items</a></li>
-                                <li><a class="dropdown-item @GetActiveStyle("PostgresDemoCategory", null, true)" asp-controller="PostgresDemoCategory" asp-action="Index">Categories</a></li>
-                                
-                                <li><hr class="dropdown-divider"></li>
-                                <li><h6 class="dropdown-header">MSSQL</h6></li>
-                                <li><a class="dropdown-item @GetActiveStyle("MssqlDemo", null, true)" asp-controller="MssqlDemo" asp-action="Index">Items</a></li>
-                                <li><a class="dropdown-item @GetActiveStyle("MssqlDemoCategory", null, true)" asp-controller="MssqlDemoCategory" asp-action="Index">Categories</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("ExtensionsDemo")" asp-area="" asp-controller="ExtensionsDemo" asp-action="Index">Extensions 示範</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("RedirectDemo")" asp-area="" asp-controller="RedirectDemo" asp-action="DemoList">Redirect 示範</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href="/scalar/v1" target="_blank">API 文件</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @GetActiveStyle("Home", "Privacy")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+            bool IsDatabaseActive()
+            {
+              string? currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+              if (string.IsNullOrEmpty(currentController)) return false;
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - DotNetMvcWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+              return currentController.StartsWith("OracleDemo", StringComparison.OrdinalIgnoreCase) ||
+                     currentController.StartsWith("MysqlDemo", StringComparison.OrdinalIgnoreCase) ||
+                     currentController.StartsWith("PostgresDemo", StringComparison.OrdinalIgnoreCase) ||
+                     currentController.StartsWith("MssqlDemo", StringComparison.OrdinalIgnoreCase);
+            }
+          }
+          <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+              <a class="nav-link @GetActiveStyle("Home", "Index")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link @GetActiveStyle("Products")" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle @(IsDatabaseActive() ? "active text-primary fw-bold" : "text-dark")" href="#" id="navbarDropdownDB" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Databases
+              </a>
+              <ul class="dropdown-menu shadow-sm" aria-labelledby="navbarDropdownDB">
+                <li><h6 class="dropdown-header">Oracle</h6></li>
+                <li><a class="dropdown-item @GetActiveStyle("OracleDemo", null, true)" asp-controller="OracleDemo" asp-action="Index">Items</a></li>
+                <li><a class="dropdown-item @GetActiveStyle("OracleDemoCategory", null, true)" asp-controller="OracleDemoCategory" asp-action="Index">Categories</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">MySQL</h6></li>
+                <li><a class="dropdown-item @GetActiveStyle("MysqlDemo", null, true)" asp-controller="MysqlDemo" asp-action="Index">Items</a></li>
+                <li><a class="dropdown-item @GetActiveStyle("MysqlDemoCategory", null, true)" asp-controller="MysqlDemoCategory" asp-action="Index">Categories</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">PostgreSQL</h6></li>
+                <li><a class="dropdown-item @GetActiveStyle("PostgresDemo", null, true)" asp-controller="PostgresDemo" asp-action="Index">Items</a></li>
+                <li><a class="dropdown-item @GetActiveStyle("PostgresDemoCategory", null, true)" asp-controller="PostgresDemoCategory" asp-action="Index">Categories</a></li>
+
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">MSSQL</h6></li>
+                <li><a class="dropdown-item @GetActiveStyle("MssqlDemo", null, true)" asp-controller="MssqlDemo" asp-action="Index">Items</a></li>
+                <li><a class="dropdown-item @GetActiveStyle("MssqlDemoCategory", null, true)" asp-controller="MssqlDemoCategory" asp-action="Index">Categories</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link @GetActiveStyle("ExtensionsDemo")" asp-area="" asp-controller="ExtensionsDemo" asp-action="Index">Extensions 示範</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link @GetActiveStyle("RedirectDemo")" asp-area="" asp-controller="RedirectDemo" asp-action="DemoList">Redirect 示範</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-dark" href="/scalar/v1" target="_blank">API 文件</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link @GetActiveStyle("Home", "Privacy")" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </li>
+          </ul>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+      </div>
+    </nav>
+  </header>
+  <div class="container">
+    <main role="main" class="pb-3">
+      @RenderBody()
+    </main>
+  </div>
+
+  <footer class="border-top footer text-muted">
+    <div class="container">
+      &copy; 2026 - DotNetMvcWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+  </footer>
+  <script src="~/lib/jquery/dist/jquery.min.js"></script>
+  <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="~/js/site.js" asp-append-version="true"></script>
+  @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,6 +1,6 @@
 using System;
-using Microsoft.EntityFrameworkCore.Migrations;
 using System.IO;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,11 +12,11 @@ namespace DotNetMvcWeb.Migrations.MysqlMigrations
         {
             string sqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Database/Procedures/Mysql/SP_UPDATE_ITEM_DESCRIPTION.sql");
             string sql;
-            if (File.Exists(sqlPath)) 
+            if (File.Exists(sqlPath))
             {
                 sql = File.ReadAllText(sqlPath);
             }
-            else 
+            else
             {
                 // Fallback for execution if path is different in deployed environment
                 sql = @"CREATE PROCEDURE SP_UPDATE_ITEM_DESCRIPTION (
@@ -29,7 +29,7 @@ namespace DotNetMvcWeb.Migrations.MysqlMigrations
                             WHERE `Id` = p_Id;
                         END";
             }
-            
+
             // MySQL does not support CREATE OR REPLACE PROCEDURE, so we DROP IF EXISTS first
             migrationBuilder.Sql("DROP PROCEDURE IF EXISTS SP_UPDATE_ITEM_DESCRIPTION;");
             migrationBuilder.Sql(sql);

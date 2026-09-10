@@ -12,14 +12,15 @@ namespace DotNetMvcWeb.Data
         {
         }
 
-        public DbSet<Models.PostgresDemoItem> PostgresDemoItems { get; set; }
-        
-        public DbSet<Models.PostgresDemoCategory> PostgresDemoCategories { get; set; }
-        
+        public DbSet<Models.PostgresDemoItem> PostgresDemoItems { get; set; } = null!;
+
+        public DbSet<Models.PostgresDemoCategory> PostgresDemoCategories { get; set; } = null!;
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<Models.PostgresDemoItem>()
                 .Property(e => e.Name)
                 .IsRequired()

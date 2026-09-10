@@ -1,9 +1,8 @@
-using Scalar.AspNetCore;
-
-using Microsoft.EntityFrameworkCore;
-using DotNetMvcWeb.Services.Interfaces;
-using DotNetMvcWeb.Services.Implements;
 using DotNetMvcWeb.Middlewares;
+using DotNetMvcWeb.Services.Implements;
+using DotNetMvcWeb.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -53,10 +52,10 @@ using (IServiceScope scope = app.Services.CreateScope())
         DotNetMvcWeb.Data.AppDbContext context = services.GetRequiredService<DotNetMvcWeb.Data.AppDbContext>();
         // 執行外部獨立的 Seed 邏輯
         DotNetMvcWeb.Seeders.DbInitializer.Initialize(context);
-        
+
         DotNetMvcWeb.Data.MysqlDbContext mysqlContext = services.GetRequiredService<DotNetMvcWeb.Data.MysqlDbContext>();
         DotNetMvcWeb.Seeders.MysqlDbInitializer.Initialize(mysqlContext);
-        
+
         DotNetMvcWeb.Data.PostgresDbContext postgresContext = services.GetRequiredService<DotNetMvcWeb.Data.PostgresDbContext>();
         DotNetMvcWeb.Seeders.PostgresDbInitializer.Initialize(postgresContext);
 
@@ -87,8 +86,8 @@ app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 
 app.UseHttpsRedirection();
 
-// 🟢 在這裡註冊我們自訂的 Middleware 
-app.UseRequestTiming(); 
+// 🟢 在這裡註冊我們自訂的 Middleware
+app.UseRequestTiming();
 
 app.UseRouting();
 

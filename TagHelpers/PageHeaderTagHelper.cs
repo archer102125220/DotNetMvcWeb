@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Razor.TagHelpers;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace DotNetMvcWeb.TagHelpers
 {
@@ -12,7 +12,7 @@ namespace DotNetMvcWeb.TagHelpers
         {
             // The outer element will be a <div>
             output.TagName = "div";
-            
+
             // Set the robust flex classes, including flex-wrap as requested by the user
             output.Attributes.SetAttribute("class", "page-header d-flex justify-content-between align-items-center mb-4 flex-wrap");
 
@@ -21,10 +21,10 @@ namespace DotNetMvcWeb.TagHelpers
 
             // Construct the title (h1 with m-0 so it centers properly)
             string titleHtml = $"<h1 class=\"m-0\">{Title}</h1>";
-            
+
             // Construct the actions wrapper if there is any child content provided
-            string actionsHtml = childContent.IsEmptyOrWhiteSpace 
-                ? "" 
+            string actionsHtml = childContent.IsEmptyOrWhiteSpace
+                ? ""
                 : $"<div class=\"d-flex gap-2 align-items-center\">{childContent.GetContent()}</div>";
 
             // Inject the content

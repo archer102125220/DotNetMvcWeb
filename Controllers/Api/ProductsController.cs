@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using DotNetMvcWeb.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetMvcWeb.Controllers.Api;
 
@@ -40,7 +40,7 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<Product>> GetProduct(int id)
     {
         Product? product = await _productRepository.GetByIdAsync(id);
-        
+
         if (product is null)
         {
             return NotFound(new { message = $"找不到 ID 為 {id} 的產品。" });

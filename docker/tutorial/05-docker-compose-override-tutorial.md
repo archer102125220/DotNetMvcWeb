@@ -44,7 +44,7 @@ services:
 services:
   webapp:
     # 1. 覆寫：不使用 Image，改用本機動態 Build
-    build: 
+    build:
       context: .
     # 2. 覆寫：修改環境變數
     environment:

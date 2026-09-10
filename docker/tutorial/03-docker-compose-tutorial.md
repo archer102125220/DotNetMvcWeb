@@ -47,9 +47,9 @@
 version: '3.8' # Compose 檔案格式版本
 
 services: # 定義要運行的各個容器
-  
+
   web:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     ports:
@@ -76,7 +76,7 @@ volumes: # 宣告有使用到的 Volume
 
 ### 關鍵概念
 - **`services`**: 每一個 service 代表一個 Container。
-- **`build` vs `image`**: 
+- **`build` vs `image`**:
   - `build`: 告訴 Docker Compose 需要根據哪個目錄的 `Dockerfile` 來現場編譯 Image。
   - `image`: 直接從 Docker Hub 或 Registry 下載現成的 Image。
 - **`depends_on`**: 定義服務的啟動順序。

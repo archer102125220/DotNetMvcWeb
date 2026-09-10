@@ -94,8 +94,9 @@ Migrations 資料夾就像是資料庫的 **Git Commit 歷史紀錄**。每一�
 這是因為 **.NET MVC (EF Core) 預設將 Seed 的行為自動化了**：
 1. **策略 A (`HasData`) 的執行時機**：當執行 `dotnet ef database update` 時，它包含在 Migration 裡面，更新資料表的同時就會把 Seed 寫進去了。
 2. **策略 B (`DbInitializer`) 的執行時機**：我們將呼叫邏輯寫在了 `Program.cs` (應用程式的進入點) 裡面。因此，只要執行 `dotnet run` 或 `dotnet watch run` 啟動網站，程式在啟動伺服器前就會自動執行這段 Seed 邏輯。
-   
+
 這代表 **不需要** 下達任何額外的 Seed 指令，一切都在資料庫更新與應用程式啟動時自動完成了！
+
 
 ---
 

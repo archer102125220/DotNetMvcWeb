@@ -37,9 +37,10 @@
 <body hx-indicator="#global-loading-bar">
     <!-- 全域 Loading Bar -->
     <div id="global-loading-bar" class="htmx-indicator"></div>
-    
+
     <!-- 頁面內容 -->
 </body>
+
 ```
 
 #### 步驟 2：CSS 動畫設計
@@ -57,8 +58,9 @@
     background: linear-gradient(90deg, transparent, #0d6efd, transparent);
     background-size: 200% 100%;
     animation: loadingBarAnim 1.2s infinite linear;
-    
+
     /* 預設隱藏並加上淡入淡出過渡效果 */
+
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease-in-out;

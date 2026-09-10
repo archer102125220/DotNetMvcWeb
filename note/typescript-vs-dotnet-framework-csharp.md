@@ -17,9 +17,9 @@
 
 ```csharp
 // 在 C# 7.3，你必須這樣寫
-public void ProcessUser(User user) 
+public void ProcessUser(User user)
 {
-    if (user == null) 
+    if (user == null)
     {
         throw new ArgumentNullException(nameof(user));
     }
@@ -47,7 +47,7 @@ TypeScript 寫一個資料結構只要一行 `type`。現代 C# 可以用 `recor
       public int Id { get; set; }
       public string Name { get; set; }
   }
-  
+
   // 必須寫出完整的型別名稱
   UserDto user = new UserDto { Id = 1, Name = "Alice" };
   ```
@@ -97,9 +97,9 @@ TypeScript 有強大的 Discriminated Unions 與 `typeof`/`instanceof` 搭配自
   using System.Threading.Tasks;
 
   // 必須有一層 namespace 大括號，導致所有的程式碼都要往內縮排一次
-  namespace MyApp.Services 
+  namespace MyApp.Services
   {
-      public class MyService 
+      public class MyService
       {
           // ...
       }
@@ -125,7 +125,7 @@ TypeScript 有強大的 Discriminated Unions 與 `typeof`/`instanceof` 搭配自
 
 在 TypeScript 中，你可以隨意寫出箭頭函式並賦值給 `const`。但在 C# 7.3，你**不能**直接用 `var` 接 Lambda 函式。
 
-- **TS**: 
+- **TS**:
   ```typescript
   const log = (msg: string) => console.log(msg);
   ```
@@ -134,8 +134,8 @@ TypeScript 有強大的 Discriminated Unions 與 `typeof`/`instanceof` 搭配自
   編譯器無法推斷，必須明確指定 `Action` 或 `Func`：
   ```csharp
   // ❌ 編譯錯誤：Cannot assign lambda expression to an implicitly-typed variable
-  // var log = (string msg) => Console.WriteLine(msg); 
-  
+  // var log = (string msg) => Console.WriteLine(msg);
+
   // ✅ 必須明確寫出委派型別
   Action<string> log = msg => Console.WriteLine(msg);
   Func<int, int, int> add = (a, b) => a + b;

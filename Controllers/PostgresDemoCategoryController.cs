@@ -69,12 +69,12 @@ namespace DotNetMvcWeb.Controllers
             if (ModelState.IsValid)
             {
                 await _categoryService.CreateCategoryAsync(item);
-                
+
                 // [教學註解] 透過 Response Header 指示 HTMX 更新瀏覽器的網址列，避免網址停留在 /Create
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemoCategory"));
                 return await Index();
             }
-            
+
             Response.Headers.Append("HX-Retarget", "#postgres-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
             return PartialView("_CreateOrEdit", item);
@@ -89,7 +89,7 @@ namespace DotNetMvcWeb.Controllers
 
             PostgresDemoCategory? item = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (item == null) return NotFound();
-            
+
             // [教學註解] 若是 HTMX 請求，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -128,7 +128,7 @@ namespace DotNetMvcWeb.Controllers
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemoCategory"));
                 return await Index();
             }
-            
+
             Response.Headers.Append("HX-Retarget", "#postgres-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
             return PartialView("_CreateOrEdit", item);
@@ -142,7 +142,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategoryAsync(id);
-            
+
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemoCategory"));
             return await Index();
         }

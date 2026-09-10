@@ -74,10 +74,11 @@ TS 中的 `interface` 常被當作「資料形狀 (Shape)」的宣告（Type Ali
 - **C#**: `public class User : IUser, IEntity { }` (使用 `:` 代替 `implements` 或 `extends`)
 
 ### 純資料物件 (DTO)
-- **TS**: 
+- **TS**:
   ```typescript
   type UserDto = { id: number; name: string; }
   ```
+
 - **C#** (建議使用 Record 或定義 Class):
   ```csharp
   public record UserDto(int Id, string Name);
@@ -149,8 +150,9 @@ TypeScript 開發者常使用 `typeof` 或 `instanceof` 以及 discriminated uni
 - **C#** 依賴邏輯上的命名空間 (Namespace)：
   ```csharp
   using DotNetMvcWeb.Services; // 放在檔案頂部
-  
+
   namespace DotNetMvcWeb.Controllers;
+
   // 類別內容...
   ```
   *不用管檔案在哪個資料夾，只要命名空間對了就能使用。但專案規範要求資料夾結構必須與命名空間一致。*

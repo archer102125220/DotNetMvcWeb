@@ -4,7 +4,7 @@
   =========================================================
   這個腳本會在 Docker 容器啟動時，由 entrypoint.sh 呼叫執行。
   目的是為了自動建立開發用的資料庫以及專屬的應用程式連線帳號。
-  
+
   所有的 IF NOT EXISTS 檢查是為了確保腳本的「冪等性」(Idempotency)，
   意思是即使這個腳本被重複執行多次，也不會因為物件已存在而報錯。
 */
@@ -48,7 +48,7 @@ IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'dot-net-mvc-
 BEGIN
     -- 在當前資料庫 (DotNetMvcDb) 中建立 User，並將其與剛才建立的 Server Login 綁定
     CREATE USER [dot-net-mvc-web] FOR LOGIN [dot-net-mvc-web];
-    
+
     -- 將此使用者加入到 db_owner 這個預設的資料庫角色 (Role) 中
     -- db_owner 擁有該資料庫內的所有權限 (包含建表、讀寫資料等)，非常適合本地開發測試使用
     ALTER ROLE db_owner ADD MEMBER [dot-net-mvc-web];

@@ -49,7 +49,7 @@ namespace DotNetMvcWeb.Extensions
         // 3. 第一個參數必須加上 `this`，代表你要擴充的是 `string`
         public static string Truncate(this string? value, int maxLength)
         {
-            if (string.IsNullOrEmpty(value)) 
+            if (string.IsNullOrEmpty(value))
             {
                 return string.Empty;
             }
@@ -74,10 +74,10 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         string title = "這是一段非常非常長的商品標題";
-        
+
         // 就像原生方法一樣直接呼叫！編譯器會自動把 title 傳入給 value 參數
-        string shortTitle = title.Truncate(10); 
-        
+        string shortTitle = title.Truncate(10);
+
         return View();
     }
 }

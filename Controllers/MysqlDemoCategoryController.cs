@@ -73,12 +73,12 @@ namespace DotNetMvcWeb.Controllers
             if (ModelState.IsValid) // 檢查資料驗證是否通過
             {
                 await _categoryService.CreateCategoryAsync(item); // 非同步寫入資料庫
-                
+
                 // [教學註解] 透過 Response Header 指示 HTMX 更新瀏覽器的網址列，避免網址停留在 /Create
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemoCategory"));
                 return await Index();
             }
-            
+
             // 若驗證失敗，指示 HTMX 將錯誤表單重新渲染回表單區塊中
             Response.Headers.Append("HX-Retarget", "#mysql-demo-category-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
@@ -95,7 +95,7 @@ namespace DotNetMvcWeb.Controllers
 
             MysqlDemoCategory? item = await _categoryService.GetCategoryByIdAsync(id.Value);
             if (item == null) return NotFound();
-            
+
             // [教學註解] 若是 HTMX 請求，只回傳表單
             if (Request.Headers.ContainsKey("HX-Request"))
             {
@@ -152,7 +152,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _categoryService.DeleteCategoryAsync(id);
-            
+
             // 刪除成功後，回傳更新後的列表
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "MysqlDemoCategory"));
             return await Index();

@@ -11,17 +11,17 @@ namespace DotNetMvcWeb.Models
         /// EF Core 預設會將名為 Id 的屬性設為主鍵，並自動遞增
         /// </summary>
         public int Id { get; set; }
-        
+
         /// <summary>
         /// 項目名稱 (必填)
         /// </summary>
         public string Name { get; set; } = string.Empty;
-        
+
         /// <summary>
         /// 項目描述 (選填，可為 Null)
         /// </summary>
         public string? Description { get; set; }
-        
+
         /// <summary>
         /// 建立時間
         /// 預設值為當前的 UTC 時間

@@ -132,9 +132,10 @@ USING (
 ON (target."Id" = source."Id")
 WHEN MATCHED THEN
     -- 當 ON 條件成立 (資料已存在)，執行 UPDATE
-    UPDATE SET 
+    UPDATE SET
         target."Name" = source."Name",
         target."Description" = source."Description"
+
 WHEN NOT MATCHED THEN
     -- 當 ON 條件不成立 (資料不存在)，執行 INSERT
     INSERT ("Id", "Name", "Description", "CreatedAt")
@@ -158,7 +159,7 @@ WHEN NOT MATCHED THEN
     ```sql
     -- ❌ 錯誤 (會報錯 Table or view does not exist)
     SELECT * FROM OracleDemoItems;
-    
+
     -- ✅ 正確
     SELECT * FROM "OracleDemoItems";
     ```
@@ -173,15 +174,16 @@ WHEN NOT MATCHED THEN
     > 💡 **補充與例外：資料庫管理工具 (UI Tools)**
     > 如果您是使用 **DBeaver、DataGrip、Oracle SQL Developer、Navicat** 或是命令列的 **SQL*Plus** 等資料庫管理介面：
     > 這些工具通常**支援甚至要求**在句尾加上分號 `;`。原因是這些工具在解析我們輸入的一大串「SQL 腳本 (Script)」時，需要依靠分號來切割多筆獨立的 SQL 語句，然後在背後自動將分號剝除，再逐一發送給 Oracle 伺服器執行。
-    > 
+    >
     > 此外，若是在 C# 程式碼中執行包含 `BEGIN ... END;` 的 PL/SQL 匿名區塊（Anonymous Block），區塊內部的敘述與 `END` 後方則**必須**包含分號。
 
     ```csharp
     // ❌ 錯誤 (加上分號會引發 ORA-00911)
     string sqlBad = "SELECT * FROM \"OracleDemoItems\";";
     var data = await connection.QueryAsync<Item>(sqlBad);
-    
+
     // ✅ 正確
     string sqlGood = "SELECT * FROM \"OracleDemoItems\"";
     var data = await connection.QueryAsync<Item>(sqlGood);
     ```
+

@@ -16,17 +16,18 @@ namespace DotNetMvcWeb.Data
         /// 定義 OracleDemoItem 對應的資料表
         /// EF Core 會依據此屬性名稱 (OracleDemoItems) 來建立與查詢資料表
         /// </summary>
-        public DbSet<Models.OracleDemoItem> OracleDemoItems { get; set; }
-        
+        public DbSet<Models.OracleDemoItem> OracleDemoItems { get; set; } = null!;
+
         /// <summary>
         /// 定義 OracleDemoCategory 對應的資料表
         /// </summary>
-        public DbSet<Models.OracleDemoCategory> OracleDemoCategories { get; set; }
-        
+        public DbSet<Models.OracleDemoCategory> OracleDemoCategories { get; set; } = null!;
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             // 可以在此處設定資料表欄位的進階限制或關聯
             // 例如限制 Name 欄位必填且最大長度為 200
             modelBuilder.Entity<Models.OracleDemoItem>()

@@ -47,7 +47,7 @@ TypeScript 開發者非常習慣使用 Array prototype methods (`map`, `filter`,
 ### 資料傳遞物件 (DTO)
 在 TS 中，傳遞資料通常只寫一個 `type` 或 `interface`。在 .NET 6 中，**強烈建議使用 `record`**（C# 9 引入）來處理不可變 (Immutable) 的資料傳遞。C# 10 更進一步加入了 `record struct`。
 
-- **TS**: 
+- **TS**:
   ```typescript
   type UserDto = { id: number; name: string; };
   ```
@@ -61,12 +61,12 @@ TypeScript 開發者非常習慣使用 Array prototype methods (`map`, `filter`,
 - **TS**: 介面常被用作純結構的定義。
 - **.NET 6**: 介面主要用於定義「合約」並結合依賴注入 (Dependency Injection)。
   ```csharp
-  public interface IUserService 
+  public interface IUserService
   {
       Task<UserDto> GetUserAsync(int id);
   }
-  
-  public class UserService : IUserService 
+
+  public class UserService : IUserService
   {
       public async Task<UserDto> GetUserAsync(int id) { ... }
   }
@@ -106,15 +106,15 @@ TypeScript 開發者非常習慣使用 Array prototype methods (`map`, `filter`,
   import { User } from '../models/User';
   ```
 - **.NET 6 (C# 10)** 採用了兩個重要的新特性：**Global Usings** 與 **File-scoped Namespaces**。
-  
+
   檔案結構通常如下：
   ```csharp
   // 透過 Namespace 來組織，不需要知道檔案具體在哪個路徑
-  using DotNetMvcWeb.Models; 
-  
+  using DotNetMvcWeb.Models;
+
   // C# 10 特性：File-scoped namespace (省去了一層大括號縮排)
   namespace DotNetMvcWeb.Services;
-  
+
   public class MyService { }
   ```
   在 .NET 6 中，你可以把常用的 `using` 定義在一個檔案中，並加上 `global` 關鍵字（如 `global using System.Linq;`），這樣整個專案都不用再重複寫這些 using 了。
@@ -145,7 +145,7 @@ TS 的 Promise 與 C# 的 Task 概念幾乎一致。
 - **C# 10**:
   ```csharp
   // C# 10 允許對 Lambda 進行自然型別推斷 (Natural Type Inference)
-  var add = (int a, int b) => a + b; 
+  var add = (int a, int b) => a + b;
   ```
 
 ---

@@ -81,12 +81,12 @@ namespace DotNetMvcWeb.Controllers
             if (ModelState.IsValid)
             {
                 await _itemService.CreateItemAsync(item);
-                
+
                 // [教學註解] 透過 Response Header 指示 HTMX 更新瀏覽器的網址列，避免網址停留在 /Create
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemo"));
                 return await Index();
             }
-            
+
             Response.Headers.Append("HX-Retarget", "#postgres-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
             await PopulateCategoriesDropDownListAsync(item.CategoryId);
@@ -102,7 +102,7 @@ namespace DotNetMvcWeb.Controllers
 
             PostgresDemoItem? item = await _itemService.GetItemByIdAsync(id.Value);
             if (item == null) return NotFound();
-            
+
             await PopulateCategoriesDropDownListAsync(item.CategoryId);
 
             // [教學註解] 若是 HTMX 請求，只回傳表單
@@ -143,7 +143,7 @@ namespace DotNetMvcWeb.Controllers
                 Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemo"));
                 return await Index();
             }
-            
+
             Response.Headers.Append("HX-Retarget", "#postgres-demo-form-container");
             Response.Headers.Append("HX-Reswap", "innerHTML");
             await PopulateCategoriesDropDownListAsync(item.CategoryId);
@@ -158,7 +158,7 @@ namespace DotNetMvcWeb.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _itemService.DeleteItemAsync(id);
-            
+
             Response.Headers.Append("HX-Push-Url", Url.Action("Index", "PostgresDemo"));
             return await Index();
         }
@@ -174,7 +174,7 @@ namespace DotNetMvcWeb.Controllers
             {
                 await _itemService.UpdateItemDescriptionViaProcAsync(id, newDescription);
             }
-            
+
             return await Index();
         }
 

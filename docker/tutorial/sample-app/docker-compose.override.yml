@@ -9,17 +9,17 @@ version: '3.8'
 # =====================================================================================
 
 services:
-  
+
   # 針對基礎檔的 `webapp` 服務進行修改
   webapp:
-    
+
     # 擴充與覆寫環境變數
     environment:
       # 將系統環境強制設為 Development，開啟詳細錯誤畫面 (此行在基礎檔也有，所以會覆寫過去)
       - ASPNETCORE_ENVIRONMENT=Development
       # 新增的環境變數：開啟 ASP.NET Core 更詳細的錯誤日誌
       - ASPNETCORE_DETAILEDERRORS=true
-    
+
     # 擴充 Volume (掛載空間) - ★ 本機開發的進階技巧 ★
     volumes:
       # Bind Mount: 語法為 "本機路徑:容器內路徑"
@@ -28,7 +28,7 @@ services:
       # 配合 `.NET Hot Reload (dotnet watch)`，您只要在本機一存檔，
       # 容器裡的程式碼就會立刻更新並重新編譯，完全不需要重新 docker build！
       - ./:/src
-    
+
     # 擴充 Ports (對外通訊埠)
     ports:
       # 假設基礎檔已經開放了 8080，但你本機開發想額外多開一個 8081 Port

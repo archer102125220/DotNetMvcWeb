@@ -1,6 +1,6 @@
 using System;
-using Microsoft.EntityFrameworkCore.Migrations;
 using System.IO;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -12,11 +12,11 @@ namespace DotNetMvcWeb.Migrations.PostgresDb
         {
             string sqlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Database/Procedures/Postgres/SP_UPDATE_ITEM_DESCRIPTION.sql");
             string sql;
-            if (File.Exists(sqlPath)) 
+            if (File.Exists(sqlPath))
             {
                 sql = File.ReadAllText(sqlPath);
             }
-            else 
+            else
             {
                 // Fallback for execution if path is different in deployed environment
                 sql = @"CREATE OR REPLACE PROCEDURE SP_UPDATE_ITEM_DESCRIPTION (
@@ -32,7 +32,7 @@ namespace DotNetMvcWeb.Migrations.PostgresDb
                         END;
                         $$;";
             }
-            
+
             migrationBuilder.Sql(sql);
         }
 

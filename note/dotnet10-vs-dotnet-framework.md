@@ -53,7 +53,7 @@
   ```
 * **.NET Framework**: 必須每個檔案都寫一堆 using，且全部程式碼都要包在大括號內縮排。
   ```csharp
-  namespace MyProject 
+  namespace MyProject
   {
       // 所有程式碼都要退一格
   }
@@ -80,12 +80,12 @@
 ### 4. using 宣告式 (C# 8+)
 * **.NET 10**: 不需要大括號，變數離開 scope 自動 Dispose。
   ```csharp
-  using var stream = new MemoryStream(); 
+  using var stream = new MemoryStream();
   // 繼續寫邏輯...
   ```
 * **.NET Framework**: 必須用大括號包住生命週期，容易造成深層巢狀（波動拳）。
   ```csharp
-  using (var stream = new MemoryStream()) 
+  using (var stream = new MemoryStream())
   {
       // 邏輯寫在這裡...
   }

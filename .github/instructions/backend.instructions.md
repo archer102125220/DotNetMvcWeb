@@ -1,5 +1,5 @@
 ---
-applyTo: 
+applyTo:
   - "**/*Controller.cs"
   - "**/*Service.cs"
   - "**/*Context.cs"

@@ -68,8 +68,9 @@ END;";
 ```
 
 > [!WARNING]
-> **手動建立 Migration 檔案的常見錯誤 (Gotcha)**  
+> **手動建立 Migration 檔案的常見錯誤 (Gotcha)**
 > 如果您是手動新增 `.cs` 檔案而非使用 CLI 產生，請務必補上 **`[DbContext(typeof(AppDbContext))]`** 與 **`[Migration("時間戳_名稱")]`** 這兩個 Attribute。若遺漏，EF Core CLI 將無法識別此 Migration，導致 `dotnet ef database update` 會直接略過它並顯示「Already up to date」。
+
 
 ### 2. 建立獨立的 `.sql` 檔案備查 (最佳實踐)
 
@@ -111,10 +112,11 @@ public async Task UpdateItemDescriptionViaProcAsync(int id, string newDescriptio
     // 使用 ExecuteSqlRawAsync 執行 Procedure
     // 注意參數的繫結方式會因資料庫類型有所不同 (例如 Oracle 使用 :p0，SQL Server 使用 @p0)
     await _context.Database.ExecuteSqlRawAsync(
-        "BEGIN SP_UPDATE_ITEM_DESCRIPTION(:p0, :p1); END;", 
-        id, 
+        "BEGIN SP_UPDATE_ITEM_DESCRIPTION(:p0, :p1); END;",
+        id,
         newDescription ?? (object)DBNull.Value
     );
+
 }
 ```
 

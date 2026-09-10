@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using DotNetMvcWeb.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetMvcWeb.Controllers
 {
@@ -16,11 +16,11 @@ namespace DotNetMvcWeb.Controllers
         public IActionResult Index(string inputText, int maxLength)
         {
             SetupDemoData();
-            
+
             // 將使用者輸入的值回傳給 View，以便保留在輸入框中
             ViewBag.TestInput = inputText;
             ViewBag.TestLength = maxLength;
-            
+
             // 💡 這裡就是呼叫我們寫的擴充方法，即時處理使用者的輸入！
             ViewBag.TestResult = inputText.Truncate(maxLength);
 

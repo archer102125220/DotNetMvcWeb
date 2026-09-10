@@ -14,35 +14,35 @@
       hx-target="#oracle-demo-category-list-container"
       hx-swap="innerHTML"
       class="oracle_demo_page-form">
-    
-    <!-- 必要的 CSRF 防護標記 -->
-    @Html.AntiForgeryToken()
 
-    @if (Model.Id != 0)
-    {
-        <!-- 如果是編輯模式，必須將 Id 與 CreatedAt 隱藏欄位帶上，以確保 Model Binding 正常 -->
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="CreatedAt" />
-    }
+  <!-- 必要的 CSRF 防護標記 -->
+  @Html.AntiForgeryToken()
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label">Name</label>
-        <input asp-for="Name" class="form-control" required />
-        <!-- 顯示伺服器端的驗證錯誤訊息 -->
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+  @if (Model.Id != 0)
+  {
+    <!-- 如果是編輯模式，必須將 Id 與 CreatedAt 隱藏欄位帶上，以確保 Model Binding 正常 -->
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="CreatedAt" />
+  }
 
-    <div class="d-flex justify-content-end gap-2 mt-4">
-        <!-- 
-          取消按鈕：
-          直接使用 JavaScript 將表單區塊還原為預設文字。
-          [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /OracleDemoCategory。
-        -->
-        <button type="button" 
-                class="btn btn-light" 
-                onclick="document.getElementById('oracle-demo-category-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select a category to edit or click \'Create New Category\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "OracleDemoCategory")');">
-            Cancel
-        </button>
-        <button type="submit" class="btn btn-primary">Save</button>
-    </div>
+  <div class="mb-3">
+    <label asp-for="Name" class="form-label">Name</label>
+    <input asp-for="Name" class="form-control" required />
+    <!-- 顯示伺服器端的驗證錯誤訊息 -->
+    <span asp-validation-for="Name" class="text-danger"></span>
+  </div>
+
+  <div class="d-flex justify-content-end gap-2 mt-4">
+    <!--
+      取消按鈕：
+      直接使用 JavaScript 將表單區塊還原為預設文字。
+      [教學註解] 同時使用 history.pushState 清除網址狀態，讓網址漂亮地退回 /OracleDemoCategory。
+    -->
+    <button type="button"
+            class="btn btn-light"
+            onclick="document.getElementById('oracle-demo-category-form-container').innerHTML = '<p class=\'text-muted mb-0\'>Select a category to edit or click \'Create New Category\'.</p>'; history.pushState(null, '', '@Url.Action("Index", "OracleDemoCategory")');">
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary">Save</button>
+  </div>
 </form>

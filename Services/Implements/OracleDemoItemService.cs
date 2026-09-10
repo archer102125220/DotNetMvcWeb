@@ -94,7 +94,7 @@ namespace DotNetMvcWeb.Services.Implements
         {
             // [教學註解] 這裡直接利用已經設定在 DbContext 內的連線字串
             string? connectionString = _context.Database.GetConnectionString();
-            
+
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("無法取得資料庫連接字串");
@@ -118,12 +118,12 @@ namespace DotNetMvcWeb.Services.Implements
                     // ⚠️ 注意：Oracle 資料庫中，如果資料表或欄位名稱被 EF Core 加上了雙引號 (強迫區分大小寫)，
                     // 這裡的原生 SQL 也必須加上雙引號 (例如 \"Id\")，否則會發生 ORA-00904: invalid identifier 錯誤。
                     string sqlText = """
-                        SELECT 
-                            item."Id", 
-                            item."Name", 
-                            item."CreatedAt", 
-                            item."Description", 
-                            item."CategoryId", 
+                        SELECT
+                            item."Id",
+                            item."Name",
+                            item."CreatedAt",
+                            item."Description",
+                            item."CategoryId",
                             category."Name" AS "CategoryName"
                         FROM "OracleDemoItems" item
                         LEFT JOIN "OracleDemoCategories" category ON item."CategoryId" = category."Id"

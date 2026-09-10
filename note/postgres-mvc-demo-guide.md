@@ -74,11 +74,12 @@ return await _context.PostgresDemoItems
 ### 前端實作：HTMX 即時防抖搜尋
 在 `Index.cshtml` 的搜尋框中，我們加入了強大的觸發條件：
 ```html
-<input type="text" 
+<input type="text"
        hx-get="/PostgresDemo/Index"
        hx-trigger="keyup changed delay:500ms, search"
        hx-target="#postgres-demo-list-container">
 ```
+
 * **防抖機制 (Debounce)**：`delay:500ms` 告訴 HTMX「在使用者停止打字半秒鐘後，才幫我送出請求」。這可以大幅減少對伺服器無意義的連線負擔，只用一行 HTML 屬性就實現了順滑的即時搜尋體驗！
 
 ---

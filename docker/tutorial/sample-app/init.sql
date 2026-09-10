@@ -9,6 +9,6 @@ CREATE TABLE Users (
     CreatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO Users (Username, Email) VALUES 
+INSERT INTO Users (Username, Email) VALUES
 ('admin', 'admin@example.com'),
 ('testuser', 'testuser@example.com');

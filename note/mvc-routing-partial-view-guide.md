@@ -34,8 +34,9 @@
 public IActionResult Create()
 {
     // ... 前面的邏輯 ...
-    
+
     // 關鍵在這一行
+
     return PartialView("_CreateOrEdit", new OracleDemoItem());
 }
 ```

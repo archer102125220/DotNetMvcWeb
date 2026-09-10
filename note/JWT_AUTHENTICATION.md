@@ -24,7 +24,7 @@ dotnet add package System.IdentityModel.Tokens.Jwt
 ```
 
 > **注意**：如果你是要在 ASP.NET Core 中實作 JWT 驗證，通常還會需要安裝 `Microsoft.AspNetCore.Authentication.JwtBearer`，因為它包含了 ASP.NET Core 驗證中介軟體 (Middleware) 的實作。`Microsoft.AspNetCore.Authentication.JwtBearer` 內部會相依於 `System.IdentityModel.Tokens.Jwt`。
-> 
+>
 > ```bash
 > dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
 > ```
@@ -80,7 +80,7 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings["Audience"], // 允許的接收者
 
         ValidateLifetime = true,             // 是否驗證 Token 的有效期限
-        
+
         ValidateIssuerSigningKey = true,     // 是否驗證簽章金鑰
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)) // 簽章金鑰
     };

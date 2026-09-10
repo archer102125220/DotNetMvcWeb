@@ -1,6 +1,6 @@
 -- ==============================================================================
 -- Oracle 資料庫與 MySQL / MSSQL 的核心差異：
--- 
+--
 -- 1. 在 Oracle 中，沒有 CREATE DATABASE 指令用來建立應用程式資料庫。
 --    Docker 容器啟動時，會預設建立好一個 Pluggable Database (PDB) 叫做 FREEPDB1。
 -- 2. 在 Oracle 中，User (帳號) 就等於 Schema (資料庫空間)。
@@ -28,7 +28,7 @@ ALTER USER "dot-net-mvc-web" QUOTA UNLIMITED ON USERS;
 -- (補充範例) 若未來需要新增「第二個資料庫空間」，只要取消下方註解即可建立：
 -- CREATE USER "DB_LOGS" IDENTIFIED BY "RandomPassword123";
 -- ALTER USER "DB_LOGS" QUOTA UNLIMITED ON USERS;
--- 
+--
 -- 屆時，主帳號 "dot-net-mvc-web" 因為擁有 DBA 權限，
 -- 可以直接跨區存取 DB_LOGS 的資料表。
 -- 例如在 EF Core 中可這樣設定: builder.ToTable("LogEntries", "DB_LOGS");

@@ -102,12 +102,13 @@ namespace DotNetMvcWeb.Controllers.Api
             try
             {
                 List<MssqlDemoItem> resultList = await _itemService.GetItemsViaAdoNetAsync(keyword);
-                
+
                 // 為了與之前的 API 回傳格式相同，將 MssqlDemoItem 轉為包含 CategoryName 的匿名物件
                 List<object> responseList = new List<object>();
-                foreach(MssqlDemoItem item in resultList)
+                foreach (MssqlDemoItem item in resultList)
                 {
-                    responseList.Add(new {
+                    responseList.Add(new
+                    {
                         Id = item.Id,
                         Name = item.Name,
                         CreatedAt = item.CreatedAt,
@@ -116,7 +117,7 @@ namespace DotNetMvcWeb.Controllers.Api
                         CategoryName = item.Category?.Name
                     });
                 }
-                
+
                 return Ok(responseList);
             }
             catch (Exception ex)

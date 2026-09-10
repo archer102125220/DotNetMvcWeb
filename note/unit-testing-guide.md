@@ -85,8 +85,9 @@ public async Task CreateProduct_WhenValid_ReturnsCreatedAtAction()
     Product newProduct = new() { Id = 10, Name = "機械鍵盤", Price = 3000 };
     var mockRepo = new Mock<IProductRepository>();
     mockRepo.Setup(r => r.AddAsync(newProduct)).Returns(Task.CompletedTask);
-    
+
     var controller = new ProductsController(mockRepo.Object);
+
 
     // Act: 執行建立動作
     var result = await controller.CreateProduct(newProduct);
@@ -452,8 +453,9 @@ open DotNetMvcWeb.Tests/CoverageReport/index.html
 dotnet tool install -g dotnet-reportgenerator-globaltool
 ```
 
-> **⚠️ 全域工具注意事項 (macOS / Linux)**：  
+> **⚠️ 全域工具注意事項 (macOS / Linux)**：
 > 全域工具會安裝在 `~/.dotnet/tools`。如果終端機出現 `zsh: command not found`，請將工具路徑加入 `~/.zshrc`：
+
 > ```bash
 > echo 'export PATH="$PATH:$HOME/.dotnet/tools"' >> ~/.zshrc
 > source ~/.zshrc

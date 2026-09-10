@@ -21,23 +21,23 @@ namespace DotNetMvcWeb.Seeders
             // 檢查是否已經存在我們即將動態寫入的資料，如果有了就直接 return
             if (context.MssqlDemoItems.Any(i => i.Name == "動態種子資料 1"))
             {
-                return;   
+                return;
             }
 
             // 建立要動態寫入的資料
             MssqlDemoItem[] dynamicItems = new MssqlDemoItem[]
             {
-                new MssqlDemoItem 
-                { 
-                    Name = "動態種子資料 1", 
-                    Description = "這筆資料是專門示範從獨立 Seeder 資料夾寫入的", 
-                    CreatedAt = DateTime.UtcNow 
+                new MssqlDemoItem
+                {
+                    Name = "動態種子資料 1",
+                    Description = "這筆資料是專門示範從獨立 Seeder 資料夾寫入的",
+                    CreatedAt = DateTime.UtcNow
                 },
-                new MssqlDemoItem 
-                { 
-                    Name = "動態種子資料 2", 
-                    Description = "這種寫法在實務上很適合用來生成大量需要隨機時間的假資料", 
-                    CreatedAt = DateTime.UtcNow.AddHours(-2) 
+                new MssqlDemoItem
+                {
+                    Name = "動態種子資料 2",
+                    Description = "這種寫法在實務上很適合用來生成大量需要隨機時間的假資料",
+                    CreatedAt = DateTime.UtcNow.AddHours(-2)
                 }
             };
 

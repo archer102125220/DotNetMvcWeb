@@ -24,8 +24,9 @@ public class MyBaseClass
 public class MyChildClass : MyBaseClass
 {
     /// <inheritdoc />
-    public override void DoSomething() { } 
+    public override void DoSomething() { }
     // 當滑鼠移到這裡，IDE 會顯示「這是一個基礎方法的說明。」
+
 }
 ```
 
