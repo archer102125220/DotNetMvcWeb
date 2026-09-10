@@ -106,7 +106,7 @@ dotnet tool restore
 # 2. 產出 HTML 互動式網站報表
 dotnet reportgenerator \
   -reports:"DotNetMvcWeb.Tests/TestResults/coverage.cobertura.xml" \
-  -targetdir:"DotNetMvcWeb.Tests/CoverageReport" \
+  -targetdir:"DotNetMvcWeb.Tests/TestResults/CoverageReport" \
   -reporttypes:"Html;TextSummary;Badges"
 
 # 3. 開啟報表 (macOS)
