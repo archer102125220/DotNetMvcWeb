@@ -1,16 +1,16 @@
-@model IEnumerable<DotNetMvcWeb.Models.Product>
+@model IEnumerable<DotNetMvcWeb.Models.DTOs.Products.ProductResponseDto>
 
 @{
   ViewData["Title"] = "Products";
 }
 
-<h1>產品列表</h1>
+<h1>產品列表 (ProductResponseDto)</h1>
 
 <p>
   <a asp-action="Create" class="btn btn-primary">新增產品</a>
 </p>
-<table class="table">
-  <thead>
+<table class="table table-striped table-hover">
+  <thead class="table-dark">
     <tr>
       <th>
         @Html.DisplayNameFor(model => model.Id)
@@ -19,7 +19,7 @@
         @Html.DisplayNameFor(model => model.Name)
       </th>
       <th>
-        @Html.DisplayNameFor(model => model.Price)
+        價格 (格式化輸出)
       </th>
       <th>
         @Html.DisplayNameFor(model => model.Description)
@@ -28,7 +28,7 @@
     </tr>
   </thead>
   <tbody>
-    @foreach (Product item in Model)
+    @foreach (var item in Model)
     {
       <tr>
         <td>
@@ -38,15 +38,15 @@
           @Html.DisplayFor(modelItem => item.Name)
         </td>
         <td>
-          @Html.DisplayFor(modelItem => item.Price)
+          <strong>@item.FormattedPrice</strong>
         </td>
         <td>
           @Html.DisplayFor(modelItem => item.Description)
         </td>
         <td>
-          <a asp-action="Edit" asp-route-id="@item.Id">編輯</a> |
-          <a asp-action="Details" asp-route-id="@item.Id">詳細</a> |
-          <a asp-action="Delete" asp-route-id="@item.Id">刪除</a>
+          <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">編輯</a>
+          <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">詳細</a>
+          <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">刪除</a>
         </td>
       </tr>
     }

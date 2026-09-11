@@ -1,4 +1,4 @@
-@model DotNetMvcWeb.Models.Product
+@model DotNetMvcWeb.Models.DTOs.Products.ProductResponseDto
 
 @{
   ViewData["Title"] = "Delete Product";
@@ -6,9 +6,9 @@
 
 <h1>刪除產品</h1>
 
-<h3>確定要刪除這個產品嗎？</h3>
+<h3 class="text-danger">確定要刪除這個產品嗎？</h3>
 <div>
-  <h4>產品</h4>
+  <h4>產品資料 (ProductResponseDto)</h4>
   <hr />
   <dl class="row">
     <dt class="col-sm-2">
@@ -27,7 +27,7 @@
       價格
     </dt>
     <dd class="col-sm-10">
-      @Html.DisplayFor(model => model.Price)
+      <strong>@Model.FormattedPrice</strong>
     </dd>
     <dt class="col-sm-2">
       描述
@@ -39,7 +39,7 @@
 
   <form asp-action="Delete">
     <input type="hidden" asp-for="Id" />
-    <input type="submit" value="刪除" class="btn btn-danger" /> |
-    <a asp-action="Index">返回列表</a>
+    <input type="submit" value="確認刪除" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-outline-secondary ms-2">返回列表</a>
   </form>
 </div>
