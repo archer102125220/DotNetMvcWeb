@@ -1,19 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
-using DotNetMvcWeb.Repositories.Interfaces;
-using DotNetMvcWeb.Services.Implements;
+using DotNetMvcWeb.Repositories.Implements;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 
-namespace DotNetMvcWeb.Tests.Services
+namespace DotNetMvcWeb.Tests.Repositories
 {
-    public class OracleDemoItemServiceTests
+    public class OracleDemoItemRepositoryTests
     {
         private AppDbContext CreateDbContext(string dbName)
         {
             DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: dbName)
+                .UseInMemoryDatabase(databaseName: $"{dbName}_{Guid.NewGuid()}")
                 .Options;
             return new AppDbContext(options);
         }
@@ -24,6 +25,12 @@ namespace DotNetMvcWeb.Tests.Services
                 .UseOracle("User Id=system;Password=DummyPass123!;Data Source=127.0.0.1:1521/XEPDB1;Connection Timeout=1")
                 .Options;
             return new AppDbContext(options);
+        }
+
+        [Fact]
+        public void Constructor_WhenContextNull_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new OracleDemoItemRepository(null!));
         }
 
         [Fact]
@@ -39,9 +46,9 @@ namespace DotNetMvcWeb.Tests.Services
             );
             await context.SaveChangesAsync();
 
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            List<OracleDemoItem> result = await service.GetItemsAsync(null);
+            List<OracleDemoItem> result = await repository.GetItemsAsync(null);
 
             Assert.Equal(2, result.Count);
             Assert.Equal(2, result[0].Id);
@@ -52,9 +59,9 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task GetItemsAsync_WithKeyword_InvokesRelationalQueryBranch()
         {
             using AppDbContext context = CreateRelationalDbContext();
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.GetItemsAsync("SearchTerm"));
+            await Assert.ThrowsAnyAsync<Exception>(() => repository.GetItemsAsync("SearchTerm"));
         }
 
         [Theory]
@@ -68,9 +75,9 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoItems.Add(new OracleDemoItem { Id = 10, Name = "Item10", CategoryId = 5 });
             await context.SaveChangesAsync();
 
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            OracleDemoItem? result = await service.GetItemByIdAsync(10, includeCategory);
+            OracleDemoItem? result = await repository.GetItemByIdAsync(10, includeCategory);
 
             Assert.NotNull(result);
             Assert.Equal(10, result.Id);
@@ -84,40 +91,24 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task GetItemByIdAsync_WhenNotFound_ReturnsNull()
         {
             using AppDbContext context = CreateDbContext(nameof(GetItemByIdAsync_WhenNotFound_ReturnsNull));
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            OracleDemoItem? result = await service.GetItemByIdAsync(999);
+            OracleDemoItem? result = await repository.GetItemByIdAsync(999);
 
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task CreateItemAsync_WhenCreatedAtIsDefault_AssignsUtcNow()
+        public async Task AddItemAsync_AddsEntity()
         {
-            using AppDbContext context = CreateDbContext(nameof(CreateItemAsync_WhenCreatedAtIsDefault_AssignsUtcNow));
-            OracleDemoItemService service = new(context);
-            OracleDemoItem item = new() { Name = "DefaultDateItem" };
+            using AppDbContext context = CreateDbContext(nameof(AddItemAsync_AddsEntity));
+            OracleDemoItemRepository repository = new(context);
+            OracleDemoItem item = new() { Name = "NewItem", CreatedAt = DateTime.UtcNow };
 
-            await service.CreateItemAsync(item);
+            await repository.AddItemAsync(item);
 
-            OracleDemoItem? saved = await context.OracleDemoItems.FirstOrDefaultAsync(i => i.Name == "DefaultDateItem");
+            OracleDemoItem? saved = await context.OracleDemoItems.FirstOrDefaultAsync(i => i.Name == "NewItem");
             Assert.NotNull(saved);
-            Assert.NotEqual(default, saved.CreatedAt);
-        }
-
-        [Fact]
-        public async Task CreateItemAsync_WhenCreatedAtIsExplicitlySet_RetainsOriginalDate()
-        {
-            using AppDbContext context = CreateDbContext(nameof(CreateItemAsync_WhenCreatedAtIsExplicitlySet_RetainsOriginalDate));
-            OracleDemoItemService service = new(context);
-            DateTime explicitDate = new(2025, 1, 1, 12, 0, 0, DateTimeKind.Utc);
-            OracleDemoItem item = new() { Name = "ExplicitDateItem", CreatedAt = explicitDate };
-
-            await service.CreateItemAsync(item);
-
-            OracleDemoItem? saved = await context.OracleDemoItems.FirstOrDefaultAsync(i => i.Name == "ExplicitDateItem");
-            Assert.NotNull(saved);
-            Assert.Equal(explicitDate, saved.CreatedAt);
         }
 
         [Fact]
@@ -130,11 +121,11 @@ namespace DotNetMvcWeb.Tests.Services
 
             context.Entry(item).State = EntityState.Detached;
 
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
             item.Name = "UpdatedName";
             item.Description = "UpdatedDesc";
 
-            await service.UpdateItemAsync(item);
+            await repository.UpdateItemAsync(item);
 
             OracleDemoItem? updated = await context.OracleDemoItems.FindAsync(20);
             Assert.NotNull(updated);
@@ -149,9 +140,9 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoItems.Add(new OracleDemoItem { Id = 30, Name = "ItemToDelete" });
             await context.SaveChangesAsync();
 
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await service.DeleteItemAsync(30);
+            await repository.DeleteItemAsync(30);
 
             Assert.Null(await context.OracleDemoItems.FindAsync(30));
         }
@@ -160,9 +151,9 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task DeleteItemAsync_WhenNotExists_DoesNothing()
         {
             using AppDbContext context = CreateDbContext(nameof(DeleteItemAsync_WhenNotExists_DoesNothing));
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await service.DeleteItemAsync(999);
+            await repository.DeleteItemAsync(999);
         }
 
         [Fact]
@@ -172,19 +163,19 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoItems.Add(new OracleDemoItem { Id = 40, Name = "ExistingItem" });
             await context.SaveChangesAsync();
 
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            Assert.True(service.ItemExists(40));
-            Assert.False(service.ItemExists(999));
+            Assert.True(repository.ItemExists(40));
+            Assert.False(repository.ItemExists(999));
         }
 
         [Fact]
         public async Task GetItemsViaAdoNetAsync_WhenNoConnectionString_ThrowsInvalidOperationException()
         {
             using AppDbContext context = CreateDbContext(nameof(GetItemsViaAdoNetAsync_WhenNoConnectionString_ThrowsInvalidOperationException));
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() => service.GetItemsViaAdoNetAsync("kw"));
+            await Assert.ThrowsAsync<InvalidOperationException>(() => repository.GetItemsViaAdoNetAsync("kw"));
         }
 
         [Theory]
@@ -193,31 +184,18 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task GetItemsViaAdoNetAsync_WithConnectionString_AttemptsConnectionAndHandlesException(string? keyword)
         {
             using AppDbContext context = CreateRelationalDbContext();
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.GetItemsViaAdoNetAsync(keyword));
+            await Assert.ThrowsAnyAsync<Exception>(() => repository.GetItemsViaAdoNetAsync(keyword));
         }
 
         [Fact]
         public async Task UpdateItemDescriptionViaProcAsync_AttemptsExecution()
         {
             using AppDbContext context = CreateRelationalDbContext();
-            OracleDemoItemService service = new(context);
+            OracleDemoItemRepository repository = new(context);
 
-            await Assert.ThrowsAnyAsync<Exception>(() => service.UpdateItemDescriptionViaProcAsync(1, "New Description"));
-        }
-
-        [Fact]
-        public async Task CreateItemAsync_WithMockRepository_SetsUtcTimestampAndCallsAdd()
-        {
-            Mock<IOracleDemoItemRepository> repoMock = new();
-            OracleDemoItemService service = new(repoMock.Object);
-            OracleDemoItem item = new() { Name = "MockItem" };
-
-            await service.CreateItemAsync(item);
-
-            Assert.NotEqual(default, item.CreatedAt);
-            repoMock.Verify(r => r.AddItemAsync(item), Times.Once);
+            await Assert.ThrowsAnyAsync<Exception>(() => repository.UpdateItemDescriptionViaProcAsync(1, "New Description"));
         }
     }
 }

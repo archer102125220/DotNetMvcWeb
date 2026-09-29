@@ -1,21 +1,28 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
-using DotNetMvcWeb.Repositories.Interfaces;
-using DotNetMvcWeb.Services.Implements;
+using DotNetMvcWeb.Repositories.Implements;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 
-namespace DotNetMvcWeb.Tests.Services
+namespace DotNetMvcWeb.Tests.Repositories
 {
-    public class OracleDemoCategoryServiceTests
+    public class OracleDemoCategoryRepositoryTests
     {
         private AppDbContext CreateDbContext(string dbName)
         {
             DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: dbName)
+                .UseInMemoryDatabase(databaseName: $"{dbName}_{Guid.NewGuid()}")
                 .Options;
             return new AppDbContext(options);
+        }
+
+        [Fact]
+        public void Constructor_WhenContextNull_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new OracleDemoCategoryRepository(null!));
         }
 
         [Fact]
@@ -29,9 +36,9 @@ namespace DotNetMvcWeb.Tests.Services
             );
             await context.SaveChangesAsync();
 
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            List<OracleDemoCategory> result = await service.GetCategoriesAsync();
+            List<OracleDemoCategory> result = await repository.GetCategoriesAsync();
 
             Assert.Equal(2, result.Count);
             Assert.Equal(2, result[0].Id);
@@ -44,9 +51,9 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoCategories.Add(new OracleDemoCategory { Id = 10, Name = "Cat10" });
             await context.SaveChangesAsync();
 
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            OracleDemoCategory? result = await service.GetCategoryByIdAsync(10);
+            OracleDemoCategory? result = await repository.GetCategoryByIdAsync(10);
 
             Assert.NotNull(result);
             Assert.Equal("Cat10", result.Name);
@@ -56,25 +63,24 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task GetCategoryByIdAsync_WhenNotExists_ReturnsNull()
         {
             using AppDbContext context = CreateDbContext(nameof(GetCategoryByIdAsync_WhenNotExists_ReturnsNull));
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            OracleDemoCategory? result = await service.GetCategoryByIdAsync(999);
+            OracleDemoCategory? result = await repository.GetCategoryByIdAsync(999);
 
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task CreateCategoryAsync_SetsCreatedAtAndAddsEntity()
+        public async Task AddCategoryAsync_AddsEntity()
         {
-            using AppDbContext context = CreateDbContext(nameof(CreateCategoryAsync_SetsCreatedAtAndAddsEntity));
-            OracleDemoCategoryService service = new(context);
-            OracleDemoCategory newCat = new() { Name = "NewCat" };
+            using AppDbContext context = CreateDbContext(nameof(AddCategoryAsync_AddsEntity));
+            OracleDemoCategoryRepository repository = new(context);
+            OracleDemoCategory newCat = new() { Name = "NewCat", CreatedAt = DateTime.UtcNow };
 
-            await service.CreateCategoryAsync(newCat);
+            await repository.AddCategoryAsync(newCat);
 
             OracleDemoCategory? saved = await context.OracleDemoCategories.FirstOrDefaultAsync(c => c.Name == "NewCat");
             Assert.NotNull(saved);
-            Assert.NotEqual(default, saved.CreatedAt);
         }
 
         [Fact]
@@ -87,10 +93,10 @@ namespace DotNetMvcWeb.Tests.Services
 
             context.Entry(cat).State = EntityState.Detached;
 
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
             cat.Name = "Modified";
 
-            await service.UpdateCategoryAsync(cat);
+            await repository.UpdateCategoryAsync(cat);
 
             OracleDemoCategory? updated = await context.OracleDemoCategories.FindAsync(20);
             Assert.NotNull(updated);
@@ -104,9 +110,9 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoCategories.Add(new OracleDemoCategory { Id = 30, Name = "ToDelete" });
             await context.SaveChangesAsync();
 
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            await service.DeleteCategoryAsync(30);
+            await repository.DeleteCategoryAsync(30);
 
             Assert.Null(await context.OracleDemoCategories.FindAsync(30));
         }
@@ -115,9 +121,9 @@ namespace DotNetMvcWeb.Tests.Services
         public async Task DeleteCategoryAsync_WhenNotExists_DoesNothing()
         {
             using AppDbContext context = CreateDbContext(nameof(DeleteCategoryAsync_WhenNotExists_DoesNothing));
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            await service.DeleteCategoryAsync(999);
+            await repository.DeleteCategoryAsync(999);
         }
 
         [Fact]
@@ -127,23 +133,10 @@ namespace DotNetMvcWeb.Tests.Services
             context.OracleDemoCategories.Add(new OracleDemoCategory { Id = 40, Name = "ExistCat" });
             await context.SaveChangesAsync();
 
-            OracleDemoCategoryService service = new(context);
+            OracleDemoCategoryRepository repository = new(context);
 
-            Assert.True(service.CategoryExists(40));
-            Assert.False(service.CategoryExists(999));
-        }
-
-        [Fact]
-        public async Task CreateCategoryAsync_WithMockRepository_SetsUtcTimestampAndCallsAdd()
-        {
-            Mock<IOracleDemoCategoryRepository> repoMock = new();
-            OracleDemoCategoryService service = new(repoMock.Object);
-            OracleDemoCategory category = new() { Name = "MockCat" };
-
-            await service.CreateCategoryAsync(category);
-
-            Assert.NotEqual(default, category.CreatedAt);
-            repoMock.Verify(r => r.AddCategoryAsync(category), Times.Once);
+            Assert.True(repository.CategoryExists(40));
+            Assert.False(repository.CategoryExists(999));
         }
     }
 }

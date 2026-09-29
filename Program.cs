@@ -1,4 +1,6 @@
 using DotNetMvcWeb.Middlewares;
+using DotNetMvcWeb.Repositories.Implements;
+using DotNetMvcWeb.Repositories.Interfaces;
 using DotNetMvcWeb.Services.Implements;
 using DotNetMvcWeb.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,11 @@ builder.Services.AddDbContext<DotNetMvcWeb.Data.PostgresDbContext>(options =>
 
 builder.Services.AddDbContext<DotNetMvcWeb.Data.MssqlDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MssqlDemoConnection")!));
+
+// [教學註解] 註冊自訂的 Repositories (倉儲層)
+// AddScoped 確保每個 HTTP 請求共用同一實例，與 DbContext 的 Scoped 生命週期完美一致。
+builder.Services.AddScoped<IOracleDemoCategoryRepository, OracleDemoCategoryRepository>();
+builder.Services.AddScoped<IOracleDemoItemRepository, OracleDemoItemRepository>();
 
 // [教學註解] 註冊自訂的 Services
 // AddScoped 表示「每一個 HTTP 請求 (Request)」都會產生一個新的 Service 實例。

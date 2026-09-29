@@ -1,67 +1,68 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DotNetMvcWeb.Data;
 using DotNetMvcWeb.Models;
+using DotNetMvcWeb.Repositories.Implements;
+using DotNetMvcWeb.Repositories.Interfaces;
 using DotNetMvcWeb.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace DotNetMvcWeb.Services.Implements
 {
     /// <summary>
     /// [教學註解] 服務層實作 (Service Implementation)
-    /// 這裡是實際處理商業邏輯與資料庫互動的地方。將原本寫在 Controller 裡的 DbContext 操作全部集中於此。
-    /// 這種做法稱為「Service Layer Pattern」或是簡化版的 Repository Pattern。
+    /// 負責處理商業邏輯與規則，不再直接存取 DbContext，而是透過注入 IOracleDemoCategoryRepository 進行資料存取。
+    /// 這種架構分層為：Controller -> Service (業務邏輯) -> Repository (資料存取) -> DbContext。
     /// </summary>
     public class OracleDemoCategoryService : IOracleDemoCategoryService
     {
-        private readonly AppDbContext _context;
+        private readonly IOracleDemoCategoryRepository _categoryRepository;
 
-        public OracleDemoCategoryService(AppDbContext context)
+        // DI 容器優先注入的建構子
+        public OracleDemoCategoryService(IOracleDemoCategoryRepository categoryRepository)
         {
-            _context = context;
+            ArgumentNullException.ThrowIfNull(categoryRepository);
+            _categoryRepository = categoryRepository;
+        }
+
+        // 提供給既有單元測試或需要直接傳入 DbContext 的便利建構子 (向下相容)
+        public OracleDemoCategoryService(AppDbContext context)
+            : this(new OracleDemoCategoryRepository(context))
+        {
         }
 
         public async Task<List<OracleDemoCategory>> GetCategoriesAsync()
         {
-            return await _context.OracleDemoCategories
-                .AsNoTracking()
-                .OrderByDescending(c => c.CreatedAt)
-                .ToListAsync();
+            return await _categoryRepository.GetCategoriesAsync();
         }
 
         public async Task<OracleDemoCategory?> GetCategoryByIdAsync(int id)
         {
-            return await _context.OracleDemoCategories.FindAsync(id);
+            return await _categoryRepository.GetCategoryByIdAsync(id);
         }
 
         public async Task CreateCategoryAsync(OracleDemoCategory category)
         {
+            ArgumentNullException.ThrowIfNull(category);
+            // 商業邏輯：建立時自動指派 UTC 建立時間
             category.CreatedAt = DateTime.UtcNow;
-            _context.Add(category);
-            await _context.SaveChangesAsync();
+            await _categoryRepository.AddCategoryAsync(category);
         }
 
         public async Task UpdateCategoryAsync(OracleDemoCategory category)
         {
-            _context.Update(category);
-            await _context.SaveChangesAsync();
+            ArgumentNullException.ThrowIfNull(category);
+            await _categoryRepository.UpdateCategoryAsync(category);
         }
 
         public async Task DeleteCategoryAsync(int id)
         {
-            OracleDemoCategory? item = await _context.OracleDemoCategories.FindAsync(id);
-            if (item != null)
-            {
-                _context.OracleDemoCategories.Remove(item);
-                await _context.SaveChangesAsync();
-            }
+            await _categoryRepository.DeleteCategoryAsync(id);
         }
 
         public bool CategoryExists(int id)
         {
-            return _context.OracleDemoCategories.Any(e => e.Id == id);
+            return _categoryRepository.CategoryExists(id);
         }
     }
 }
