@@ -8,7 +8,7 @@
 - 📜 **[AI 開發指南 / 規範 (AI_CODING_GUIDELINES.md)](./AI_CODING_GUIDELINES.md)**
   - 給 AI 以及開發者的程式碼撰寫與最佳實踐準則。
 - 🏗️ **[專案架構說明 (PROJECT_STRUCTURE.md)](./PROJECT_STRUCTURE.md)**
-  - 介紹 MVC 專案的目錄結構及各資料夾的作用。
+  - 介紹 MVC 專案的目錄結構、各資料夾的作用，以及本專案中 Service Layer vs Repository Pattern 的架構對照。
 - 📐 **[Models 開發規範與指南 (MODELS_GUIDELINE.md)](./MODELS_GUIDELINE.md)**
   - 包含 Entity, ViewModel, DTO 等 Models 的設計與驗證規範。
 - 🧩 **[C# 擴充方法教學與使用指南 (csharp-extensions-guide.md)](./csharp-extensions-guide.md)**
@@ -46,7 +46,7 @@
 - ⚖️ **[ORM 架構比較 (orm-architecture-comparison.md)](./orm-architecture-comparison.md)**
   - 詳細對比了 Entity Framework Core 與 Dapper 的差異以及各自的使用情境。
 - 🛢️ **[Oracle MVC 整合 Demo 指南 (oracle-mvc-demo-guide.md)](./oracle-mvc-demo-guide.md)**
-  - 介紹如何結合 EF Core、Oracle 資料庫與前端 HTMX 實現無重整的 CRUD 操作，以及在 ASP.NET Core MVC 中操作 Oracle 的示範。
+  - 介紹如何結合 3-Tier + Repository Pattern、EF Core、Oracle 資料庫與前端 HTMX 實現無重整的 CRUD 操作。
 - 🔌 **[Oracle API 開發指南 (oracle-api-guide.md)](./oracle-api-guide.md)**
   - 提供給前端 (Vue, React, Nuxt) 串接的純 JSON RESTful API 使用說明與端點介紹。
 - ⌨️ **[Oracle 資料庫指令指南 (oracle-database-commands-guide.md)](./oracle-database-commands-guide.md)**

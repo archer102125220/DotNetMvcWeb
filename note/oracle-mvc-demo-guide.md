@@ -9,15 +9,31 @@
 
 ## 1. 核心架構概覽
 
-這個示範模組完全遵循標準的 MVC (Model-View-Controller) 架構：
+本示範模組採用企業級常見的 **3-Tier + Repository Pattern（三層式倉儲架構）**，落實關注點分離 (Separation of Concerns)：
+
+```text
+Controller (HTTP/View)
+  └── Service (商業邏輯)
+        └── Repository (資料存取)
+              └── AppDbContext / 原生 ADO.NET (Oracle)
+```
 
 ### 📦 Model (資料模型)
-* **`Models/OracleDemoItem.cs`**：定義了資料庫中 `OracleDemoItems` 資料表的結構（包含 `Id`, `Name`, `Description`, `CreatedAt`）。
-* **`Data/AppDbContext.cs`**：負責定義與 Oracle 資料庫的連線上下文，以及包含 `HasData` (Seed Data) 的靜態設定。
+* **`Models/OracleDemoItem.cs`**：定義了資料庫中 `OracleDemoItems` 資料表的結構（包含 `Id`, `Name`, `Description`, `CreatedAt`, `CategoryId`）。
+* **`Data/AppDbContext.cs`**：負責定義與 Oracle 資料庫的連線上下文，以及包含 `HasData` (Seed Data) 的設定。
+
+### 🗄️ Repository (倉儲層)
+* **`Repositories/Interfaces/IOracleDemoItemRepository.cs`** & **`OracleDemoItemRepository.cs`**：
+  * 專職負責與資料庫溝通，封裝了 **EF Core LINQ 查詢**、**安全原生 SQL (`FromSqlInterpolated`)**、**原生 ADO.NET 流式讀取** 與 **預存程序 (`SP_UPDATE_ITEM_DESCRIPTION`)**。
+  * 透過 `.AsNoTracking()` 與非同步方法 (`ToListAsync()`) 最佳化效能。
+
+### ⚙️ Service (服務層)
+* **`Services/Interfaces/IOracleDemoItemService.cs`** & **`OracleDemoItemService.cs`**：
+  * 專責處理商業邏輯（例如：自動指派建立時間戳記、業務檢核），並將資料存取委派給 `IOracleDemoItemRepository`。
+  * 這種分層使得 Service 可以在單元測試中使用 `Moq` 徹底隔離資料庫。
 
 ### 🎮 Controller (控制器)
-* **`Controllers/OracleDemoController.cs`**：負責處理所有的 HTTP 請求 (CRUD)。
-* 在這個控制器中，我們大量使用了 `async / await` 以及 EF Core 的 `.AsNoTracking()` 來最佳化讀取效能。
+* **`Controllers/OracleDemoController.cs`**：負責處理所有的 HTTP 請求 (CRUD)，透過建構子注入 `IOracleDemoItemService`，不直接與資料庫 ORM 打交道。
 
 ### 🖼️ View (畫面視圖)
 * **`Views/OracleDemo/Index.cshtml`**：主頁面。負責載入框架與基本版面，並引用了 HTMX。
@@ -60,7 +76,7 @@ return PartialView("_CreateOrEdit", item);
 本模組示範了如何同時結合「後端 EF Core 原生 SQL」與「前端 HTMX 即時搜尋」：
 
 ### 後端實作：安全的 Raw SQL
-在 `OracleDemoController.cs` 中，我們示範了如何透過 `FromSqlInterpolated` 來執行原生的 Oracle SQL 查詢：
+在 `OracleDemoItemRepository.cs` 中，我們示範了如何透過 `FromSqlInterpolated` 來執行原生的 Oracle SQL 查詢：
 ```csharp
 var searchPattern = $"%{keyword}%";
 return await _context.OracleDemoItems

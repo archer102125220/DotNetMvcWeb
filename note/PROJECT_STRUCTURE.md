@@ -31,6 +31,33 @@
 - **用途**：存放與專案執行、建置或發佈相關的設定。
 - **重要檔案 (`launchSettings.json`)**：定義了在開發環境下啟動專案的設定，包括本機伺服器的 Port 號、環境變數 (`ASPNETCORE_ENVIRONMENT`) 等。
 
+### 6. `Services/` (商業邏輯服務層)
+- **用途**：負責處理系統的商業邏輯規則 (Business Logic) 與流程調度（例如：時間戳記指派、跨實體檢核）。
+- **架構設計**：
+  - `Interfaces/`：服務介面定義（例如 `IOracleDemoItemService.cs`），讓 Controller 只依賴抽象介面。
+  - `Implements/`：具體實作類別。
+
+### 7. `Repositories/` (資料存取倉儲層)
+- **用途**：專職負責與資料庫的資料存取 (Data Access)，將 EF Core LINQ、原生 SQL、ADO.NET 連線及預存程序完整封裝，不讓底層資料庫細節滲透到商業層。
+- **架構設計**：
+  - `Interfaces/`：倉儲介面定義（例如 `IOracleDemoItemRepository.cs`）。
+  - `Implements/`：具體實作類別（例如 `OracleDemoItemRepository.cs`）。
+
+### 8. `Data/` (資料庫上下文)
+- **用途**：存放 Entity Framework Core 的 `DbContext` 類別（如 `AppDbContext`、`MysqlDbContext` 等），管理實體與資料表的映射關聯及連線組態。
+
+---
+
+## 🏛️ 本專案架構設計：兩種分層模式對照
+
+為了提供最佳的學習體驗，本專案在不同的資料庫示範模組中，同時展示了業界常見的兩種架構風格：
+
+| 架構模式 | 適用模組 | 呼叫流程 (Data Flow) | 特點與適用情境 |
+| :--- | :--- | :--- | :--- |
+| **Service Layer Pattern**<br>*(簡化版 Repository)* | MSSQL<br>MySQL<br>PostgreSQL | `Controller` $\to$ `Service` $\to$ `DbContext` | 輕量直覺，由 Service 同時處理業務邏輯並操作 `DbContext`，適合中小型專案或原型開發。 |
+| **3-Tier + Repository Pattern**<br>*(標準倉儲架構)* | Oracle | `Controller` $\to$ `Service` $\to$ `Repository` $\to$ `DbContext` | 職責徹底解耦。Service 只管業務規則，Repository 專責資料存取，便於使用 `Moq` 進行純粹的單元測試，適合大型企業級系統。 |
+
+
 ---
 
 ## ⚙️ 重要設定檔
