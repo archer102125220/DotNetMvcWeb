@@ -43,19 +43,25 @@
   - `Interfaces/`：倉儲介面定義（例如 `IOracleDemoItemRepository.cs`）。
   - `Implements/`：具體實作類別（例如 `OracleDemoItemRepository.cs`）。
 
-### 8. `Data/` (資料庫上下文)
+### 8. `Domain/` (領域核心層 - 領域驅動/整潔架構)
+- **用途**：系統的核心業務領域模型與規則，獨立於任何 UI、資料庫 (EF Core) 或第三方套件。
+- **說明**：包含富領域實體 (Rich Entities)、值物件 (Value Objects)、業務異常 (Exceptions) 以及領域倉儲介面 (Domain Repository Interfaces)。
+- **原則**：業務邏輯內聚於實體自身（例如 `wallet.Withdraw(amount)`），而非外溢於 Service 之中。
+
+### 9. `Data/` (資料庫上下文)
 - **用途**：存放 Entity Framework Core 的 `DbContext` 類別（如 `AppDbContext`、`MysqlDbContext` 等），管理實體與資料表的映射關聯及連線組態。
 
 ---
 
-## 🏛️ 本專案架構設計：兩種分層模式對照
+## 🏛️ 本專案架構設計：三種分層模式對照
 
-為了提供最佳的學習體驗，本專案在不同的資料庫示範模組中，同時展示了業界常見的兩種架構風格：
+為了提供最佳的學習體驗，本專案在不同的資料庫示範模組中，同時展示了業界常見的三種架構風格：
 
 | 架構模式 | 適用模組 | 呼叫流程 (Data Flow) | 特點與適用情境 |
 | :--- | :--- | :--- | :--- |
 | **Service Layer Pattern**<br>*(簡化版 Repository)* | MSSQL<br>MySQL<br>PostgreSQL | `Controller` $\to$ `Service` $\to$ `DbContext` | 輕量直覺，由 Service 同時處理業務邏輯並操作 `DbContext`，適合中小型專案或原型開發。 |
-| **3-Tier + Repository Pattern**<br>*(標準倉儲架構)* | Oracle | `Controller` $\to$ `Service` $\to$ `Repository` $\to$ `DbContext` | 職責徹底解耦。Service 只管業務規則，Repository 專責資料存取，便於使用 `Moq` 進行純粹的單元測試，適合大型企業級系統。 |
+| **3-Tier + Repository Pattern**<br>*(傳統標準倉儲架構)* | Oracle (`OracleDemo`) | `Controller` $\to$ `Service` $\to$ `Repository` $\to$ `DbContext` | 職責解耦。Service 管流程與資料組裝，Repository 管資料存取。實體為貧血模型 (Anemic Model)，適合資料導向的 CRUD 企業系統。 |
+| **Domain-Driven Pattern**<br>*(現代領域驅動架構)* | 錢包交易 (`Wallet`) | `Controller` $\to$ `Service` $\to$ `Domain (Rich Entity)` $\to$ `Repository` $\to$ `DbContext` | 核心業務規則收斂於 Domain 實體自身，倉儲介面定義於 Domain 層 (依賴反轉 DIP)。具備高內聚、極高單元測試便利性，適合業務邏輯複雜的核心模組。 |
 
 
 ---
