@@ -23,10 +23,31 @@ namespace DotNetMvcWeb.Data
         /// </summary>
         public DbSet<Models.OracleDemoCategory> OracleDemoCategories { get; set; } = null!;
 
+        /// <summary>
+        /// 定義數位錢包 (Wallet) 領域聚合根對應的資料表
+        /// </summary>
+        public DbSet<Domain.Wallets.Entities.Wallet> Wallets { get; set; } = null!;
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // 設定 Wallet 領域實體的持久化屬性
+            modelBuilder.Entity<Domain.Wallets.Entities.Wallet>(entity =>
+            {
+                entity.HasKey(w => w.Id);
+                entity.Property(w => w.OwnerId)
+                    .IsRequired()
+                    .HasMaxLength(100);
+                entity.Property(w => w.Balance)
+                    .HasPrecision(18, 2)
+                    .IsRequired();
+                entity.Property(w => w.CreatedAtUtc)
+                    .IsRequired();
+                entity.Property(w => w.UpdatedAtUtc)
+                    .IsRequired();
+            });
 
             // 可以在此處設定資料表欄位的進階限制或關聯
             // 例如限制 Name 欄位必填且最大長度為 200
