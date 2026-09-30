@@ -1,0 +1,100 @@
+@model DotNetMvcWeb.Models.ViewModels.WalletViewModel
+@{
+    ViewData["Title"] = "數位錢包 (DDD 領域驅動架構示範)";
+}
+
+<div class="wallet_page container py-4">
+    <!-- 頁面標題與架構標註區 -->
+    <div class="wallet_page-header mb-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">
+                Architecture Demo: Domain-Driven Pattern
+            </span>
+            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                對照組：傳統三層式 (OracleDemo)
+            </span>
+        </div>
+        <h2 class="display-6 fw-bold text-dark">數位錢包交易示範 (Wallet DDD)</h2>
+        <p class="text-muted">
+            本頁面展示<strong>「富領域模型 (Rich Domain Model)」</strong>如何自行捍衛業務不變性約束（禁止負數交易、禁止超額扣款）。
+            操作透過 <code>HTMX</code> 局部刷新，核心業務例外直接由 <code>Domain.Wallets.Exceptions</code> 拋出並處理。
+        </p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- 錢包卡片顯示區域 (HTMX 刷新容器) -->
+        <div class="col-lg-6">
+            <div id="wallet-card-container">
+                <partial name="_WalletCard" model="Model" />
+            </div>
+
+            <!-- 架構說明小卡 -->
+            <div class="card border-0 bg-light-subtle rounded-4 p-4 mt-4 shadow-sm">
+                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>領域驅動 (DDD) 設計要點</h5>
+                <ul class="text-muted small ps-3 mb-0 d-flex flex-column gap-2">
+                    <li><strong>業務規則守門員</strong>：<code>Wallet.Withdraw()</code> 實體內部自行檢查餘額，不用在 Service 重複撰寫防禦邏輯。</li>
+                    <li><strong>狀態封裝</strong>：餘額 <code>Balance</code> 為 <code>private set</code>，任何人都無法在外部直接修改。</li>
+                    <li><strong>依賴反轉 DIP</strong>：<code>IWalletRepository</code> 介面開在 <code>Domain</code> 層，讓資料庫技術依賴業務核心。</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 儲值與扣款操作區域 -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h5 class="fw-bold mb-4">錢包操作面板 (HTMX 局部刷新)</h5>
+
+                <!-- 儲值表單 -->
+                <div class="action_form mb-4 p-3 bg-light rounded-3">
+                    <h6 class="fw-semibold text-success mb-3">
+                        <i class="bi bi-plus-circle me-1"></i> 儲值 (Deposit)
+                    </h6>
+                    <form hx-post="/Wallet/Deposit"
+                          hx-target="#wallet-card-container"
+                          hx-swap="innerHTML"
+                          class="row g-2 align-items-center">
+                        @Html.AntiForgeryToken()
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">NT$</span>
+                                <input type="number" name="amount" class="form-control" placeholder="請輸入儲值金額" min="1" step="100" value="500" required />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-success w-100 fw-semibold">
+                                執行儲值
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 扣款表單 -->
+                <div class="action_form p-3 bg-light rounded-3">
+                    <h6 class="fw-semibold text-danger mb-3">
+                        <i class="bi bi-dash-circle me-1"></i> 扣款 / 消費 (Withdraw)
+                    </h6>
+                    <form hx-post="/Wallet/Withdraw"
+                          hx-target="#wallet-card-container"
+                          hx-swap="innerHTML"
+                          class="row g-2 align-items-center">
+                        @Html.AntiForgeryToken()
+                        <div class="col-sm-8">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">NT$</span>
+                                <input type="number" name="amount" class="form-control" placeholder="請輸入扣款金額" min="1" step="100" value="300" required />
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-danger w-100 fw-semibold">
+                                執行扣款
+                            </button>
+                        </div>
+                    </form>
+                    <div class="form-text mt-2 text-muted small">
+                        💡 <strong>測試業務異常</strong>：輸入大於當前餘額的數值（如 99,999），觀察 Domain 如何主動拒絕並觸發 <code>InsufficientBalanceException</code>。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

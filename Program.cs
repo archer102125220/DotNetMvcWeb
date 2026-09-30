@@ -47,6 +47,9 @@ builder.Services.AddScoped<IMysqlDemoCategoryService, MysqlDemoCategoryService>(
 builder.Services.AddScoped<IPostgresDemoItemService, PostgresDemoItemService>();
 builder.Services.AddScoped<IPostgresDemoCategoryService, PostgresDemoCategoryService>();
 
+// [教學註解] 註冊 Domain 模式的 Wallet 應用服務
+builder.Services.AddScoped<IWalletService, WalletService>();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
