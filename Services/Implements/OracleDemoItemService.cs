@@ -19,15 +19,15 @@ namespace DotNetMvcWeb.Services.Implements
     {
         private readonly IOracleDemoItemRepository _itemRepository;
 
-        // DI 容器優先注入的建構子
+        // DI 容器使用的唯一 public 建構子
         public OracleDemoItemService(IOracleDemoItemRepository itemRepository)
         {
             ArgumentNullException.ThrowIfNull(itemRepository);
             _itemRepository = itemRepository;
         }
 
-        // 提供給既有單元測試或需要直接傳入 DbContext 的便利建構子 (向下相容)
-        public OracleDemoItemService(AppDbContext context)
+        // 提供給既有單元測試直接傳入 DbContext 的便利建構子 (設為 internal 避免 DI 歧義)
+        internal OracleDemoItemService(AppDbContext context)
             : this(new OracleDemoItemRepository(context))
         {
         }

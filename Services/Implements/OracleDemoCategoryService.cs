@@ -18,15 +18,15 @@ namespace DotNetMvcWeb.Services.Implements
     {
         private readonly IOracleDemoCategoryRepository _categoryRepository;
 
-        // DI 容器優先注入的建構子
+        // DI 容器使用的唯一 public 建構子
         public OracleDemoCategoryService(IOracleDemoCategoryRepository categoryRepository)
         {
             ArgumentNullException.ThrowIfNull(categoryRepository);
             _categoryRepository = categoryRepository;
         }
 
-        // 提供給既有單元測試或需要直接傳入 DbContext 的便利建構子 (向下相容)
-        public OracleDemoCategoryService(AppDbContext context)
+        // 提供給既有單元測試直接傳入 DbContext 的便利建構子 (設為 internal 避免 DI 歧義)
+        internal OracleDemoCategoryService(AppDbContext context)
             : this(new OracleDemoCategoryRepository(context))
         {
         }
